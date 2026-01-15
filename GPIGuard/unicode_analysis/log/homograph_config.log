@@ -1,0 +1,19 @@
+2025-09-19 11:50:09,652 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-19 11:50:09,655 - HomographConfig - INFO - 同形异义字符配置已加载，包含 6355 个混淆字符
+2025-09-19 14:25:37,319 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-19 14:25:37,322 - HomographConfig - INFO - 同形异义字符配置已加载，包含 6355 个混淆字符
+2025-09-19 14:40:00,175 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-19 14:40:00,178 - HomographConfig - INFO - 同形异义字符配置已加载，包含 6355 个混淆字符
+2025-09-19 16:52:53,554 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-19 16:52:53,554 - HomographConfig - INFO - 同形异义字符配置已加载，包含 0 个混淆字符
+2025-09-19 16:53:33,958 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-19 16:53:33,958 - HomographConfig - INFO - 同形异义字符配置已加载，包含 0 个混淆字符
+2025-09-19 17:07:51,682 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-19 17:07:51,682 - HomographConfig - INFO - 使用latin_related_confusables数据结构
+2025-09-19 17:07:51,683 - HomographConfig - INFO - 同形异义字符配置已加载，包含 1800 个混淆字符
+2025-09-23 14:46:28,391 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-23 14:46:28,393 - HomographConfig - INFO - 同形异义字符配置已加载，包含 5963 个混淆字符
+2025-10-11 15:03:48,541 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-10-11 15:03:48,544 - HomographConfig - INFO - 同形异义字符配置已加载，包含 5963 个混淆字符
+2025-10-11 15:04:17,165 - HomographConfig - INFO - 成功加载confusables数据: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-10-11 15:04:17,169 - HomographConfig - INFO - 同形异义字符配置已加载，包含 5963 个混淆字符

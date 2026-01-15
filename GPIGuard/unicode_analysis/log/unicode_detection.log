@@ -1,0 +1,51 @@
+2025-09-08 17:18:21,063 - TargetUnicodeDetector - INFO - 初始化检测器，启用 1 个目标字符
+2025-09-08 17:19:19,299 - TargetUnicodeDetector - INFO - 初始化检测器，启用 6361 个目标字符
+2025-09-08 17:24:56,662 - TargetUnicodeDetector - INFO - 开始检测Unicode威胁，共 2857405 个字符
+2025-09-08 17:24:57,931 - TargetUnicodeDetector - INFO - 威胁检测完成，发现 209752 个威胁字符
+2025-09-08 17:25:25,505 - TargetUnicodeDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\unicode_threat_detections.json
+2025-09-08 17:25:53,178 - TargetUnicodeDetector - INFO - 类别 homograph_attacks 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\threats_homograph_attacks.json
+2025-09-08 17:25:53,186 - TargetUnicodeDetector - INFO - 类别 invisible_characters 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\threats_invisible_characters.json
+2025-09-08 17:25:53,192 - TargetUnicodeDetector - INFO - 类别 confusing_punctuation 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\threats_confusing_punctuation.json
+2025-09-08 17:25:53,322 - TargetUnicodeDetector - INFO - 检测报告已生成: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\unicode_threat_report.json
+2025-09-09 17:46:41,208 - TargetUnicodeDetector - INFO - 初始化检测器，启用 6370 个目标字符
+2025-09-11 15:56:54,206 - TargetUnicodeDetector - INFO - 初始化检测器，启用 6468 个目标字符
+2025-09-11 16:00:19,396 - TargetUnicodeDetector - INFO - 开始检测Unicode威胁，共 4771592 个字符
+2025-09-11 16:00:20,667 - TargetUnicodeDetector - INFO - 威胁检测完成，发现 174519 个威胁字符
+2025-09-11 16:00:31,275 - TargetUnicodeDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\unicode_threat_detections.json
+2025-09-11 16:00:41,939 - TargetUnicodeDetector - INFO - 类别 homograph_attacks 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\threats_homograph_attacks.json
+2025-09-11 16:00:41,993 - TargetUnicodeDetector - INFO - 类别 invisible_characters 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\threats_invisible_characters.json
+2025-09-11 16:00:42,010 - TargetUnicodeDetector - INFO - 类别 tag_characters 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\threats_tag_characters.json
+2025-09-11 16:00:42,046 - TargetUnicodeDetector - INFO - 类别 bidi_characters 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\threats_bidi_characters.json
+2025-09-11 16:00:42,127 - TargetUnicodeDetector - INFO - 检测报告已生成: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection\unicode_threat_report.json
+2025-09-11 17:19:21,913 - TargetUnicodeDetector - INFO - 初始化检测器，启用 6468 个目标字符
+2025-09-11 17:19:21,913 - TargetUnicodeDetector - INFO - 配置的数据源: twitter
+2025-09-11 17:19:22,100 - TargetUnicodeDetector - INFO - 开始检测Unicode威胁，共 3615 个字符
+2025-09-11 17:19:22,115 - TargetUnicodeDetector - INFO - 检测到数据源: twitter
+2025-09-11 17:19:22,115 - TargetUnicodeDetector - INFO - 威胁检测结果将保存到: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter
+2025-09-11 17:19:22,116 - TargetUnicodeDetector - INFO - 威胁检测完成，发现 122 个威胁字符
+2025-09-11 17:19:22,123 - TargetUnicodeDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\unicode_threat_detections.json
+2025-09-11 17:19:22,129 - TargetUnicodeDetector - INFO - 类别 homograph_attacks 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\threats_homograph_attacks.json
+2025-09-11 17:19:22,130 - TargetUnicodeDetector - INFO - 检测报告已生成: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\unicode_threat_report.json
+2025-09-12 17:09:37,201 - TargetUnicodeDetector - INFO - 初始化检测器，启用 6468 个目标字符
+2025-09-12 17:09:37,216 - TargetUnicodeDetector - INFO - 配置的数据源: twitter
+2025-09-12 17:09:37,601 - TargetUnicodeDetector - INFO - 开始检测Unicode威胁，共 3631 个字符
+2025-09-12 17:09:37,602 - TargetUnicodeDetector - INFO - 检测到数据源: twitter
+2025-09-12 17:09:37,602 - TargetUnicodeDetector - INFO - 威胁检测结果将保存到: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter
+2025-09-12 17:09:37,604 - TargetUnicodeDetector - INFO - 威胁字符检测完成，发现 113 个威胁字符
+2025-09-12 17:09:37,604 - TargetUnicodeDetector - INFO - 开始检测Unicode规范化威胁...
+2025-09-12 17:09:37,605 - TargetUnicodeDetector - INFO - 规范化威胁检测完成，发现 7 个规范化威胁
+2025-09-12 17:09:37,605 - TargetUnicodeDetector - INFO - 总威胁检测完成，共发现 120 个威胁
+2025-09-12 17:09:37,611 - TargetUnicodeDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\unicode_threat_detections.json
+2025-09-12 17:11:48,061 - TargetUnicodeDetector - INFO - 初始化检测器，启用 6468 个目标字符
+2025-09-12 17:11:48,061 - TargetUnicodeDetector - INFO - 配置的数据源: twitter
+2025-09-12 17:11:48,344 - TargetUnicodeDetector - INFO - 开始检测Unicode威胁，共 3631 个字符
+2025-09-12 17:11:48,346 - TargetUnicodeDetector - INFO - 检测到数据源: twitter
+2025-09-12 17:11:48,346 - TargetUnicodeDetector - INFO - 威胁检测结果将保存到: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter
+2025-09-12 17:11:48,347 - TargetUnicodeDetector - INFO - 威胁字符检测完成，发现 113 个威胁字符
+2025-09-12 17:11:48,347 - TargetUnicodeDetector - INFO - 开始检测Unicode规范化威胁...
+2025-09-12 17:11:48,348 - TargetUnicodeDetector - INFO - 规范化威胁检测完成，发现 7 个规范化威胁
+2025-09-12 17:11:48,348 - TargetUnicodeDetector - INFO - 总威胁检测完成，共发现 120 个威胁
+2025-09-12 17:11:48,356 - TargetUnicodeDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\unicode_threat_detections.json
+2025-09-12 17:11:48,362 - TargetUnicodeDetector - INFO - 类别 homograph_attacks 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\threats_homograph_attacks.json
+2025-09-12 17:11:48,364 - TargetUnicodeDetector - INFO - 类别 unicode_normalization 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\threats_unicode_normalization.json
+2025-09-12 17:11:48,365 - TargetUnicodeDetector - INFO - 检测报告已生成: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\threat_detection_twitter\unicode_threat_report.json

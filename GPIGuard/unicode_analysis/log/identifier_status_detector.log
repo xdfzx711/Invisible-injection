@@ -1,0 +1,130 @@
+2025-09-15 15:59:56,462 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-15 16:00:05,246 - IdentifierStatusDetector - INFO - 检测完成，发现 905802 个问题字符
+2025-09-15 16:00:05,247 - IdentifierStatusDetector - INFO -   - 受限字符: 905802
+2025-09-15 16:00:05,247 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-15 16:00:50,853 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detections_identifier_status.json (905802 条记录)
+2025-09-15 16:00:50,912 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detection_summary.json
+2025-09-15 16:15:15,039 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-15 16:15:19,885 - IdentifierStatusDetector - INFO - 检测完成，发现 69718 个问题字符
+2025-09-15 16:15:19,885 - IdentifierStatusDetector - INFO -   - 受限字符: 69718
+2025-09-15 16:15:19,886 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-15 16:15:23,619 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detections_identifier_status.json (69718 条记录)
+2025-09-15 16:15:23,620 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detection_summary.json
+2025-09-15 16:30:39,592 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-15 16:30:46,611 - IdentifierStatusDetector - INFO - 检测完成，发现 785288 个问题字符
+2025-09-15 16:30:46,612 - IdentifierStatusDetector - INFO -   - 受限字符: 785288
+2025-09-15 16:30:46,612 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-15 16:31:30,397 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detections_identifier_status.json (785288 条记录)
+2025-09-15 16:31:30,398 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detection_summary.json
+2025-09-15 16:31:30,398 - IdentifierStatusDetector - INFO - 总体检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detection_overall_summary.json
+2025-09-15 16:40:55,949 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-15 16:41:00,566 - IdentifierStatusDetector - INFO - 检测完成，发现 13336 个问题字符
+2025-09-15 16:41:00,566 - IdentifierStatusDetector - INFO -   - 受限字符: 13336
+2025-09-15 16:41:00,567 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-15 16:41:01,276 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detections_identifier_status.json (13336 条记录)
+2025-09-15 16:41:01,276 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detection_summary.json
+2025-09-15 16:41:01,276 - IdentifierStatusDetector - INFO - 总体检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detection_overall_summary.json
+2025-09-15 17:01:59,865 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-15 17:02:04,566 - IdentifierStatusDetector - INFO - 检测完成，发现 12825 个问题字符
+2025-09-15 17:02:04,566 - IdentifierStatusDetector - INFO -   - 受限字符: 12825
+2025-09-15 17:02:04,566 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-15 17:02:05,243 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detections_identifier_status.json (12825 条记录)
+2025-09-15 17:02:05,243 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detection_summary.json
+2025-09-15 17:02:05,244 - IdentifierStatusDetector - INFO - 总体检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detection_overall_summary.json
+2025-09-15 17:30:35,062 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-15 17:30:39,868 - IdentifierStatusDetector - INFO - 检测完成，发现 12825 个问题字符
+2025-09-15 17:30:39,870 - IdentifierStatusDetector - INFO -   - 受限字符: 12825
+2025-09-15 17:30:39,870 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-15 17:30:40,545 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detections_identifier_status.json (12825 条记录)
+2025-09-15 17:30:40,546 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detection_summary.json
+2025-09-15 17:30:40,547 - IdentifierStatusDetector - INFO - 总体检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\identifier_status_detection_overall_summary.json
+2025-09-15 18:10:59,287 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-15 18:11:03,989 - IdentifierStatusDetector - INFO - 检测完成，发现 12825 个问题字符
+2025-09-15 18:11:03,989 - IdentifierStatusDetector - INFO -   - 受限字符: 12825
+2025-09-15 18:11:03,989 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-15 18:11:04,677 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detections_identifier_status.json (12825 条记录)
+2025-09-15 18:11:04,678 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detection_summary.json
+2025-09-16 14:49:48,264 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-16 14:49:48,273 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-16 14:49:48,273 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-16 14:49:48,273 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-16 14:49:48,277 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-16 14:49:48,278 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-16 15:14:13,871 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-16 15:14:13,881 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-16 15:14:13,881 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-16 15:14:13,881 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-16 15:14:13,886 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-16 15:14:13,886 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-16 16:13:19,001 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-16 16:13:19,023 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-16 16:13:19,023 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-16 16:13:19,024 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-16 16:13:19,055 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-16 16:13:19,056 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-16 16:17:20,467 - IdentifierStatusDetector - INFO - 开始检测 4771592 个字符的标识符状态
+2025-09-16 16:17:25,375 - IdentifierStatusDetector - INFO - 检测完成，发现 12825 个问题字符
+2025-09-16 16:17:25,376 - IdentifierStatusDetector - INFO -   - 受限字符: 12825
+2025-09-16 16:17:25,376 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-16 16:17:26,084 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detections_identifier_status.json (12825 条记录)
+2025-09-16 16:17:26,084 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_reddit\identifier_status_detection_summary.json
+2025-09-16 16:33:20,534 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-16 16:33:20,543 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-16 16:33:20,543 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-16 16:33:20,543 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-16 16:33:20,546 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-16 16:33:20,547 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-19 14:21:35,685 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-19 14:21:35,713 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-19 14:21:35,714 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-19 14:21:35,714 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-19 14:21:35,719 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-19 14:21:35,719 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-19 14:25:37,399 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-19 14:25:37,408 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-19 14:25:37,409 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-19 14:25:37,409 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-19 14:25:37,414 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-19 14:25:37,415 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-19 14:40:00,257 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-19 14:40:00,267 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-19 14:40:00,268 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-19 14:40:00,268 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-19 14:40:00,272 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-19 14:40:00,273 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-19 16:52:53,667 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-19 16:52:53,677 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-19 16:52:53,678 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-19 16:52:53,678 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-19 16:52:53,682 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-19 16:52:53,683 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-19 16:53:34,033 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-19 16:53:34,042 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-19 16:53:34,042 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-19 16:53:34,042 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-19 16:53:34,047 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-19 16:53:34,047 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-19 17:07:51,757 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-19 17:07:51,767 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-19 17:07:51,767 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-19 17:07:51,767 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-19 17:07:51,771 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-19 17:07:51,772 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-09-23 14:46:28,489 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-09-23 14:46:28,498 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-09-23 14:46:28,499 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-09-23 14:46:28,499 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-09-23 14:46:28,503 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-09-23 14:46:28,504 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json
+2025-10-11 15:01:54,988 - IdentifierStatusDetector - INFO - 开始检测 3 个字符的标识符状态
+2025-10-11 15:01:54,988 - IdentifierStatusDetector - INFO - 检测完成，发现 1 个问题字符
+2025-10-11 15:01:54,988 - IdentifierStatusDetector - INFO -   - 受限字符: 1
+2025-10-11 15:01:54,988 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-10-11 15:01:54,990 - IdentifierStatusDetector - INFO - 检测结果已保存: testscan_data\unicode_analysis\identifier_status_detections_identifier_status.json (1 条记录)
+2025-10-11 15:01:54,990 - IdentifierStatusDetector - INFO - 检测汇总已保存: testscan_data\unicode_analysis\identifier_status_detection_summary.json
+2025-10-11 15:04:17,290 - IdentifierStatusDetector - INFO - 开始检测 8222 个字符的标识符状态
+2025-10-11 15:04:17,299 - IdentifierStatusDetector - INFO - 检测完成，发现 88 个问题字符
+2025-10-11 15:04:17,300 - IdentifierStatusDetector - INFO -   - 受限字符: 88
+2025-10-11 15:04:17,300 - IdentifierStatusDetector - INFO -   - 规范化问题: 0
+2025-10-11 15:04:17,319 - IdentifierStatusDetector - INFO - 检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detections_identifier_status.json (88 条记录)
+2025-10-11 15:04:17,320 - IdentifierStatusDetector - INFO - 检测汇总已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\identifier_status_detection_summary.json

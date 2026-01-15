@@ -1,0 +1,10 @@
+2025-10-11 16:26:59,106 - WebScraper - INFO - 开始爬取网站: Google (https://google.com)
+2025-10-11 16:26:59,106 - WebScraper - INFO - 爬取页面: https://google.com
+2025-10-11 16:27:00,482 - WebScraper - INFO - 发现 4 个二级页面链接
+2025-10-11 16:27:02,672 - WebScraper - INFO - 爬取页面: https://google.com/search/howsearchworks/?fg=1
+2025-10-11 16:27:04,426 - WebScraper - INFO - 爬取页面: https://google.com/advanced_search?hl=ko&fg=1
+2025-10-11 16:27:05,068 - WebScraper - INFO - 网站爬取完成: Google, 成功页面: 3
+2025-10-11 16:27:06,075 - WebScraper - INFO - 开始爬取网站: Microsoft (https://microsoft.com)
+2025-10-11 16:27:06,075 - WebScraper - INFO - 爬取页面: https://microsoft.com
+2025-10-11 16:27:10,555 - WebScraper - INFO - 发现 0 个二级页面链接
+2025-10-11 16:27:10,555 - WebScraper - INFO - 网站爬取完成: Microsoft, 成功页面: 1

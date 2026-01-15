@@ -1,0 +1,75 @@
+2025-09-15 15:50:54,913 - IdentifierStatusConfig - ERROR - 查找表文件不存在: testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 15:50:54,913 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 0 个允许字符
+2025-09-15 15:54:11,090 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 15:54:11,092 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112778 个允许字符
+2025-09-15 15:54:11,096 - IdentifierStatusConfig - INFO - 查找表验证完成
+2025-09-15 15:55:25,011 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 15:55:25,013 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112778 个允许字符
+2025-09-15 15:56:16,654 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 15:56:16,657 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112778 个允许字符
+2025-09-15 16:11:52,840 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 16:11:52,853 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112783 个允许字符
+2025-09-15 16:27:02,630 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 16:27:02,632 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112805 个允许字符
+2025-09-15 16:37:27,633 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 16:37:27,635 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112825 个允许字符
+2025-09-15 16:56:57,024 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 16:56:57,027 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 17:22:10,353 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 17:22:10,356 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 17:35:28,572 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 17:35:28,574 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 17:38:13,976 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 17:38:13,978 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 17:52:03,011 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 17:52:03,014 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 17:58:52,827 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 17:58:52,829 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 18:02:54,309 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 18:02:54,311 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 18:03:02,130 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 18:03:02,132 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 18:06:41,624 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 18:06:41,626 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-15 18:07:18,707 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-15 18:07:18,708 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 14:49:47,937 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 14:49:47,939 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 15:14:13,778 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 15:14:13,780 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 15:14:47,839 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 15:14:47,841 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 15:15:36,521 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 15:15:36,524 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 15:22:21,214 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 15:22:21,216 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 16:09:16,993 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 16:09:16,996 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 16:13:18,802 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 16:13:18,804 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 16:13:29,573 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 16:13:29,575 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 16:13:39,680 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 16:13:39,683 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-16 16:33:20,450 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-16 16:33:20,453 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-19 14:21:35,503 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-19 14:21:35,513 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-19 14:25:37,198 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-19 14:25:37,200 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-19 14:40:00,131 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-19 14:40:00,133 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-19 16:52:53,527 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-19 16:52:53,530 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-19 16:53:33,934 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-19 16:53:33,938 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-19 17:07:51,660 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-19 17:07:51,662 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-09-23 14:46:28,345 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-09-23 14:46:28,348 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-10-11 15:01:54,961 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-10-11 15:01:54,967 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-10-11 15:03:48,490 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-10-11 15:03:48,494 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符
+2025-10-11 15:04:17,124 - IdentifierStatusConfig - INFO - 成功加载查找表: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\identifier_status_lookup.json
+2025-10-11 15:04:17,126 - IdentifierStatusConfig - INFO - 标识符状态配置已加载，包含 112835 个允许字符

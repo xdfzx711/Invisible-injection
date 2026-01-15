@@ -1,0 +1,56 @@
+2025-09-19 14:25:37,323 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: twitter
+2025-09-19 14:25:37,323 - HomographDetector - INFO - 可检测 6355 个混淆字符
+2025-09-19 14:25:37,415 - HomographDetector - INFO - 开始检测 8222 个字符的同形异义字符
+2025-09-19 14:25:37,419 - HomographDetector - INFO - 检测 twitter 数据源的 8222 个字符
+2025-09-19 14:25:37,451 - HomographDetector - INFO - 同形异义字符检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\homograph_detections.json
+2025-09-19 14:25:37,452 - HomographDetector - INFO - twitter 数据源发现 288 个同形异义字符
+2025-09-19 14:25:37,452 - HomographDetector - INFO - 同形异义字符检测完成，共发现 288 个混淆字符
+2025-09-19 14:25:37,475 - HomographDetector - INFO - 检测耗时: 0.036秒
+2025-09-19 14:40:00,179 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: twitter
+2025-09-19 14:40:00,179 - HomographDetector - INFO - 可检测 6355 个混淆字符
+2025-09-19 14:40:00,273 - HomographDetector - INFO - 开始检测 8222 个字符的同形异义字符
+2025-09-19 14:40:00,277 - HomographDetector - INFO - 检测 twitter 数据源的 8222 个字符
+2025-09-19 14:40:00,298 - HomographDetector - INFO - 同形异义字符检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\homograph_detections.json
+2025-09-19 14:40:00,298 - HomographDetector - INFO - twitter 数据源发现 288 个同形异义字符
+2025-09-19 14:40:00,298 - HomographDetector - INFO - 同形异义字符检测完成，共发现 288 个混淆字符
+2025-09-19 14:40:00,298 - HomographDetector - INFO - 检测耗时: 0.025秒
+2025-09-19 16:52:53,555 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: twitter
+2025-09-19 16:52:53,558 - HomographDetector - INFO - 可检测 0 个混淆字符
+2025-09-19 16:52:53,683 - HomographDetector - INFO - 开始检测 8222 个字符的同形异义字符
+2025-09-19 16:52:53,688 - HomographDetector - INFO - 检测 twitter 数据源的 8222 个字符
+2025-09-19 16:52:53,691 - HomographDetector - INFO - twitter 数据源未发现同形异义字符
+2025-09-19 16:52:53,692 - HomographDetector - INFO - 同形异义字符检测完成，共发现 0 个混淆字符
+2025-09-19 16:52:53,692 - HomographDetector - INFO - 检测耗时: 0.010秒
+2025-09-19 16:53:33,959 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: twitter
+2025-09-19 16:53:33,959 - HomographDetector - INFO - 可检测 0 个混淆字符
+2025-09-19 16:53:34,048 - HomographDetector - INFO - 开始检测 8222 个字符的同形异义字符
+2025-09-19 16:53:34,054 - HomographDetector - INFO - 检测 twitter 数据源的 8222 个字符
+2025-09-19 16:53:34,058 - HomographDetector - INFO - twitter 数据源未发现同形异义字符
+2025-09-19 16:53:34,058 - HomographDetector - INFO - 同形异义字符检测完成，共发现 0 个混淆字符
+2025-09-19 16:53:34,059 - HomographDetector - INFO - 检测耗时: 0.010秒
+2025-09-19 17:07:51,683 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: twitter
+2025-09-19 17:07:51,683 - HomographDetector - INFO - 可检测 1800 个混淆字符
+2025-09-19 17:07:51,772 - HomographDetector - INFO - 开始检测 8222 个字符的同形异义字符
+2025-09-19 17:07:51,775 - HomographDetector - INFO - 检测 twitter 数据源的 8222 个字符
+2025-09-19 17:07:51,795 - HomographDetector - INFO - 同形异义字符检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\homograph_detections.json
+2025-09-19 17:07:51,795 - HomographDetector - INFO - twitter 数据源发现 231 个同形异义字符
+2025-09-19 17:07:51,795 - HomographDetector - INFO - 同形异义字符检测完成，共发现 231 个混淆字符
+2025-09-19 17:07:51,795 - HomographDetector - INFO - 检测耗时: 0.023秒
+2025-09-23 14:46:28,394 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: twitter
+2025-09-23 14:46:28,394 - HomographDetector - INFO - 可检测 5963 个混淆字符
+2025-09-23 14:46:28,504 - HomographDetector - INFO - 开始检测 8222 个字符的同形异义字符
+2025-09-23 14:46:28,509 - HomographDetector - INFO - 检测 twitter 数据源的 8222 个字符
+2025-09-23 14:46:28,520 - HomographDetector - INFO - 同形异义字符检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\homograph_detections.json
+2025-09-23 14:46:28,520 - HomographDetector - INFO - twitter 数据源发现 91 个同形异义字符
+2025-09-23 14:46:28,521 - HomographDetector - INFO - 同形异义字符检测完成，共发现 91 个混淆字符
+2025-09-23 14:46:28,521 - HomographDetector - INFO - 检测耗时: 0.017秒
+2025-10-11 15:03:48,545 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: json, csv, xml, html, reddit, twitter
+2025-10-11 15:03:48,545 - HomographDetector - INFO - 可检测 5963 个混淆字符
+2025-10-11 15:04:17,169 - HomographDetector - INFO - 同形异义字符检测器已初始化，数据源: twitter
+2025-10-11 15:04:17,169 - HomographDetector - INFO - 可检测 5963 个混淆字符
+2025-10-11 15:04:17,321 - HomographDetector - INFO - 开始检测 8222 个字符的同形异义字符
+2025-10-11 15:04:17,324 - HomographDetector - INFO - 检测 twitter 数据源的 8222 个字符
+2025-10-11 15:04:17,364 - HomographDetector - INFO - 同形异义字符检测结果已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\threat_detection_twitter\homograph_detections.json
+2025-10-11 15:04:17,364 - HomographDetector - INFO - twitter 数据源发现 91 个同形异义字符
+2025-10-11 15:04:17,365 - HomographDetector - INFO - 同形异义字符检测完成，共发现 91 个混淆字符
+2025-10-11 15:04:17,365 - HomographDetector - INFO - 检测耗时: 0.045秒

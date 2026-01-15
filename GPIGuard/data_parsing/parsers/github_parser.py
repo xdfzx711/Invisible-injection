@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+GitHub 数据解析器
+- 输入: testscan_data/origin_data/github/*.json (由 GithubCollector 生成)
+- 输出: testscan_data/parsed_data/github_analysis/*_parsed.json
+  统一结构包含 file_info 与 text_entries，便于 CharacterExtractor 提取字符
+"""
+
+import json
+from pathlib import Path
+from typing import Dict, Any, List
+import sys
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from data_parsing.base_parser import BaseParser
+from data_parsing.utils import FileUtils, TextExtractor
+
+
+class GithubParser(BaseParser):
+    def __init__(self, enable_interference_filter: bool = True, filter_config: Dict[str, Any] = None):
+        super().__init__('github', enable_interference_filter, filter_config)
+
+    def _get_files_to_parse(self, directory: Path) -> List[Path]:
+        return list(directory.glob('*.json'))
+
+    def parse_file(self, file_path: Path) -> Dict[str, Any]:
+        """
+        解析单个 GitHub 原始数据File
+        """
+        self.logger.info(f"Parsing GitHub origin file: {file_path}")
+        try:
+            content = FileUtils.safe_read_file(file_path)
+            data = json.loads(content)
+
+            owner = data.get("owner", "")
+            repo = data.get("repo", "")
+            repo_url = data.get("repository_url", "")
+            fetched = data.get("fetched", {})
+
+            text_entries: List[Dict[str, Any]] = []
+
+            # README
+            readme = fetched.get("readme")
+            if isinstance(readme, dict) and readme.get("text"):
+                text_entries.append({
+                    "json_path": "fetched.readme.text",
+                    "value": readme.get("text", ""),
+                    "field_type": "readme",
+                    "parent_key": "readme",
+                    "value_type": "string",
+                    "is_key": False,
+                    "length": len(readme.get("text", "")),
+                    "context": {
+                        "owner": owner,
+                        "repo": repo,
+                        "repository_url": repo_url
+                    }
+                })
+
+            missing_files: List[Dict[str, Any]] = []
+
+            # Files
+            files = fetched.get("files", [])
+            if isinstance(files, list):
+                for idx, file_item in enumerate(files):
+                    if isinstance(file_item, dict):
+                        file_text = file_item.get("text", "")
+                        file_item_path = file_item.get("path", "")
+                        file_name = file_item.get("name", "")
+
+                        if file_text:  # 只处理有文本内容的File
+                            text_entries.append({
+                                "json_path": f"fetched.files[{idx}].text",
+                                "value": file_text,
+                                "field_type": "file",
+                                "parent_key": "files",
+                                "value_type": "string",
+                                "is_key": False,
+                                "length": len(file_text),
+                                "context": {
+                                    "owner": owner,
+                                    "repo": repo,
+                                    "repository_url": repo_url,
+                                    "file_path": file_item_path,
+                                    "file_name": file_name,
+                                    "branch": file_item.get("branch", ""),
+                                    "size": file_item.get("size", 0)
+                                }
+                            })
+                        else:
+                            warning_msg = (
+                                f"跳过File: {file_item_path or file_name or idx}，"
+                                "因为 fetched.files[].text 为空，"
+                                "请重新采集以获取内容。"
+                            )
+                            self.logger.warning(warning_msg)
+                            missing_files.append({
+                                "json_path": f"fetched.files[{idx}].text",
+                                "file_path": file_item_path,
+                                "file_name": file_name,
+                                "reason": "empty_text"
+                            })
+
+            # 预留: issues / pull_requests / commits 可分别添加
+
+            parsing_info = {
+                "parser_type": "github",
+                "total_text_entries": len(text_entries),
+                "encoding": FileUtils.detect_encoding(file_path)
+            }
+
+            if missing_files:
+                parsing_info["warnings"] = missing_files
+
+            result = {
+                "file_info": {
+                    "file_name": file_path.name,
+                    "file_path": str(file_path.relative_to(self.output_dir.parent.parent)),  # 相对 testscan_data
+                    "owner": owner,
+                    "repo": repo,
+                    "repository_url": repo_url
+                },
+                "parsing_info": parsing_info,
+                "text_entries": text_entries
+            }
+
+            return result
+        except Exception as e:
+            self.logger.error(f"Error parsing {file_path}: {e}")
+            return {
+                "file_info": FileUtils.get_file_info(file_path),
+                "parsing_info": {
+                    "parser_type": "github",
+                    "status": "failed",
+                    "error": str(e)
+                },
+                "text_entries": []
+            }
+
+    def parse_directory(self, directory: Path = None) -> List[Dict[str, Any]]:
+        """
+        遍历 origin_data/github，逐File解析并各自保存 *_parsed.json
+        """
+        if directory is None:
+            directory = self.input_dir
+
+        if not directory.exists():
+            self.logger.warning(f"Directory not found: {directory}")
+            return []
+
+        files = self._get_files_to_parse(directory)
+        self.logger.info(f"Found {len(files)} GitHub files to parse in {directory}")
+        print(f"\n找到 {len(files)} 个GitHub原始File待解析")
+
+        results: List[Dict[str, Any]] = []
+        for i, file_path in enumerate(files, 1):
+            try:
+                print(f"[{i}/{len(files)}] 解析: {file_path.name}")
+                result = self.parse_file(file_path)
+                output_filename = f"{file_path.stem}_parsed.json"
+                output_path = self.output_dir / output_filename
+                self.save_parsed_data(result, output_path)
+                results.append(result)
+                print(f"  成功: {len(result.get('text_entries', []))} 个文本entries目")
+            except Exception as e:
+                self.logger.error(f"Failed to parse {file_path.name}: {e}")
+                print(f"  Failed: {e}")
+
+        return results
+
+
+__all__ = ["GithubParser"]
+
+
+
+
+
+
+
+
+
+

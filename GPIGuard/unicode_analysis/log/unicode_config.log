@@ -1,0 +1,14 @@
+2025-09-08 17:18:21,054 - UnicodeConfig - ERROR - 配置文件不存在: unicode_threats_config.json
+2025-09-08 17:18:21,055 - UnicodeConfig - INFO - 构建目标字符字典完成，共 1 个字符
+2025-09-08 17:19:19,291 - UnicodeConfig - INFO - 成功加载配置文件: D:\pythonproject\Unicode_Agent\testscan\unicode_threats_config.json
+2025-09-08 17:19:19,294 - UnicodeConfig - INFO - 构建目标字符字典完成，共 6363 个字符
+2025-09-09 17:46:41,200 - UnicodeConfig - INFO - 成功加载配置文件: D:\pythonproject\Unicode_Agent\testscan\unicode_threats_config.json
+2025-09-09 17:46:41,203 - UnicodeConfig - INFO - 构建目标字符字典完成，共 6372 个字符
+2025-09-11 15:56:54,198 - UnicodeConfig - INFO - 成功加载配置文件: D:\pythonproject\Unicode_Agent\testscan\unicode_threats_config.json
+2025-09-11 15:56:54,200 - UnicodeConfig - INFO - 构建目标字符字典完成，共 6470 个字符
+2025-09-11 17:19:21,903 - UnicodeConfig - INFO - 成功加载配置文件: D:\pythonproject\Unicode_Agent\testscan\unicode_threats_config.json
+2025-09-11 17:19:21,908 - UnicodeConfig - INFO - 构建目标字符字典完成，共 6470 个字符
+2025-09-12 17:09:37,183 - UnicodeConfig - INFO - 成功加载配置文件: D:\pythonproject\Unicode_Agent\testscan\unicode_threats_config.json
+2025-09-12 17:09:37,193 - UnicodeConfig - INFO - 构建目标字符字典完成，共 6470 个字符
+2025-09-12 17:11:48,054 - UnicodeConfig - INFO - 成功加载配置文件: D:\pythonproject\Unicode_Agent\testscan\unicode_threats_config.json
+2025-09-12 17:11:48,056 - UnicodeConfig - INFO - 构建目标字符字典完成，共 6470 个字符

@@ -1,0 +1,14 @@
+{
+  "client_id": "your_reddit_client_id",
+  "client_secret": "your_reddit_client_secret",
+  "user_agent": "UnicodeAgent/1.0 by YourUsername",
+  "targets": [
+    "r/Python",
+    "r/learnprogramming",
+    "r/AskReddit",
+    "u/spez",
+    "u/AutoModerator"
+  ],
+  "limit": 50,
+  "_comment": "支持两种模式: r/subreddit_name (社区模式) 和 u/username (用户模式)"
+}

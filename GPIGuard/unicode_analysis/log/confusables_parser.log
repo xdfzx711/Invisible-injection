@@ -1,0 +1,14 @@
+2025-09-19 11:29:14,792 - ConfusablesParser - INFO - Confusables解析器输出目录: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis
+2025-09-19 11:29:14,793 - ConfusablesParser - INFO - 开始解析和保存confusables数据
+2025-09-19 11:29:14,793 - ConfusablesParser - INFO - 开始解析confusables文件: D:\pythonproject\Unicode_Agent\testscan\confusables.txt
+2025-09-19 11:29:14,843 - ConfusablesParser - INFO - Confusables解析完成: 6355 个条目
+2025-09-19 11:29:14,844 - ConfusablesParser - INFO - 解析统计:
+2025-09-19 11:29:14,844 - ConfusablesParser - INFO -   总行数: 9685
+2025-09-19 11:29:14,844 - ConfusablesParser - INFO -   注释行: 12
+2025-09-19 11:29:14,844 - ConfusablesParser - INFO -   空行: 3318
+2025-09-19 11:29:14,845 - ConfusablesParser - INFO -   解析条目: 6355
+2025-09-19 11:29:14,845 - ConfusablesParser - INFO -   错误行: 0
+2025-09-19 11:29:14,845 - ConfusablesParser - INFO -   类型分布:
+2025-09-19 11:29:14,845 - ConfusablesParser - INFO -     MA: 6355
+2025-09-19 11:29:14,974 - ConfusablesParser - INFO - Confusables数据已保存: D:\pythonproject\Unicode_Agent\testscan\testscan_data\unicode_analysis\unicode_confusables.json
+2025-09-19 11:29:14,974 - ConfusablesParser - INFO - 包含 6355 个混淆字符条目

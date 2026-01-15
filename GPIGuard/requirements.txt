@@ -1,0 +1,44 @@
+# Unicode Threat Scanner - Requirements
+
+# Core Dependencies
+requests>=2.31.0          # HTTP request library for data collection
+certifi>=2023.7.22        # SSL certificate bundle
+urllib3>=2.0.4            # HTTP client library
+
+# Data Processing
+chardet>=5.2.0            # Character encoding detection
+lxml>=4.9.3               # XML/HTML parsing library
+beautifulsoup4>=4.12.2    # HTML/XML parsing library for web scraping
+
+# Logging and Debugging
+colorama>=0.4.6           # Cross-platform colored terminal output
+
+# Development and Testing
+pytest>=7.4.0             # Testing framework
+pytest-cov>=4.1.0         # Test coverage measurement
+
+# Unicode Analysis Related
+regex>=2023.8.8           # Advanced regular expression library with Unicode support
+
+# Web Scraping Related
+beautifulsoup4>=4.12.2    # HTML/XML parsing library
+pandas>=2.0.3             # Data analysis library for Excel file handling
+openpyxl>=3.1.2           # Excel file handling
+xlrd>=2.0.1               # Support for older Excel file formats
+
+# Reddit Data Collection
+praw>=7.7.1               # Python Reddit API Wrapper
+
+# Twitter Data Collection
+tweepy>=4.14.0            # Twitter API v2 Python library
+
+# Optional Dependencies
+# Uncomment the following packages if you need to handle more complex data formats:
+
+# xmltodict>=0.13.0       # XML to dictionary conversion tool
+# ujson>=5.8.0            # Fast JSON parser
+# cchardet>=2.1.7         # Fast character encoding detection
+selenium>=4.15.0          # Browser automation for JavaScript rendering
+webdriver-manager>=4.0.0   # Automatic browser driver management (ChromeDriver, etc.)
+
+# Note: unicodedata is a Python built-in module and does not need to be installed
