@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-GodOfPrompt 数据解析器
-解析从 GodOfPrompt.ai 收集的提示词数据
+GodOfPrompt Data Parser
+Parse prompt word data collected from GodOfPrompt.ai
 """
 
 import json
@@ -18,49 +18,49 @@ from data_parsing.utils import FileUtils, TextExtractor
 
 
 class GodOfPromptParser(BaseParser):
-    """GodOfPrompt 提示词数据解析器"""
+    """GodOfPrompt Prompt Word Data Parser"""
     
     def __init__(self, enable_interference_filter: bool = True, filter_config: Dict[str, Any] = None):
         super().__init__('godofprompt', enable_interference_filter, filter_config)
     
     def _get_files_to_parse(self, directory: Path) -> List[Path]:
-        """获取所有 JSON File"""
+        """Get all JSON files"""
         return list(directory.glob('*.json'))
     
     def parse_file(self, file_path: Path) -> Dict[str, Any]:
         """
-        解析单个 GodOfPrompt JSON File
+        Parse a single GodOfPrompt JSON file
         
         Args:
-            file_path: JSON File路径
+            file_path: JSON file path
             
         Returns:
-            解析结果字典
+            Parsing result dictionary
         """
         self.logger.info(f"Parsing GodOfPrompt file: {file_path}")
         
         try:
-            # 读取File内容
+            # Read file content
             content = FileUtils.safe_read_file(file_path)
             
-            # 解析 JSON
+            # Parse JSON
             data = json.loads(content)
             
-            # 提取文本entries目（简化格式：只保留 value, slug, category）
+            # Extract text entries (simplified format: keep only value, slug, category)
             text_entries = []
             
             if isinstance(data, list):
-                # 如果是数组，遍历每个提示词对象
+                # If it is an array, iterate through each prompt object
                 for idx, item in enumerate(data):
                     if isinstance(item, dict):
-                        # 提取 prompt 字段作为主要内容
+                        # Extract 'prompt' field as main content
                         prompt_text = item.get('prompt', '')
                         slug = item.get('slug', f'prompt_{idx}')
                         category = item.get('category', '')
                         
-                        # 只保留 value, slug, category
+                        # Keep only value, slug, category
                         if prompt_text and prompt_text.strip():
-                            # 应用干扰字符过滤器
+                            # Apply interference character filter
                             filtered_text = self._process_extracted_text(prompt_text)
                             text_entries.append({
                                 'value': filtered_text,
@@ -68,14 +68,14 @@ class GodOfPromptParser(BaseParser):
                                 'category': category
                             })
             elif isinstance(data, dict):
-                # 如果是单个对象，直接提取
+                # If it is a single object, extract directly
                 prompt_text = data.get('prompt', '')
                 slug = data.get('slug', 'unknown')
                 category = data.get('category', '')
                 
-                # 只保留 value, slug, category
+                # Keep only value, slug, category
                 if prompt_text and prompt_text.strip():
-                    # 应用干扰字符过滤器
+                    # Apply interference character filter
                     filtered_text = self._process_extracted_text(prompt_text)
                     text_entries.append({
                         'value': filtered_text,
@@ -83,13 +83,13 @@ class GodOfPromptParser(BaseParser):
                         'category': category
                     })
             
-            # 构建解析结果
+            # Build parsing result
             result = {
                 'file_info': FileUtils.get_file_info(file_path),
                 'parsing_info': {
                     'parser_type': 'godofprompt',
                     'total_text_entries': len(text_entries),
-                    'total_prompts': len(text_entries),  # 每个entries目都是一个提示词
+                    'total_prompts': len(text_entries),  # Each entry is a prompt
                     'encoding': FileUtils.detect_encoding(file_path),
                     'status': 'success'
                 },
@@ -101,13 +101,13 @@ class GodOfPromptParser(BaseParser):
             
         except json.JSONDecodeError as e:
             self.logger.error(f"JSON decode error in {file_path}: {e}")
-            return self._create_error_result(file_path, f"JSON格式Error: {e}")
+            return self._create_error_result(file_path, f"JSON format error: {e}")
         except Exception as e:
             self.logger.error(f"Error parsing {file_path}: {e}")
-            return self._create_error_result(file_path, f"解析Error: {e}")
+            return self._create_error_result(file_path, f"Parsing error: {e}")
     
     def _create_error_result(self, file_path: Path, error_message: str) -> Dict[str, Any]:
-        """创建Error结果"""
+        """Create error result"""
         return {
             'file_info': FileUtils.get_file_info(file_path),
             'parsing_info': {
@@ -120,13 +120,13 @@ class GodOfPromptParser(BaseParser):
     
     def parse_directory(self, directory: Path = None) -> List[Dict[str, Any]]:
         """
-        解析整个directory（重写以支持单File单独保存）
+        Parse entire directory (rewrite to support saving each file separately)
         
         Args:
-            directory: directory路径
+            directory: Directory path
             
         Returns:
-            解析结果列表
+            List of parsing results
         """
         if directory is None:
             directory = self.input_dir
@@ -137,18 +137,18 @@ class GodOfPromptParser(BaseParser):
         
         files = self._get_files_to_parse(directory)
         self.logger.info(f"Found {len(files)} files to parse in {directory}")
-        print(f"\n找到 {len(files)} 个GodOfPromptFile待解析")
+        print(f"\nFound {len(files)} GodOfPrompt files to parse")
         
         self.stats['total_files'] = len(files)
         
         results = []
         for i, file_path in enumerate(files, 1):
             try:
-                print(f"[{i}/{len(files)}] 解析: {file_path.name}")
+                print(f"[{i}/{len(files)}] Parsing: {file_path.name}")
                 result = self.parse_file(file_path)
                 
                 if result and result.get('parsing_info', {}).get('status') != 'failed':
-                    # 单独保存每个File的解析结果
+                    # Save parsing results for each file separately
                     output_filename = f"{file_path.stem}_parsed.json"
                     output_path = self.output_dir / output_filename
                     self.save_parsed_data(result, output_path)
@@ -156,7 +156,7 @@ class GodOfPromptParser(BaseParser):
                     results.append(result)
                     self.stats['successful_files'] += 1
                     self.stats['total_texts_extracted'] += len(result.get('text_entries', []))
-                    print(f"  成功: {len(result.get('text_entries', []))} 个文本entries目")
+                    print(f"  Success: {len(result.get('text_entries', []))} text entries")
                 else:
                     self.stats['failed_files'] += 1
                     print(f"  Failed")

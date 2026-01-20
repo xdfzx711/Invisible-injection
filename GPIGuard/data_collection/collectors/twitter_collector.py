@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Twitter数据收集器
-使用Twitter API v2和snscrape收集推文数据
-"""
 
 import json
 import time
@@ -13,7 +9,7 @@ from pathlib import Path
 from typing import Dict, Any, List
 from datetime import datetime
 
-# 尝试导入snscrape
+
 try:
     import snscrape.modules.twitter as sntwitter
     import snscrape
@@ -23,7 +19,7 @@ except ImportError:
     SNSCRAPE_AVAILABLE = False
     snscrape_version = None
 
-# 尝试导入tweepy
+
 try:
     import tweepy
     TWEEPY_AVAILABLE = True
@@ -34,24 +30,24 @@ from data_collection.base_collector import BaseCollector
 
 
 class TwitterCollector(BaseCollector):
-    """Twitter数据收集器 - 支持官方API和snscrape"""
+
     
     def __init__(self):
         super().__init__('twitter')
         
-        print(f"📦 snscrape版本: {snscrape_version if SNSCRAPE_AVAILABLE else 'not installed'}")
+        print(f"📦 snscrape version: {snscrape_version if SNSCRAPE_AVAILABLE else 'not installed'}")
         
-        # 配置File路径
+        # Config file path
         self.config_file = self.get_config_path('twitter_config.json')
         
-        # 如果配置不在新位置，尝试从旧位置读取
+        # If config is not in new location, try reading from old location
         if not self.config_file.exists():
             old_config = self.path_manager.get_project_root() / "twitter_collect" / "twitter_config.json"
             if old_config.exists():
                 self.config_file = old_config
                 self.logger.info(f"Using config from old location: {old_config}")
         
-        # Twitter API对象（延迟初始化）
+        # Twitter API object (lazy initialization)
         self.client = None
         self.config = None
         self.data_source = "hybrid"  # hybrid, snscrape, api
@@ -59,14 +55,14 @@ class TwitterCollector(BaseCollector):
         self.snscrape_available = SNSCRAPE_AVAILABLE
     
     def validate_config(self) -> bool:
-        """验证配置"""
+        """Validate configuration"""
         if not self.config_file.exists():
             self.logger.warning(f"Config file not found: {self.config_file}")
-            print(f"\nWarning: 未找到Twitter配置File")
-            print(f"将尝试使用snscrape模式（不需要API密钥）")
-            print(f"\n如需使用官方API，请创建配置File:")
+            print(f"\nWarning: Twitter config file not found")
+            print(f"Will try to use snscrape mode (no API key required)")
+            print(f"\nTo use the official API, please create config file:")
             print(f"  {self.config_file}")
-            print("\n示例内容:")
+            print("\nExample content:")
             print(json.dumps({
                 "bearer_token": "your_bearer_token",
                 "api_key": "your_api_key",
@@ -86,7 +82,7 @@ class TwitterCollector(BaseCollector):
             return SNSCRAPE_AVAILABLE
     
     def _setup_api(self) -> bool:
-        """设置Twitter API客户端"""
+        """Setup Twitter API client"""
         if not self.config:
             self.logger.info("No API config, will use snscrape if available")
             return SNSCRAPE_AVAILABLE
@@ -105,22 +101,22 @@ class TwitterCollector(BaseCollector):
                 wait_on_rate_limit=True
             )
             self.api_available = True
-            print("✅ Twitter官方API客户端初始化成功")
+            print("✅ Twitter official API client initialized successfully")
             self.logger.info("Twitter API client initialized")
             return True
             
         except Exception as e:
             self.logger.warning(f"Failed to setup Twitter API: {e}")
-            print(f"⚠️ Twitter官方API初始化Failed: {e}")
-            print("💡 将使用snscrape模式")
+            print(f"⚠️ Twitter official API initialization failed: {e}")
+            print("💡 Will use snscrape mode")
             return SNSCRAPE_AVAILABLE
     
     def collect(self) -> Dict[str, Any]:
-        """主收集方法"""
+        """Main collection method"""
         self.start_collection()
         
         try:
-            # 验证配置
+            # Validate configuration
             if not self.validate_config():
                 return {
                     'success': False,
@@ -128,22 +124,22 @@ class TwitterCollector(BaseCollector):
                     'stats': self.get_stats()
                 }
             
-            # 设置API
+            # Setup API
             self._setup_api()
             
-            # 显示可用的数据源
+            # Print available data sources
             self._print_data_source_info()
             
-            print("\nTwitter数据收集")
+            print("\nTwitter data collection")
             print("-" * 70)
             
-            # 获取用户输入
-            print("\n请输入要搜索的关键词（用逗号分隔）")
-            print("示例: unicode,security,python")
-            user_input = input("\n关键词: ").strip()
+            # Get user input
+            print("\nPlease enter keywords to search (separated by commas)")
+            print("Example: unicode,security,python")
+            user_input = input("\nKeywords: ").strip()
             
             if not user_input:
-                print("Error: 未输入关键词")
+                print("Error: No keywords provided")
                 return {
                     'success': False,
                     'message': 'No keywords provided',
@@ -152,10 +148,10 @@ class TwitterCollector(BaseCollector):
             
             keywords = [k.strip() for k in user_input.split(',')]
             
-            # 获取数量
-            print("\n请输入每个关键词要收集的推文数量")
-            print("（直接回车使用默认: 100）")
-            limit_input = input("\n推文数量: ").strip()
+            # Get tweet limit
+            print("\nPlease enter the number of tweets to collect per keyword")
+            print("(Press Enter to use default: 100)")
+            limit_input = input("\nTweet count: ").strip()
             
             if not limit_input:
                 limit = 100
@@ -163,31 +159,31 @@ class TwitterCollector(BaseCollector):
                 try:
                     limit = int(limit_input)
                 except ValueError:
-                    print("无效数量，使用默认: 100")
+                    print("Invalid count, using default: 100")
                     limit = 100
             
-            # 收集数据
-            print(f"\n开始收集 {len(keywords)} 个关键词的推文...")
+            # Collect data
+            print(f"\nStarting to collect tweets for {len(keywords)} keywords...")
             print(f"Output directory: {self.output_dir}")
             print("-" * 70)
             
             for keyword in keywords:
                 try:
-                    print(f"\n正在收集: {keyword}")
-                    # 收集数据
+                    print(f"\nCollecting: {keyword}")
+                    # Collect data
                     data = self._search_tweets(keyword, max_results=limit)
                     
-                    # 保存数据
+                    # Save data
                     if data:
-                        # 生成安全的File名
+                        # Generate safe filename
                         safe_filename = keyword.replace(' ', '_').replace('#', '').replace('@', '')[:50]
                         filename = f"{safe_filename}_tweets.json"
                         self._save_data(data, filename)
                         self.increment_success()
-                        print(f"  成功并has been保存")
+                        print(f"  Successfully saved")
                     else:
                         self.increment_failure()
-                        print(f"  Failed: 未收集到数据")
+                        print(f"  Failed: No data collected")
                 except Exception as e:
                     self.logger.error(f"Failed to collect tweets for '{keyword}': {e}")
                     self.increment_failure()
@@ -196,7 +192,7 @@ class TwitterCollector(BaseCollector):
             self.end_collection()
             self.log_summary()
             
-            # 统计收集的File
+            # Count collected JSON files
             file_count = len(list(self.output_dir.glob('*.json')))
             
             return {
@@ -208,7 +204,7 @@ class TwitterCollector(BaseCollector):
             }
             
         except KeyboardInterrupt:
-            print("\n\n用户中断收集")
+            print("\n\nUser interrupted collection")
             self.end_collection()
             return {
                 'success': False,
@@ -226,25 +222,25 @@ class TwitterCollector(BaseCollector):
             }
     
     def _print_data_source_info(self):
-        """显示数据源信息"""
-        print("🔧 数据收集器配置:")
-        print(f"   📊 数据源模式: {self.data_source}")
-        print(f"   🔑 官方API: {'✅ 可用' if self.api_available else '❌ 不可用'}")
-        print(f"   🕷️ snscrape: {'✅ 可用' if self.snscrape_available else '❌ 不可用'}")
+        """Print data source information"""
+        print("🔧 Data collector configuration:")
+        print(f"   📊 Data source mode: {self.data_source}")
+        print(f"   🔑 Official API: {'✅ Available' if self.api_available else '❌ Not available'}")
+        print(f"   🕷️ snscrape: {'✅ Available' if self.snscrape_available else '❌ Not available'}")
         
         if self.data_source == "hybrid":
-            print("💡 混合模式：优先snscrape，备用官方API")
+            print("💡 Hybrid mode: Prioritize snscrape, fallback to official API")
         elif self.data_source == "snscrape":
-            print("💡 snscrape模式：无需API密钥，无速率限制")
+            print("💡 snscrape mode: No API key needed, no rate limit")
         elif self.data_source == "api":
-            print("💡 官方API模式：需要认证，有速率限制")
+            print("💡 Official API mode: Requires authentication, has rate limit")
         
         print("-" * 70)
     
     def _search_tweets(self, query: str, max_results: int = 100) -> Dict[str, Any]:
-        """搜索推文 - 支持多种数据源"""
-        print(f"🔍 搜索推文: '{query}'")
-        print(f"📊 目标数量: {max_results} entries推文")
+        """Search tweets - supports multiple data sources"""
+        print(f"🔍 Searching tweets: '{query}'")
+        print(f"📊 Target count: {max_results} tweets")
         
         # 根据数据源选择搜索方法
         if self.data_source == "snscrape":
@@ -255,43 +251,43 @@ class TwitterCollector(BaseCollector):
             return self._search_tweets_hybrid(query, max_results)
     
     def _search_tweets_hybrid(self, query: str, max_results: int) -> Dict[str, Any]:
-        """混合模式搜索 - 智能回退策略"""
-        print("🔄 使用混合模式搜索")
+        """Hybrid mode search - intelligent fallback strategy"""
+        print("🔄 Using hybrid mode search")
         
-        # 优先使用snscrape
+        # Prioritize snscrape
         if self.snscrape_available:
-            print("🕷️ 第一步：尝试snscrape...")
+            print("🕷️ Step 1: Try snscrape...")
             result = self._search_tweets_snscrape(query, max_results)
             if result and result.get('tweets'):
-                print("✅ snscrape搜索成功")
+                print("✅ snscrape search successful")
                 return result
             else:
-                print("⚠️ snscrape未找到结果或Failed")
+                print("⚠️ snscrape found no results or failed")
         
-        # 回退到官方API
+        # Fallback to official API
         if self.api_available:
-            print("🔄 第二步：回退到官方API...")
+            print("🔄 Step 2: Fallback to official API...")
             try:
                 result = self._search_tweets_api(query, max_results)
                 if result and result.get('tweets'):
-                    print("✅ 官方API搜索成功")
+                    print("✅ Official API search successful")
                     return result
                 else:
-                    print("⚠️ 官方API未找到结果")
+                    print("⚠️ Official API found no results")
             except Exception as e:
-                print(f"⚠️ 官方APIFailed: {e}")
+                print(f"⚠️ Official API failed: {e}")
         
-        # 所有方法都Failed
-        print("❌ 所有数据源都Failed")
+        # All methods failed
+        print("❌ All data sources failed")
         return None
     
     def _search_tweets_snscrape(self, query: str, max_results: int) -> Dict[str, Any]:
-        """使用snscrape搜索推文"""
+        """Search tweets using snscrape"""
         if not self.snscrape_available:
-            print("❌ snscrape不可用")
+            print("❌ snscrape not available")
             return None
         
-        print(f"🕷️ 使用snscrape搜索推文: '{query}'")
+        print(f"🕷️ Searching tweets using snscrape: '{query}'")
         tweets_data = []
         
         try:
@@ -303,7 +299,7 @@ class TwitterCollector(BaseCollector):
                     break
                 
                 try:
-                    # 转换为统一格式
+                    # Convert to unified format
                     processed_tweet = {
                         "id": str(tweet.id),
                         "text": tweet.content or "",
@@ -324,11 +320,11 @@ class TwitterCollector(BaseCollector):
                     tweets_data.append(processed_tweet)
                     tweet_count += 1
                     
-                    # 进度显示
+                    # Progress display
                     if tweet_count % 10 == 0:
-                        print(f"📄 has been获取 {tweet_count} entries推文...")
+                        print(f"📄 Fetched {tweet_count} tweets...")
                     
-                    # 添加小延迟
+                    # Add small delay
                     if tweet_count % 20 == 0:
                         time.sleep(0.5)
                 
@@ -337,7 +333,7 @@ class TwitterCollector(BaseCollector):
                     continue
             
             if len(tweets_data) > 0:
-                print(f"✅ snscrape搜索Completed，获取 {len(tweets_data)} entries推文")
+                print(f"✅ snscrape search completed, fetched {len(tweets_data)} tweets")
                 return {
                     "collection_info": {
                         "query": query,
@@ -348,21 +344,21 @@ class TwitterCollector(BaseCollector):
                     "tweets": tweets_data
                 }
             else:
-                print("⚠️ snscrape未获取到任何推文")
+                print("⚠️ snscrape did not fetch any tweets")
                 return None
         
         except Exception as e:
             self.logger.error(f"snscrape search failed: {e}")
-            print(f"❌ snscrape搜索Failed: {e}")
+            print(f"❌ snscrape search failed: {e}")
             return None
     
     def _search_tweets_api(self, query: str, max_results: int) -> Dict[str, Any]:
-        """使用官方API搜索推文"""
+        """Search tweets using official API"""
         if not self.api_available:
-            print("❌ 官方API不可用")
+            print("❌ Official API not available")
             return None
         
-        print(f"🔑 使用官方API搜索推文: '{query}'")
+        print(f"🔑 Searching tweets using official API: '{query}'")
         
         try:
             response = self.client.search_recent_tweets(
@@ -373,7 +369,7 @@ class TwitterCollector(BaseCollector):
             )
             
             if not response.data:
-                print("⚠️ 官方API未找到推文")
+                print("⚠️ Official API found no tweets")
                 return None
             
             tweets_data = []
@@ -389,7 +385,7 @@ class TwitterCollector(BaseCollector):
                 }
                 tweets_data.append(tweet_info)
             
-            print(f"✅ 官方API搜索Completed，获取 {len(tweets_data)} entries推文")
+            print(f"✅ Official API search completed, fetched {len(tweets_data)} tweets")
             return {
                 "collection_info": {
                     "query": query,
@@ -402,44 +398,44 @@ class TwitterCollector(BaseCollector):
         
         except Exception as e:
             self.logger.error(f"API search failed: {e}")
-            print(f"❌ 官方API搜索Failed: {e}")
+            print(f"❌ Official API search failed: {e}")
             return None
     
     def _save_data(self, data: Dict[str, Any], filename: str):
-        """保存数据到JSONFile，支持合并和去重"""
+        """Save data to JSON file, supports merging and deduplication"""
         filepath = self.output_dir / filename
         
         try:
-            # CheckFile是否has beenexists
+            # Check if file already exists
             if filepath.exists():
-                # 加载现有数据
+                # Load existing data
                 with open(filepath, 'r', encoding='utf-8') as f:
                     existing_data = json.load(f)
                 
-                # 合并推文数据，根据ID去重
+                # Merge tweet data, deduplicate by ID
                 existing_tweet_ids = {t['id'] for t in existing_data.get('tweets', [])}
                 new_tweets = [t for t in data.get('tweets', []) if t['id'] not in existing_tweet_ids]
                 
-                # 合并
+                # Merge
                 existing_data['tweets'].extend(new_tweets)
                 existing_data['collection_info']['tweets_count'] = len(existing_data['tweets'])
                 existing_data['collection_info']['last_updated'] = datetime.now().isoformat()
                 
-                # 保存合并后的数据
+                # Save merged data
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(existing_data, f, ensure_ascii=False, indent=2)
                 
-                print(f"💾 数据has been合并保存: {filepath}")
-                print(f"   新增推文: {len(new_tweets)} entries")
+                print(f"💾 Data merged and saved: {filepath}")
+                print(f"   New tweets: {len(new_tweets)}")
                 self.logger.info(f"Merged {len(new_tweets)} new tweets into {filename}")
             else:
-                # 直接保存新File
+                # Save new file directly
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
                 
-                print(f"💾 数据has been保存: {filepath}")
+                print(f"💾 Data saved: {filepath}")
                 self.logger.info(f"Saved: {filename}")
         
         except Exception as e:
             self.logger.error(f"Failed to save {filename}: {e}")
-            print(f"❌ 保存数据Failed: {e}")
+            print(f"❌ Failed to save data: {e}")

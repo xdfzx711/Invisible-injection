@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-CSV API数据收集器
-从政府和公共数据源收集CSV格式的数据
-"""
+
 
 import sys
 import csv
@@ -14,7 +11,7 @@ from pathlib import Path
 from typing import Dict, Any
 import random
 
-# 添加项目根directory到路径
+# Add project root directory to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -23,16 +20,16 @@ from data_collection.utils.api_sources import GOVERNMENT_CSV_SOURCES
 
 
 class CSVAPICollector(BaseCollector):
-    """CSV API数据收集器"""
+
     
     def __init__(self):
         super().__init__('csv')
         
-        # 初始化HTTP会话
+        # Initialize HTTP session
         self.session = self._setup_session()
     
     def _setup_session(self) -> requests.Session:
-        """设置HTTP会话"""
+
         session = requests.Session()
         session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -42,25 +39,25 @@ class CSVAPICollector(BaseCollector):
         return session
     
     def validate_config(self) -> bool:
-        """验证配置 - CSV收集器不需要额外配置"""
+        """Validate configuration - CSV collector does not need additional configuration"""
         return True
     
     def collect(self) -> Dict[str, Any]:
-        """执行CSV数据收集"""
+        """Execute CSV data collection"""
         self.start_collection()
         
-        print("\nCSV数据收集 - 政府开放数据")
+        print("\nCSV Data Collection - Government Open Data")
         print("-" * 70)
-        print("\n将收集以下数据:")
-        print("  - 美国联邦假日数据")
-        print("  - 美国州代码数据")
-        print("  - 英国邮编数据")
-        print("  - 国家代码数据")
-        print("  - 世界城市数据")
-        print("  - 世界货币代码")
+        print("\nWill collect the following data:")
+        print("  - US Federal Holiday Data")
+        print("  - US State Code Data")
+        print("  - UK Postcode Data")
+        print("  - Country Code Data")
+        print("  - World Cities Data")
+        print("  - World Currency Code")
         print()
         
-        confirm = input("是否继续? (y/n): ").strip().lower()
+        confirm = input("Continue? (y/n): ").strip().lower()
         if confirm != 'y':
             return {
                 'success': False,
@@ -69,7 +66,7 @@ class CSVAPICollector(BaseCollector):
             }
         
         try:
-            print("\n开始收集CSV数据...")
+            print("\nStarting CSV data collection...")
             print("-" * 70)
             
             self._collect_government_data()
@@ -77,7 +74,7 @@ class CSVAPICollector(BaseCollector):
             self.end_collection()
             self.log_summary()
             
-            # 统计收集的File
+            # Count collected files
             file_count = len(list(self.output_dir.glob('*.csv')))
             
             return {
@@ -89,7 +86,7 @@ class CSVAPICollector(BaseCollector):
             }
             
         except KeyboardInterrupt:
-            print("\n\n用户中断收集")
+            print("\n\nUser interrupted collection")
             self.end_collection()
             return {
                 'success': False,
@@ -107,7 +104,7 @@ class CSVAPICollector(BaseCollector):
             }
     
     def _collect_government_data(self):
-        """收集政府开放数据"""
+        """Collect government open data"""
         self.set_total_items(len(GOVERNMENT_CSV_SOURCES))
         
         for source in GOVERNMENT_CSV_SOURCES:
@@ -118,29 +115,29 @@ class CSVAPICollector(BaseCollector):
             print(f"\n[{country}] {source['description']}")
             
             try:
-                # 获取CSV数据
+                # Fetch CSV data
                 csv_text = self._fetch_csv(url)
                 
                 if csv_text:
-                    # 验证CSV格式
+                    # Validate CSV format
                     if self._validate_csv(csv_text, source_name):
-                        # 保存CSVFile
+                        # Save CSV file
                         filename = self.output_dir / f"{country}_{source_name}.csv"
                         self._save_csv(csv_text, filename)
                         
-                        # 统计行数
+                        # Count lines
                         line_count = len(csv_text.strip().split('\n'))
-                        print(f"  保存成功: {line_count} 行")
+                        print(f"  Saved successfully: {line_count} lines")
                         
                         self.increment_success()
                     else:
-                        print(f"  格式验证Failed")
+                        print(f"  Format validation failed")
                         self.increment_failure()
                 else:
-                    print(f"  下载Failed")
+                    print(f"  Download failed")
                     self.increment_failure()
                 
-                # 添加延迟
+                # Add delay
                 time.sleep(random.uniform(1, 2))
                 
             except Exception as e:
@@ -149,13 +146,13 @@ class CSVAPICollector(BaseCollector):
                 self.increment_failure()
     
     def _fetch_csv(self, url: str) -> str:
-        """获取CSV数据"""
+        """Fetch CSV data"""
         try:
-            # 尝试验证SSL
+            # Try to verify SSL
             try:
                 response = self.session.get(url, timeout=30, verify=True)
             except requests.exceptions.SSLError:
-                # SSL验证Failed，尝试不验证
+                # SSL verification failed, try without verification
                 self.logger.warning(f"SSL verification failed, retrying without verification: {url}")
                 response = self.session.get(url, timeout=30, verify=False)
             
@@ -170,16 +167,16 @@ class CSVAPICollector(BaseCollector):
             return None
     
     def _validate_csv(self, csv_text: str, source_name: str) -> bool:
-        """验证CSV格式"""
+        """Validate CSV format"""
         try:
-            # 尝试解析前几行
+            # Try to parse first few lines
             lines = csv_text.strip().split('\n')[:5]
             
             if len(lines) < 2:
                 self.logger.error(f"CSV too short: {source_name}")
                 return False
             
-            # 验证是否可以被CSV解析器读取
+            # Verify if it can be read by CSV parser
             csv_reader = csv.reader(lines)
             headers = next(csv_reader)
             
@@ -187,12 +184,12 @@ class CSVAPICollector(BaseCollector):
                 self.logger.error(f"No CSV headers found: {source_name}")
                 return False
             
-            # 至少有一行数据
+            # At least one data row
             try:
                 next(csv_reader)
             except StopIteration:
                 self.logger.warning(f"CSV has no data rows: {source_name}")
-                # 即使没有数据行也接受（可能只是空数据集）
+                # Accept even without data rows (might be just an empty dataset)
                 return True
             
             return True
@@ -202,7 +199,7 @@ class CSVAPICollector(BaseCollector):
             return False
     
     def _save_csv(self, csv_text: str, filename: Path):
-        """保存CSV数据"""
+        """Save CSV data"""
         try:
             with open(filename, 'w', encoding='utf-8', newline='') as f:
                 f.write(csv_text)

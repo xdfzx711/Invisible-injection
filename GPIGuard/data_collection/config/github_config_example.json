@@ -1,0 +1,30 @@
+{
+  "token": "Yopur_GitHub_Token_Here",
+  "repositories": [
+    "https://github.com/0xeb/TheBigPromptLibrary/tree/main/CustomInstructions/ChatGPT"
+  ],
+  "fetch": {
+    "readme": true,
+    "issues": false,
+    "pull_requests": false,
+    "commits": false,
+    "recursive_directory": false,
+    "max_files_per_directory": 100
+  },
+  "filter": {
+    "english_only": true,
+    "english_threshold": 0.7
+  },
+  "request": {
+    "per_page": 50
+  }
+}
+
+
+
+
+
+
+
+
+

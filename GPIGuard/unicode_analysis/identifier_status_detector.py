@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-标识符状态检测器
-基于 Unicode IdentifierStatus 标准的简化检测系统
-"""
 
 import json
 import time
@@ -14,16 +10,16 @@ from typing import Dict, List, Any, Union
 import sys
 import os
 
-# 添加项目根directory到路径
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# 导入项目工具
+
 from data_collection.utils.logger import setup_logger
 
-# 修复相对导入问题
+
 try:
     from .identifier_status_config import IdentifierStatusConfig
 except ImportError:
@@ -31,27 +27,27 @@ except ImportError:
 
 
 class IdentifierStatusDetector:
-    """标识符状态检测器"""
+
 
     def __init__(self, config: IdentifierStatusConfig, output_dir: Union[str, Path] = "testscan_data/unicode_analysis", data_sources: List[str] = None):
         self.config = config
         self.base_output_dir = Path(output_dir)
         self.data_sources = data_sources or ['general']
 
-        # 为每个数据源创建Output directory
+
         self.output_dirs = {}
         for source in self.data_sources:
             source_output_dir = self.base_output_dir / f"threat_detection_{source}"
             source_output_dir.mkdir(parents=True, exist_ok=True)
             self.output_dirs[source] = source_output_dir
 
-        # 默认Output directory（用于向后兼容）
+
         self.output_dir = self.base_output_dir
         
-        # 设置日志
+
         self.logger = setup_logger('IdentifierStatusDetector', 'identifier_status_detector.log')
         
-        # 检测统计
+   
         self.detection_stats = {
             "total_characters_checked": 0,
             "restricted_characters_found": 0,
@@ -61,15 +57,15 @@ class IdentifierStatusDetector:
         }
     
     def detect_restrictions_in_characters(self, all_characters: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """检测字符列表中的受限字符"""
+
         if not all_characters:
-            self.logger.warning("没有字符需要检测")
+            self.logger.warning("No characters to detect")
             return []
         
-        self.logger.info(f"开始检测 {len(all_characters)} 个字符的标识符状态")
+        self.logger.info(f"Starting detection of identifier status for {len(all_characters)} characters")
         start_time = time.time()
         
-        # 重置统计
+        # Reset statistics
         self.detection_stats = {
             "total_characters_checked": 0,
             "restricted_characters_found": 0,
@@ -80,11 +76,11 @@ class IdentifierStatusDetector:
         
         detections = []
         
-        # 检测标识符状态
+
         if self.config.is_detection_enabled("identifier_status"):
             detections.extend(self._detect_identifier_status(all_characters))
         
-        # 检测规范化问题（保留现有功能）
+
         if self.config.is_detection_enabled("normalization"):
             normalization_detections = self._detect_normalization_issues(all_characters)
             detections.extend(normalization_detections)
@@ -93,17 +89,17 @@ class IdentifierStatusDetector:
         end_time = time.time()
         self.detection_stats["detection_time"] = end_time - start_time
         
-        self.logger.info(f"检测Completed，发现 {len(detections)} 个问题字符")
-        self.logger.info(f"  - 受限字符: {self.detection_stats['restricted_characters_found']}")
-        self.logger.info(f"  - 规范化问题: {self.detection_stats['normalization_issues_found']}")
+        self.logger.info(f"Detection completed, found {len(detections)} problematic characters")
+        self.logger.info(f"  - Restricted characters: {self.detection_stats['restricted_characters_found']}")
+        self.logger.info(f"  - Normalization issues: {self.detection_stats['normalization_issues_found']}")
         
-        # 保存检测结果
+        # Save detection results
         self._save_detection_results(detections)
         
         return detections
     
     def _detect_identifier_status(self, all_characters: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """检测标识符状态"""
+        """Detect identifier status"""
         detections = []
         
         for char_info in all_characters:
@@ -113,7 +109,7 @@ class IdentifierStatusDetector:
             
             self.detection_stats["total_characters_checked"] += 1
             
-            # Check字符是否受限
+            # Check if character is restricted
             if self.config.is_character_restricted(char):
                 detection = self._create_restriction_detection(char_info)
                 detections.append(detection)
@@ -124,12 +120,12 @@ class IdentifierStatusDetector:
         return detections
     
     def _create_restriction_detection(self, char_info: Dict[str, Any]) -> Dict[str, Any]:
-        """创建受限字符检测记录"""
+        """Create restriction detection record"""
         char = char_info.get("character", "")
         unicode_point = char_info.get("unicode_point", f"U+{ord(char):04X}")
         source_info = char_info.get("source_info", {})
         
-        # 获取字符的基本信息
+        # Get basic character information
         try:
             char_name = unicodedata.name(char, f"UNNAMED-{unicode_point}")
             char_category = unicodedata.category(char)
@@ -137,7 +133,7 @@ class IdentifierStatusDetector:
             char_name = f"UNNAMED-{unicode_point}"
             char_category = "Cn"
         
-        # 创建简化的检测记录
+        # Create simplified detection record
         detection = {
             "detection_id": f"restricted_{self.detection_stats['restricted_characters_found']:06d}",
             "character": char,
@@ -164,7 +160,7 @@ class IdentifierStatusDetector:
         return detection
     
     def _detect_normalization_issues(self, all_characters: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """检测规范化问题（保留现有功能的简化版）"""
+        """Detect normalization issues (simplified version of existing functionality)"""
         normalization_detections = []
         processed_strings = set()
         
@@ -174,13 +170,13 @@ class IdentifierStatusDetector:
             if not normalization_info:
                 continue
             
-            # 避免重复处理相同的字符串
+            # Avoid processing the same string multiple times
             original_string = normalization_info.get("original_string", "")
             if original_string in processed_strings:
                 continue
             processed_strings.add(original_string)
             
-            # Check是否有规范化变化
+            # Check if there are normalization changes
             if normalization_info.get("has_normalization_changes", False):
                 detection = self._create_normalization_detection(char_info, normalization_info)
                 if detection:
@@ -189,7 +185,7 @@ class IdentifierStatusDetector:
         return normalization_detections
     
     def _create_normalization_detection(self, char_info: Dict[str, Any], normalization_info: Dict[str, Any]) -> Dict[str, Any]:
-        """创建规范化问题检测记录"""
+        """Create normalization issue detection record"""
         source_info = char_info.get("source_info", {})
         
         detection = {
@@ -215,15 +211,15 @@ class IdentifierStatusDetector:
         return detection
     
     def _save_detection_results(self, detections: List[Dict[str, Any]]):
-        """保存检测结果"""
+        """Save detection results"""
         if not detections:
-            self.logger.info("没有检测结果需要保存")
+            self.logger.info("No detection results to save")
             return
 
-        # 按数据源和检测类型分组保存
+        # Group by source and detection type for saving
         source_detection_groups = {}
         for detection in detections:
-            # 获取数据源信息
+            # Get source information
             source_type = detection.get("source_info", {}).get("source_type", "general")
             detection_type = detection.get("detection_info", {}).get("detection_type", "unknown")
 
@@ -234,33 +230,24 @@ class IdentifierStatusDetector:
 
             source_detection_groups[source_type][detection_type].append(detection)
 
-        # 为每个数据源保存检测结果
-        # 注意：identifier_status 模式的详细检测Filehas been废弃，使用 threat_based 模式的 formatted_threats File
-        self.logger.info(f"检测Completed，共 {len(detections)} entries记录（使用新格式威胁报告）")
+      
+        self.logger.info(f"Detection completed, total {len(detections)} entries (using new format threat reports)")
         
-        # 旧的File保存逻辑has been注释（has been废弃 identifier_status_detections 和 identifier_status_detection_summary File）
-        # for source_type, detection_groups in source_detection_groups.items():
-        #     output_dir = self.output_dirs.get(source_type, self.output_dir)
-        #     for detection_type, group_detections in detection_groups.items():
-        #         output_file = output_dir / f"identifier_status_detections_{detection_type}.json"
-        #         # ... (保存逻辑has been移除)
-        #     source_summary_file = output_dir / "identifier_status_detection_summary.json"
-        #     # ... (保存逻辑has been移除)
-    
+
     def get_detection_statistics(self) -> Dict[str, Any]:
-        """获取检测Statistics"""
+        """Get detection statistics"""
         return self.detection_stats.copy()
 
 
 def main():
     """Test function"""
-    print("=== 标识符状态检测器测试 ===\n")
+    print("=== Identifier Status Detector Test ===\n")
     
-    # 创建配置和检测器
+    # Create config and detector
     config = IdentifierStatusConfig()
     detector = IdentifierStatusDetector(config)
     
-    # 模拟字符数据
+    # Simulate character data
     test_characters = [
         {
             "character": "a",
@@ -269,37 +256,37 @@ def main():
             "source_info": {"string_value": "test", "file_name": "test.txt"}
         },
         {
-            "character": "а",  # 西里尔字母 a
+            "character": "а",  # Cyrillic letter a
             "unicode_point": "U+0430",
             "position_in_string": 1,
             "source_info": {"string_value": "test", "file_name": "test.txt"}
         },
         {
-            "character": "🙂",  # 表情符号
+            "character": "🙂",  # Emoji
             "unicode_point": "U+1F642",
             "position_in_string": 2,
             "source_info": {"string_value": "test", "file_name": "test.txt"}
         }
     ]
     
-    # 执行检测
+
     detections = detector.detect_restrictions_in_characters(test_characters)
     
-    # 显示结果
-    print(f"检测Completed，发现 {len(detections)} 个问题")
+
+    print(f"Detection completed, found {len(detections)} issues")
     for detection in detections:
         char = detection.get("character", "")
         status = detection.get("status", "")
         detection_type = detection.get("detection_info", {}).get("detection_type", "")
         print(f"  '{char}' ({detection.get('unicode_point', '')}): {status} ({detection_type})")
     
-    # 显示统计
+    # Show statistics
     stats = detector.get_detection_statistics()
     print(f"\nStatistics:")
-    print(f"  检测字符总数: {stats['total_characters_checked']}")
-    print(f"  受限字符数: {stats['restricted_characters_found']}")
-    print(f"  允许字符数: {stats['allowed_characters_found']}")
-    print(f"  检测耗时: {stats['detection_time']:.3f}秒")
+    print(f"  Total characters checked: {stats['total_characters_checked']}")
+    print(f"  Restricted characters found: {stats['restricted_characters_found']}")
+    print(f"  Allowed characters found: {stats['allowed_characters_found']}")
+    print(f"  Detection time: {stats['detection_time']:.3f} seconds")
 
 
 if __name__ == "__main__":

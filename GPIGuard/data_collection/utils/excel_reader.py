@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-Excel/CSVFile读取器
-用于读取网站列表File
+Excel/CSV File Reader
+For reading website list files
 """
 
 import pandas as pd
@@ -15,20 +15,20 @@ from .logger import setup_logger
 
 
 class ExcelReader:
-    """Excel/CSVFile读取器 - 读取网站列表"""
+    """Excel/CSV File Reader - Read website list"""
     
     def __init__(self):
         self.logger = setup_logger('ExcelReader', console_output=False)
     
     def read_websites(self, file_path: Union[str, Path]) -> List[Dict[str, Any]]:
         """
-        从Excel/CSVFile中读取网站列表
+        Read website list from Excel/CSV file
         
         Args:
-            file_path: File路径
+            file_path: File path
         
         Returns:
-            网站数据列表
+            Website data list
         """
         file_path = Path(file_path)
         self.logger.info(f"Reading file: {file_path}")
@@ -38,13 +38,13 @@ class ExcelReader:
             return []
 
         try:
-            # 根据File扩展名选择读取方式
+            # Select read method based on file extension
             if file_path.suffix.lower() == '.xlsx':
                 df = pd.read_excel(file_path, engine='openpyxl')
             elif file_path.suffix.lower() == '.xls':
                 df = pd.read_excel(file_path, engine='xlrd')
             elif file_path.suffix.lower() == '.csv':
-                # 读取CSVFile，自动Detect encoding
+                # Read CSV file, auto-detect encoding
                 try:
                     df = pd.read_csv(file_path, encoding='utf-8')
                 except UnicodeDecodeError:
@@ -57,8 +57,6 @@ class ExcelReader:
                 return []
 
             self.logger.info(f"Successfully read file, {len(df)} rows")
-
-            # 解析网站数据
             websites = self._parse_website_data(df)
 
             self.logger.info(f"Parsed {len(websites)} valid websites")
@@ -69,10 +67,10 @@ class ExcelReader:
             return []
     
     def _parse_website_data(self, df: pd.DataFrame) -> List[Dict[str, Any]]:
-        """解析网站数据"""
+        """Parse website data"""
         websites = []
         
-        # 识别列名
+        # Identify column names
         column_mapping = self._identify_columns(df.columns.tolist())
         
         for index, row in df.iterrows():
@@ -87,16 +85,16 @@ class ExcelReader:
         return websites
     
     def _identify_columns(self, columns: List[str]) -> Dict[str, str]:
-        """识别列名对应的字段"""
+        """Identify column names mapping to fields"""
         column_mapping = {}
 
         patterns = {
-            'name': [r'name', r'网站名', r'站点名', r'名称', r'title', r'网站', r'website_name'],
-            'url': [r'url', r'网址', r'链接', r'地址', r'domain', r'website', r'site'],
-            'rank': [r'rank', r'排名', r'排序', r'序号', r'position', r'#'],
-            'category': [r'category', r'分类', r'类别', r'类型', r'type'],
-            'country': [r'country', r'国家', r'地区', r'region'],
-            'traffic_tier': [r'traffic_tier', r'流量', r'traffic']
+            'name': [r'name', r'website name', r'site name', r'title', r'website'],
+            'url': [r'url', r'website address', r'link', r'address', r'domain', r'website', r'site'],
+            'rank': [r'rank', r'ranking', r'order', r'number', r'position', r'#'],
+            'category': [r'category', r'categories', r'type', r'classification'],
+            'country': [r'country', r'region', r'location'],
+            'traffic_tier': [r'traffic_tier', r'traffic', r'volume']
         }
 
         for col in columns:
@@ -112,12 +110,12 @@ class ExcelReader:
         return column_mapping
     
     def _extract_website_info(self, row: pd.Series, column_mapping: Dict[str, str], index: int) -> Dict[str, Any]:
-        """从行数据中提取网站信息"""
+        """Extract website information from row data"""
         
-        # 获取URL（必需字段）
+        # Get URL (required field)
         url = self._get_column_value(row, column_mapping, 'url')
         if not url:
-            # 尝试从第一列获取
+            # Try to get from first column
             for col in row.index:
                 value = str(row[col]).strip()
                 if value.startswith(('http://', 'https://', 'www.')):
@@ -127,7 +125,7 @@ class ExcelReader:
         if not url:
             return None
         
-        # 标准化URL
+        # Normalize URL
         url = self._normalize_url(url)
         
         website_data = {
@@ -144,7 +142,7 @@ class ExcelReader:
         return website_data
     
     def _get_column_value(self, row: pd.Series, column_mapping: Dict[str, str], field: str) -> str:
-        """获取列值"""
+        """Get column value"""
         if field in column_mapping and column_mapping[field] in row.index:
             value = row[column_mapping[field]]
             if pd.notna(value):
@@ -152,11 +150,11 @@ class ExcelReader:
         return ''
     
     def _get_numeric_value(self, row: pd.Series, column_mapping: Dict[str, str], field: str, default: int) -> int:
-        """获取数值列值"""
+        """Get numeric column value"""
         value_str = self._get_column_value(row, column_mapping, field)
         if value_str:
             try:
-                # 移除逗号等分隔符
+                # Remove comma and space separators
                 value_str = value_str.replace(',', '').replace(' ', '')
                 return int(float(value_str))
             except (ValueError, TypeError):
@@ -164,13 +162,13 @@ class ExcelReader:
         return default
     
     def _normalize_url(self, url: str) -> str:
-        """标准化URL"""
+        """Normalize URL"""
         url = url.strip()
         
-        # 移除尾部斜杠
+        # Remove trailing slash
         url = url.rstrip('/')
         
-        # 如果没有协议，添加https://
+        # Add https:// if no protocol
         if not url.startswith(('http://', 'https://')):
             if url.startswith('www.'):
                 url = 'https://' + url
@@ -180,14 +178,14 @@ class ExcelReader:
         return url
     
     def _extract_domain_name(self, url: str) -> str:
-        """从URL提取域名"""
+        """Extract domain name from URL"""
         from urllib.parse import urlparse
         
         try:
             parsed = urlparse(url)
             domain = parsed.netloc or parsed.path
             
-            # 移除www.前缀
+            # Remove www. prefix
             if domain.startswith('www.'):
                 domain = domain[4:]
             
@@ -197,23 +195,24 @@ class ExcelReader:
             return url
     
     def _validate_website_data(self, website_data: Dict[str, Any]) -> bool:
-        """验证网站数据是否有效"""
+        """Validate if website data is valid"""
         if not website_data.get('url'):
             return False
         
         url = website_data['url']
         
-        # 基本URL验证
+        # Basic URL validation
         if not any(url.startswith(prefix) for prefix in ['http://', 'https://']):
             return False
         
-        # 排除明显无效的URL
+        # Exclude obviously invalid URLs
         invalid_patterns = ['example.com', 'test.com', 'localhost']
         for pattern in invalid_patterns:
             if pattern in url.lower():
                 return False
         
         return True
+
 
 
 

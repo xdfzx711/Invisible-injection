@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-统一日志管理器
-所有模块使用统一的日志配置
+Unified Logger Manager
+All modules use unified logging configuration
 """
 
 import logging
@@ -17,32 +17,32 @@ def setup_logger(name: str,
                 level: int = logging.INFO,
                 console_output: bool = True) -> logging.Logger:
     """
-    设置标准化的日志器
+    Setup standardized logger
     
     Args:
-        name: 日志器名称
-        log_file: 日志File名（可选，默认使用name.log）
-        level: 日志级别
-        console_output: 是否输出到控制台
+        name: Logger name
+        log_file: Log file name (optional, defaults to name.log)
+        level: Log level
+        console_output: Whether to output to console
     
     Returns:
-        配置好的logger对象
+        Configured logger object
     """
-    # 获取统一的Log directory
+    # Get unified log directory
     path_manager = PathManager()
     log_dir = path_manager.get_log_dir()
     log_dir.mkdir(parents=True, exist_ok=True)
     
-    # 确定日志File路径
+    # Determine log file path
     if log_file is None:
         log_file = f"{name.lower().replace(' ', '_')}.log"
     log_path = log_dir / log_file
     
-    # 创建logger
+    # Create logger
     logger = logging.getLogger(name)
     logger.setLevel(level)
     
-    # 避免重复添加handler
+    # Avoid adding duplicate handlers
     if logger.handlers:
         return logger
     
@@ -50,7 +50,7 @@ def setup_logger(name: str,
     file_handler = logging.FileHandler(log_path, encoding='utf-8')
     file_handler.setLevel(level)
     
-    # 格式化器
+    # Formatter
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
@@ -59,7 +59,7 @@ def setup_logger(name: str,
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
     
-    # 控制台handler（可选）
+    # Console handler (optional)
     if console_output:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
@@ -71,13 +71,13 @@ def setup_logger(name: str,
 
 def get_logger(name: str) -> logging.Logger:
     """
-    获取has beenexists的logger
+    Get an existing logger
     
     Args:
-        name: logger名称
+        name: Logger name
     
     Returns:
-        logger对象
+        Logger object
     """
     return logging.getLogger(name)
 

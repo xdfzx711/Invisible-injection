@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-数据收集器基类
-所有数据收集器必须继承此类并实现指定方法
+Data Collector Base Class
+All data collectors must inherit from this class and implement specified methods
 """
 
 from abc import ABC, abstractmethod
@@ -17,26 +17,26 @@ from .utils.path_manager import PathManager
 
 
 class BaseCollector(ABC):
-    """数据收集器基类"""
+    """Data Collector Base Class"""
     
     def __init__(self, collector_type: str):
         """
-        初始化收集器
+        Initialize collector
         
         Args:
-            collector_type: 收集器类型 (html, api, reddit, twitter)
+            collector_type: Collector type (html, api, reddit, twitter)
         """
         self.collector_type = collector_type
         self.logger = setup_logger(f'{self.__class__.__name__}')
         
-        # 使用统一的Path Manager
+        # Use unified Path Manager
         self.path_manager = PathManager()
         self.output_dir = self.path_manager.get_origin_data_dir(collector_type)
         
-        # 确保Output directoryexists
+        # Ensure output directory exists
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # 收集统计
+        # Collection statistics
         self.stats = {
             'total_items': 0,
             'successful_items': 0,
@@ -52,51 +52,51 @@ class BaseCollector(ABC):
     @abstractmethod
     def collect(self) -> Dict[str, Any]:
         """
-        执行数据收集（必须实现）
+        Execute data collection (must be implemented)
         
         Returns:
-            收集结果字典，包含:
-                - success: 是否成功
-                - file_count: 收集的File数量
-                - total_size: 总大小（字节）
+            Collection result dictionary containing:
+                - success: Whether successful
+                - file_count: Number of files collected
+                - total_size: Total size (bytes)
                 - output_dir: Output directory
                 - stats: Statistics
-                - message: 结果消息
+                - message: Result message
         """
         pass
     
     @abstractmethod
     def validate_config(self) -> bool:
         """
-        验证配置是否有效（必须实现）
+        Validate whether configuration is valid (must be implemented)
         
         Returns:
-            配置是否有效
+            Whether configuration is valid
         """
         pass
     
     def get_config_path(self, config_name: str) -> Path:
-        """获取配置File路径"""
+        """Get configuration file path"""
         return self.path_manager.get_config_dir() / config_name
     
     def start_collection(self):
-        """开始收集，记录开始时间"""
+        """Start collection, record start time"""
         self.stats['start_time'] = time.time()
         self.logger.info(f"Starting data collection for {self.collector_type}")
     
     def end_collection(self):
-        """结束收集，记录结束时间"""
+        """End collection, record end time"""
         self.stats['end_time'] = time.time()
         if self.stats['start_time']:
             self.stats['duration_seconds'] = self.stats['end_time'] - self.stats['start_time']
         self.logger.info(f"Collection completed in {self.stats['duration_seconds']:.2f} seconds")
     
     def get_stats(self) -> Dict[str, Any]:
-        """获取收集统计"""
+        """Get collection statistics"""
         return self.stats.copy()
     
     def log_summary(self):
-        """记录收集摘要"""
+        """Log collection summary"""
         self.logger.info("="*60)
         self.logger.info(f"Collection Summary - {self.collector_type.upper()}")
         self.logger.info("="*60)
@@ -108,15 +108,15 @@ class BaseCollector(ABC):
         self.logger.info("="*60)
     
     def increment_success(self):
-        """增加成功计数"""
+        """Increment success count"""
         self.stats['successful_items'] += 1
     
     def increment_failure(self):
-        """增加Failed计数"""
+        """Increment failure count"""
         self.stats['failed_items'] += 1
     
     def set_total_items(self, count: int):
-        """设置总项目数"""
+        """Set total items count"""
         self.stats['total_items'] = count
     
     def __repr__(self):

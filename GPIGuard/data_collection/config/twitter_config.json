@@ -1,7 +1,8 @@
 {
-  "bearer_token": "AAAAAAAAAAAAAAAAAAAAAFc24AEAAAAA%2FGXmPt6oJH3KGfvug0rc6mG%2BLWA%3DgFHEDc10xpjzzfpvCyUFNwk19v3bbISCWG1WyMQDlPrtE9R3dZ",
-  "api_key": "mZRMrQbu2YnMcRbhFoFKPECTl",
-  "api_secret": "YMzbOq8V81lr4KlcHff85ilj2h1XkZo1JlgiIdprujdAgCj6W7x",
-  "access_token": "1837783029743288320-Mau3UhffgBS9wtTlBQ3AOxREbzn41e",
-  "access_token_secret": "O25iwZXk28oT9w3o6P0lxi7OoViUkR2PW472WBx5ImmuS"
+  "bearer_token": "YOUR_TWITTER_BEARER_TOKEN_HERE",
+  "api_key": "YOUR_API_KEY_HERE",
+  "api_secret": "YOUR_API_SECRET_HERE",
+  "access_token": "YOUR_ACCESS_TOKEN_HERE",
+  "access_token_secret": "YOUR_ACCESS_TOKEN_SECRET_HERE"
+
 }

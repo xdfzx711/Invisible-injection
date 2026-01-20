@@ -57,7 +57,6 @@ class UnicodeAnalysisManager:
 
         # Set default paths (relative to testscan directory)
         if output_dir is None:
-            # 从unicode_analysisdirectory向上找到testscandirectory
             current_dir = Path(__file__).parent
             testscan_dir = current_dir.parent
             output_dir = testscan_dir / "testscan_data"
@@ -76,7 +75,7 @@ class UnicodeAnalysisManager:
         self.data_sources = data_sources or ['json', 'csv', 'xml', 'html', 'reddit', 'twitter', 'github', 'godofprompt']
         self.logger.info(f"Enabled data sources: {', '.join(self.data_sources)}")
         if force_extract:
-            self.logger.info("强制重新提取字符模式has been启用")
+            self.logger.info("Force re-extraction of character patterns has been enabled")
 
         # Initialize configuration
         self.config = IdentifierStatusConfig(lookup_file)
@@ -100,7 +99,7 @@ class UnicodeAnalysisManager:
                 if confusables_file.exists():
                     homograph_config = HomographConfig(confusables_file)
                     self.homograph_detector = HomographDetector(homograph_config, output_dir, self.data_sources)
-                    self.logger.info("Homoglyph Character检测器has been启用")
+                    self.logger.info("Homoglyph Character Detection has been enabled")
                 else:
                     self.logger.warning(f"Confusables data file not found: {confusables_file}")
                     self.logger.warning("Homoglyph detection will be skipped")
@@ -111,7 +110,6 @@ class UnicodeAnalysisManager:
         else:
             self.logger.info("Homoglyph detection is disabled")
         
-        # 初始化新格式化组件
         self.logger.info("Initializing threat formatting component...")
         self.unicode_classifier = UnicodeTypeClassifier(confusables_file if confusables_file.exists() else None)
         self.threat_formatter = ThreatFormatter()
@@ -143,7 +141,6 @@ class UnicodeAnalysisManager:
         start_time = time.time()
         
         try:
-            # 第一步：智能字符提取（自动Checkhas been有File）
             self.logger.info("Step 1: Intelligent character extraction...")
             all_characters = self.character_extractor.extract_from_parsed_data_smart(
                 parsed_data_dir,
@@ -160,11 +157,9 @@ class UnicodeAnalysisManager:
                 self.logger.error(error_message)
                 return {"error": error_message}
 
-            # 第二步：检测受限字符
             self.logger.info("Step 2: Detect restricted characters...")
             restriction_detections = self.restriction_detector.detect_restrictions_in_characters(all_characters)
 
-            # 第三步：检测Homoglyph Character（可选）
             homograph_detections = []
             if self.enable_homograph and self.homograph_detector:
                 self.logger.info("Step 3: Detect homoglyph characters...")
@@ -172,32 +167,30 @@ class UnicodeAnalysisManager:
             else:
                 self.logger.info("Step 3: Skip homoglyph detection")
 
-            # 第四步：Generate new format threat reports
             self.logger.info("Step 4: Generate new format threat reports...")
             formatted_reports = self._generate_formatted_reports(
                 restriction_detections, homograph_detections
             )
 
-            # 新增步骤：生成对比报告
             if homograph_detections:
                 self.logger.info("Step 4.5: Generate homoglyph comparison reports...")
                 comparison_reports = self.comparison_report_generator.generate_reports(
                     all_characters, homograph_detections
                 )
                 if comparison_reports:
-                    # 按数据源类型分组保存对比报告
+                    # Save comparison reports grouped by data source type
                     self.comparison_report_generator.save_reports_by_source(
                         comparison_reports, self.output_dir
                     )
                     self.logger.info(f"Comparison reports saved by data source type to {self.output_dir}/threat_detection_*/ directory")
 
-            # 第五步：Generate analysis results
+            # Step 5: Generate analysis results
             end_time = time.time()
             analysis_result = self._generate_analysis_result(
                 all_characters, restriction_detections, homograph_detections, start_time, end_time
             )
             
-            # 添加新格式报告信息到分析结果
+            # Add new format report information to analysis results
             analysis_result["formatted_reports"] = {
                 "total_threats": len(formatted_reports),
                 "reports_generated": True
@@ -223,7 +216,7 @@ class UnicodeAnalysisManager:
         Returns:
             List of formatted threat reports
         """
-        self.logger.info("开始生成新格式威胁报告...")
+        self.logger.info("Starting to generate new format threat reports...")
         
         # Merge all detection results
         all_detections = []
@@ -248,14 +241,14 @@ class UnicodeAnalysisManager:
         
         self.logger.info(f"Generated {len(formatted_reports)} threat reports")
         
-        # 按数据源保存报告
+
         self._save_formatted_reports_by_source(formatted_reports)
         
         return formatted_reports
     
     def _save_formatted_reports_by_source(self, reports: List[Dict[str, Any]]):
         """Save formatted reports by data source"""
-        # 按数据源分组
+
         reports_by_source = {}
         for report in reports:
             source_type = report["source_info"].get("source_type", "unknown")
@@ -263,12 +256,12 @@ class UnicodeAnalysisManager:
                 reports_by_source[source_type] = []
             reports_by_source[source_type].append(report)
         
-        # 为每个数据源保存报告
+
         for source_type, source_reports in reports_by_source.items():
             output_dir = self.output_dir / f"threat_detection_{source_type}"
             output_dir.mkdir(parents=True, exist_ok=True)
             
-            # 保存JSON格式
+  
             json_file = output_dir / "formatted_threats.json"
             self.threat_formatter.save_formatted_reports(
                 source_reports, 
@@ -276,7 +269,7 @@ class UnicodeAnalysisManager:
                 include_metadata=True
             )
             
-            # 保存统计摘要
+
             stats = self.threat_formatter.generate_summary_statistics(source_reports)
             stats_file = output_dir / "threat_summary_by_type.json"
             
@@ -284,22 +277,22 @@ class UnicodeAnalysisManager:
             try:
                 with open(stats_file, 'w', encoding='utf-8') as f:
                     json.dump(stats, f, ensure_ascii=False, indent=2)
-                self.logger.info(f"统计摘要has been保存: {stats_file}")
+                self.logger.info(f"Summary statistics has been saved: {stats_file}")
             except Exception as e:
-                self.logger.error(f"保存统计摘要Failed: {e}")
+                self.logger.error(f"Failed to save summary statistics: {e}")
             
-            # Convert to standard format并分离BIDI threats
-            self.logger.info(f"开始转换{source_type}威胁报告为标准格式...")
+  
+            self.logger.info(f"Starting conversion of {source_type} threat reports to standard format...")
             try:
                 conversion_stats = self.threat_converter.convert_formatted_threats(json_file, output_dir)
                 if conversion_stats.get('conversion_success', False):
-                    self.logger.info(f"{source_type}威胁报告Conversion completed:")
+                    self.logger.info(f"{source_type} threat report conversion completed:")
                     self.logger.info(f"  - BIDI threats: {conversion_stats['bidi_converted']} entries")
                     self.logger.info(f"  - Other threats: {conversion_stats['non_bidi_converted']} entries")
                 else:
-                    self.logger.error(f"{source_type}威胁报告转换Failed: {conversion_stats.get('error', '未知Error')}")
+                    self.logger.error(f"{source_type} threat report conversion failed: {conversion_stats.get('error', 'Unknown error')}")
             except Exception as e:
-                self.logger.error(f"转换{source_type}威胁报告时发生异常: {e}")
+                self.logger.error(f"Exception occurred while converting {source_type} threat reports: {e}")
     
     def _generate_analysis_result(self, all_characters: List[Dict[str, Any]],
                                 restriction_detections: List[Dict[str, Any]],
@@ -307,19 +300,19 @@ class UnicodeAnalysisManager:
                                 start_time: float, end_time: float) -> Dict[str, Any]:
         """Generate analysis results"""
         
-        # 基本统计
+        # Basic statistics
         char_summary = self.character_extractor.get_character_summary(all_characters)
         
-        # 受限字符统计
+        # Restricted character statistics
         restriction_stats = self._calculate_restriction_stats(restriction_detections)
 
-        # Homoglyph Character统计
+        # Homoglyph Character statistics
         homograph_stats = self._calculate_homograph_stats(homograph_detections)
 
-        # File统计
+        # File statistics
         file_stats = self._calculate_file_stats(all_characters, restriction_detections, homograph_detections)
 
-        # 检测器统计
+        # Detector statistics
         detector_stats = self.restriction_detector.get_detection_statistics()
         homograph_detector_stats = self.homograph_detector.get_detection_statistics() if self.homograph_detector else {}
 
@@ -370,17 +363,17 @@ class UnicodeAnalysisManager:
         confusable_chars = {}
 
         for detection in homograph_detections:
-            # 混淆类型统计
+            # Confusable type statistics
             confusable_type = detection.get("confusable_type", "unknown")
             confusable_types[confusable_type] = confusable_types.get(confusable_type, 0) + 1
 
-            # 混淆字符统计
+            # Confusable character statistics
             character = detection.get("character", "")
             unicode_point = detection.get("unicode_point", "")
             char_key = f"{character} ({unicode_point})"
             confusable_chars[char_key] = confusable_chars.get(char_key, 0) + 1
 
-        # 获取前10个最常见的混淆字符
+        # Get the top 10 most common confusable characters
         top_confusable_chars = sorted(confusable_chars.items(), key=lambda x: x[1], reverse=True)[:10]
 
         return {
@@ -390,18 +383,18 @@ class UnicodeAnalysisManager:
         }
 
     def _calculate_restriction_stats(self, restriction_detections: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """计算受限字符Statistics"""
+        """Calculate restricted character statistics"""
 
         detection_types = {}
         restricted_chars = {}
         char_counts = {}
         
         for detection in restriction_detections:
-            # 检测类型统计
+            # Detection type statistics
             detection_type = detection.get("detection_info", {}).get("detection_type", "unknown")
             detection_types[detection_type] = detection_types.get(detection_type, 0) + 1
 
-            # 受限字符统计
+            # Restricted character statistics
             char_key = detection["unicode_point"]
             if char_key not in char_counts:
                 char_counts[char_key] = {
@@ -414,7 +407,7 @@ class UnicodeAnalysisManager:
                 }
             char_counts[char_key]["count"] += 1
 
-        # 获取最常见的受限字符
+        # Get the top 10 most common restricted characters
         top_restricted_chars = sorted(char_counts.values(), key=lambda x: x["count"], reverse=True)[:10]
 
         return {
@@ -427,7 +420,7 @@ class UnicodeAnalysisManager:
                             homograph_detections: List[Dict[str, Any]]) -> Dict[str, Any]:
         """计算FileStatistics"""
         
-        # 所有File统计
+        # All file statistics
         all_files = {}
         for char in all_characters:
             file_path = char["source_info"]["file_path"]
@@ -442,36 +435,36 @@ class UnicodeAnalysisManager:
                 }
             all_files[file_path]["total_characters"] += 1
 
-        # 受限字符File统计
+        # Restricted character file statistics
         for detection in restriction_detections:
             file_path = detection["source_info"]["file_path"]
             if file_path in all_files:
                 all_files[file_path]["restrictions_found"] += 1
 
-        # Homoglyph CharacterFile统计
+        # Homoglyph character file statistics
         for detection in homograph_detections:
             file_path = detection["source_info"]["file_path"]
             if file_path in all_files:
                 all_files[file_path]["homographs_found"] += 1
 
-        # 计算比率
+        # Calculate rates
         for file_info in all_files.values():
             file_info["restriction_rate"] = file_info["restrictions_found"] / file_info["total_characters"] if file_info["total_characters"] > 0 else 0
             file_info["homograph_rate"] = file_info["homographs_found"] / file_info["total_characters"] if file_info["total_characters"] > 0 else 0
 
-        # 按受限字符数量排序
+        # Sort by number of restricted characters
         files_by_restrictions = sorted(all_files.values(), key=lambda x: x["restrictions_found"], reverse=True)
 
         return {
             "total_files": len(all_files),
             "files_with_restrictions": len([f for f in all_files.values() if f["restrictions_found"] > 0]),
             "files_with_homographs": len([f for f in all_files.values() if f["homographs_found"] > 0]),
-            "files_by_restriction_count": files_by_restrictions[:10],  # 前10个受限字符最多的File
+            "files_by_restriction_count": files_by_restrictions[:10],  
             "source_type_distribution": self._get_source_type_distribution(all_files.values())
         }
     
     def _get_source_type_distribution(self, file_infos) -> Dict[str, Dict[str, int]]:
-        """获取按源类型的分布统计"""
+        """Get distribution statistics by source type"""
         distribution = {}
         
         for file_info in file_infos:
@@ -494,7 +487,7 @@ class UnicodeAnalysisManager:
         return distribution
 
     def _diagnose_extraction_failure(self, parsed_data_dir: Path) -> str:
-        """诊断字符提取Failed的原因"""
+        """Diagnose the reason for character extraction failure"""
         diagnostic_messages = []
 
         # CheckParsed data directory
@@ -502,7 +495,6 @@ class UnicodeAnalysisManager:
             diagnostic_messages.append(f"Parsed data directory does not exist: {parsed_data_dir}")
             return " ".join(diagnostic_messages)
 
-        # Check各数据源directory
         source_handlers = {
             'json': 'json_analysis',
             'csv': 'csv_analysis',
@@ -521,7 +513,7 @@ class UnicodeAnalysisManager:
             if source_type in source_handlers:
                 dir_name = source_handlers[source_type]
             else:
-                # 动态数据源directory推断
+
                 dir_name = f"{source_type}_analysis"
                 
             source_dir = parsed_data_dir / dir_name
@@ -533,7 +525,7 @@ class UnicodeAnalysisManager:
             else:
                 existing_dirs.append(f"{source_type}({dir_name})")
 
-        # Check字符提取File
+
         char_output_dir = self.output_dir / "unicode_analysis" / "character_extraction"
         extraction_file_status = []
         large_files = []
@@ -546,164 +538,150 @@ class UnicodeAnalysisManager:
                     size_gb = size / (1024 * 1024 * 1024)
 
                     if size == 0:
-                        extraction_file_status.append(f"{source_type}(File为空)")
+                        extraction_file_status.append(f"{source_type}(File is empty)")
                     elif size_gb > 1.0:
-                        extraction_file_status.append(f"{source_type}(Fileexists,{size_gb:.2f}GB)")
+                        extraction_file_status.append(f"{source_type}(File exists,{size_gb:.2f}GB)")
                         if size_gb > 8.0:
                             large_files.append(f"{source_type}({size_gb:.2f}GB)")
                     else:
                         size_mb = size / (1024 * 1024)
-                        extraction_file_status.append(f"{source_type}(Fileexists,{size_mb:.1f}MB)")
+                        extraction_file_status.append(f"{source_type}(File exists,{size_mb:.1f}MB)")
                 except Exception as e:
                     extraction_file_status.append(f"{source_type}(FileError:{e})")
             else:
-                extraction_file_status.append(f"{source_type}(File不exists)")
+                extraction_file_status.append(f"{source_type}(File not exists)")
 
-        # 构建诊断消息
         if missing_dirs:
-            diagnostic_messages.append(f"缺失数据源directory: {', '.join(missing_dirs)}")
+            diagnostic_messages.append(f"Missing data source directories: {', '.join(missing_dirs)}")
 
         if empty_dirs:
-            diagnostic_messages.append(f"空数据源directory: {', '.join(empty_dirs)}")
+            diagnostic_messages.append(f"Empty data source directories: {', '.join(empty_dirs)}")
 
         if existing_dirs:
-            diagnostic_messages.append(f"exists数据源directory: {', '.join(existing_dirs)}")
+            diagnostic_messages.append(f"Existing data source directories: {', '.join(existing_dirs)}")
 
-        diagnostic_messages.append(f"字符提取File状态: {', '.join(extraction_file_status)}")
+        diagnostic_messages.append(f"Character extraction file status: {', '.join(extraction_file_status)}")
 
-        # 提供建议
+
         suggestions = []
         if missing_dirs or empty_dirs:
-            suggestions.append("请先运行数据解析步骤生成解析数据")
+            suggestions.append("Please run the data parsing step to generate parsed data")
 
         if not existing_dirs:
-            suggestions.append("请Check数据源配置和Parsed data directory")
+            suggestions.append("Please check data source configuration and parsed data directory")
 
         if large_files:
-            suggestions.append(f"检测到超大File({', '.join(large_files)})可能导致内存不足")
-            suggestions.append("建议: 1) 增加系统内存 2) 使用 --force-extract 重新生成File 3) 分批处理数据")
+            suggestions.append(f"Detected large files ({', '.join(large_files)}) that may cause insufficient memory")
+            suggestions.append("Suggestions: 1) Increase system memory 2) Use --force-extract to regenerate files 3) Process data in batches")
         else:
-            suggestions.append("可以使用 --force-extract 参数强制重新提取字符")
+            suggestions.append("You can use the --force-extract parameter to forcibly re-extract characters")
 
         if suggestions:
-            diagnostic_messages.append(f"建议: {'; '.join(suggestions)}")
+            diagnostic_messages.append(f"Suggestions: {'; '.join(suggestions)}")
 
         return " ".join(diagnostic_messages)
 
-    # 注释：删除_save_analysis_result方法，不再生成unicode_analysis_result.json
-    # def _save_analysis_result(self, analysis_result: Dict[str, Any]):
-    #     """保存分析结果"""
-    #
-    #     import json
-    #
-    #     result_file = self.analysis_output_dir / "unicode_analysis_result.json"
-    #     try:
-    #         with open(result_file, 'w', encoding='utf-8') as f:
-    #             json.dump(analysis_result, f, ensure_ascii=False, indent=2)
-    #         self.logger.info(f"分析结果has been保存: {result_file}")
-    #     except Exception as e:
-    #         self.logger.error(f"保存分析结果Failed: {e}")
-
+ 
     def print_analysis_summary(self, analysis_result: Dict[str, Any]):
-        """打印分析摘要"""
+        """Print analysis summary"""
 
         print("\n" + "="*70)
-        print("🔍 Unicode identifier status analysis completed摘要")
+        print("🔍 Unicode identifier status analysis completed summary")
         print("="*70)
 
-        # 基本信息
+        # Basic information
         char_info = analysis_result["character_extraction"]
         restriction_info = analysis_result["restriction_detection"]
         file_info = analysis_result["file_analysis"]
 
-        print(f"⏱️  分析耗时: {analysis_result['analysis_info']['duration_seconds']:.2f} 秒")
-        print(f"📊 字符分析: {char_info['total_characters']} 个字符 ({char_info['unique_characters']} 个唯一字符)")
-        print(f"📁 File分析: {file_info['total_files']} 个File")
+        print(f"⏱️  Analysis duration: {analysis_result['analysis_info']['duration_seconds']:.2f} seconds")
+        print(f"📊 Character analysis: {char_info['total_characters']} characters ({char_info['unique_characters']} unique characters)")
+        print(f"📁 File analysis: {file_info['total_files']} files")
 
         # Restricted character detection results
-        print(f"\n✅ 标识符状态检测:")
-        print(f"   ✅ 允许字符: {restriction_info['allowed_characters']} 个")
-        print(f"   ❌ 受限字符: {restriction_info['restricted_characters']} 个")
-        print(f"   📈 受限率: {restriction_info['restriction_rate']:.4f} ({restriction_info['restriction_rate']*100:.2f}%)")
-        print(f"   📁 涉及File: {file_info['files_with_restrictions']}/{file_info['total_files']} 个")
+        print(f"\n✅ Identifier status detection:")
+        print(f"   ✅ Allowed characters: {restriction_info['allowed_characters']}")
+        print(f"   ❌ Restricted characters: {restriction_info['restricted_characters']}")
+        print(f"   📈 Restriction rate: {restriction_info['restriction_rate']:.4f} ({restriction_info['restriction_rate']*100:.2f}%)")
+        print(f"   📁 Files involved: {file_info['files_with_restrictions']}/{file_info['total_files']}")
 
         if restriction_info["total_restrictions"] > 0:
-            print(f"\n📊 检测类型分布:")
+            print(f"\n📊 Detection type distribution:")
             for detection_type, count in restriction_info["detection_types"].items():
                 print(f"   • {detection_type}: {count} 个")
 
             if restriction_info["top_restricted_chars"]:
-                print(f"\n🔝 最常见受限字符:")
+                print(f"\n🔝 Most common restricted characters:")
                 for i, restricted_char in enumerate(restriction_info["top_restricted_chars"][:5]):
                     print(f"   {i+1}. '{restricted_char['character']}' ({restricted_char['unicode_point']}) - {restricted_char['count']} 次")
 
         else:
-            print(f"\n✅ 标识符状态检测: 所有字符均为允许状态")
+            print(f"\n✅ Identifier status detection: All characters are allowed")
         
-        # 新格式报告信息
+        # New format report information
         if "formatted_reports" in analysis_result and analysis_result["formatted_reports"]["reports_generated"]:
-            print(f"\n📝 新格式威胁报告:")
-            print(f"   📄 威胁报告数: {analysis_result['formatted_reports']['total_threats']} entries")
-            print(f"   ✅ has been生成新格式报告File:")
-            print(f"      • formatted_threats.json (JSON格式)")
-            print(f"      • threat_summary_by_type.json (按类型统计)")
+            print(f"\n📝 New format threat reports:")
+            print(f"   📄 Number of threat reports: {analysis_result['formatted_reports']['total_threats']} entries")
+            print(f"   ✅ New format report files have been generated:")
+            print(f"      • formatted_threats.json (JSON format)")
+            print(f"      • threat_summary_by_type.json (summary by type)")
         
         print(f"\n📂 Output directory: {self.analysis_output_dir}")
         print("="*70)
 
 def parse_arguments():
-    """解析命令行参数"""
+  
     parser = argparse.ArgumentParser(
-        description="Unicode标识符状态分析工具 - 从指定数据源提取字符并检测受限字符",
+        description="Unicode identifier status analysis tool - Extract characters from specified data sources and detect restricted characters",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-示例用法:
-  python analysis_main.py                    # 分析所有数据源
-  python analysis_main.py --csv              # 只分析CSV数据
-  python analysis_main.py --reddit           # 只分析Reddit数据
-  python analysis_main.py --godofprompt      # 只分析GodOfPrompt数据
-  python analysis_main.py --csv --html       # 分析CSV和HTML数据
-  python analysis_main.py --json --xml --reddit  # 分析JSON、XML和Reddit数据
-  python analysis_main.py --github --godofprompt  # 分析GitHub和GodOfPrompt数据
+Example usage:
+  python analysis_main.py                    # Analyze all data sources
+  python analysis_main.py --csv              # Analyze only CSV data
+  python analysis_main.py --reddit           # Analyze only Reddit data
+  python analysis_main.py --godofprompt      # Analyze only GodOfPrompt data
+  python analysis_main.py --csv --html       # Analyze CSV and HTML data
+  python analysis_main.py --json --xml --reddit  # Analyze JSON, XML, and Reddit data
+  python analysis_main.py --github --godofprompt  # Analyze GitHub and GodOfPrompt data
         """
     )
 
-    # 数据源选择参数
+    # Data source parameters
     parser.add_argument('--json', action='store_true',
-                       help='分析JSON数据源')
+                       help='Analyze JSON data source')
     parser.add_argument('--csv', action='store_true',
-                       help='分析CSV数据源')
+                       help='Analyze CSV data source')
     parser.add_argument('--xml', action='store_true',
-                       help='分析XML数据源')
+                       help='Analyze XML data source')
     parser.add_argument('--html', action='store_true',
-                       help='分析HTML数据源')
+                       help='Analyze HTML data source')
     parser.add_argument('--reddit', action='store_true',
-                       help='分析Reddit数据源')
+                       help='Analyze Reddit data source')
     parser.add_argument('--twitter', action='store_true',
-                       help='分析Twitter数据源')
+                       help='Analyze Twitter data source')
     parser.add_argument('--github', action='store_true',
-                       help='分析GitHub数据源')
+                       help='Analyze GitHub data source')
     parser.add_argument('--godofprompt', action='store_true',
-                       help='分析GodOfPrompt数据源')
+                       help='Analyze GodOfPrompt data source')
 
-    # 其他参数
+    # Other parameters
     parser.add_argument('--output-dir', type=str,
-                       help='Output directory路径 (默认: testscan_data)')
+                       help='Output directory path (default: testscan_data)')
     parser.add_argument('--lookup-file', type=str,
-                       help='标识符状态查找表File路径 (默认: identifier_status_lookup.json)')
+                       help='Identifier status lookup file path (default: identifier_status_lookup.json)')
     parser.add_argument('--verbose', '-v', action='store_true',
-                       help='显示详细输出')
+                       help='Show detailed output')
     parser.add_argument('--force-extract', action='store_true',
-                       help='强制重新提取字符，即使has been有提取结果')
+                       help='Force re-extraction of characters even if extraction results exist')
 
     return parser.parse_known_args()
 
 def main():
-    """主函数"""
-    # 解析命令行参数
+    """Main function"""
+    # Parse command-line arguments
     args, unknown_args = parse_arguments()
 
-    # 确定要处理的数据源
+    # Determine data sources to process
     data_sources = []
     if args.json:
         data_sources.append('json')
@@ -722,23 +700,23 @@ def main():
     if args.godofprompt:
         data_sources.append('godofprompt')
 
-    # 处理动态参数 (例如 --reddit_top)
+    # Handle dynamic parameters (e.g., --reddit_top)
     for arg in unknown_args:
         if arg.startswith('--'):
             source_name = arg[2:]
             if source_name and source_name not in data_sources:
                 data_sources.append(source_name)
 
-    # 如果没有指定任何数据源，则使用所有数据源
+    # If no data source is specified, use all data sources
     if not data_sources:
         data_sources = ['json', 'csv', 'xml', 'html', 'reddit', 'twitter', 'github', 'godofprompt']
 
-    print("🔍 Unicode标识符状态分析工具")
+    print("🔍 Unicode Identifier Status Analysis Tool")
     print("="*50)
-    print(f"📊 分析数据源: {', '.join(data_sources)}")
+    print(f"📊 Analyzing data sources: {', '.join(data_sources)}")
     print("="*50)
 
-    # 初始化分析管理器
+    # Initialize analysis manager
     analysis_manager = UnicodeAnalysisManager(
         output_dir=args.output_dir,
         lookup_file=args.lookup_file,
@@ -748,34 +726,34 @@ def main():
 
     # 显示配置摘要
     config_stats = analysis_manager.config.get_statistics()
-    print(f"📋 配置信息:")
-    print(f"   ✅ 允许字符数: {config_stats['total_allowed_characters']:,}")
-    print(f"   📁 查找表File: {config_stats['lookup_file']}")
-    print(f"   🔧 配置状态: {config_stats['config_status']}")
+    print(f"📋 Configuration Information:")
+    print(f"   ✅ Allowed characters: {config_stats['total_allowed_characters']:,}")
+    print(f"   📁 Lookup file: {config_stats['lookup_file']}")
+    print(f"   🔧 Configuration status: {config_stats['config_status']}")
 
-    # 执行分析
+    # Execute analysis
     result = analysis_manager.analyze_unicode_restrictions()
 
     if "error" in result:
-        print(f"\n❌ 分析Failed: {result['error']}")
+        print(f"\n❌ Analysis Failed: {result['error']}")
         return
 
-    # 显示分析摘要
+    # Display analysis summary
     analysis_manager.print_analysis_summary(result)
 
-    # 显示检测详情
+    # Display detection details
     if result["restriction_detection"]["total_restrictions"] > 0:
         base_output_dir = result["analysis_info"]["output_directory"]
-        print(f"\n💡 建议查看详细检测结果:")
+        print(f"\n💡 It is recommended to check the detailed detection results:")
 
-        # 显示各数据源的检测结果
+        # Display detection results for each data source
         for source in data_sources:
             source_dir = f"{base_output_dir}/threat_detection_{source}"
-            print(f"   📁 {source.upper()} 数据源:")
-            print(f"      📋 检测汇总: {source_dir}/identifier_status_detection_summary.json")
-            print(f"      🔍 受限字符: {source_dir}/identifier_status_detections_identifier_status.json")
+            print(f"   📁 {source.upper()} data source:")
+            print(f"      📋 Detection summary: {source_dir}/identifier_status_detection_summary.json")
+            print(f"      🔍 Restricted characters: {source_dir}/identifier_status_detections_identifier_status.json")
 
-        print(f"   📊 总体汇总: {base_output_dir}/identifier_status_detection_overall_summary.json")
+        print(f"   📊 Overall summary: {base_output_dir}/identifier_status_detection_overall_summary.json")
 
     print(f"\n✅ Unicode identifier status analysis completed！")
 

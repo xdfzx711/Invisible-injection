@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Twitter Data Parsing器
-从Twitter JSONFile中提取推文文本
+Twitter data parser
+Extract tweets text from Twitter JSON files
 """
 
 import json
@@ -20,19 +20,19 @@ from data_parsing.utils import TextExtractor, FileUtils
 
 
 class TwitterParser(BaseParser):
-    """Twitter Data Parsing器（兼容旧格式）"""
+    """Twitter data parser (compatible with old format)"""
     
     def __init__(self, enable_interference_filter: bool = True, filter_config: Dict[str, Any] = None):
         super().__init__('twitter', enable_interference_filter, filter_config)
     
     def decode_text(self, text: str) -> str:
-        """基础文本解码处理"""
+        """Basic text decoding processing"""
         if not text:
             return ""
         return html.unescape(text).strip()
     
     def process_tweets(self, tweets: List[Dict], query: str, source_file: str) -> Dict[str, Any]:
-        """处理推文数据（兼容旧格式）"""
+        """Process tweet data (compatible with old format)"""
         processed_tweets = []
         
         for tweet in tweets:
@@ -47,13 +47,13 @@ class TwitterParser(BaseParser):
                 'url': tweet.get('url', '')
             }
             
-            # 添加处理后的元数据
+            # Add processed metadata
             cleaned_tweet['text_content'] = cleaned_tweet['text']
             cleaned_tweet['content_length'] = len(cleaned_tweet['text'])
             
             processed_tweets.append(cleaned_tweet)
         
-        # 构建输出数据（与旧格式相同）
+        # Build output data (identical to old format)
         output_data = {
             "parsing_info": {
                 "query": query,
@@ -68,8 +68,8 @@ class TwitterParser(BaseParser):
     
     def parse_file(self, file_path: Path) -> bool:
         """
-        解析单个Twitter JSONFile
-        返回布尔值表示成功/Failed
+        Parse a single Twitter JSON file
+        Return boolean indicating success/failure
         """
         self.logger.info(f"Parsing Twitter file: {file_path}")
         print(f"🔍 处理File: {file_path.name}")
@@ -106,12 +106,12 @@ class TwitterParser(BaseParser):
             return False
     
     def _get_files_to_parse(self, directory: Path) -> List[Path]:
-        """获取所有Twitter JSONFile"""
-        # 匹配所有JSONFile（包括 twitter_*_data.json 和 *_tweets.json 格式）
+        """Get all Twitter JSON files"""
+        # Match all JSON files (including twitter_*_data.json and *_tweets.json formats)
         return list(directory.glob('*.json'))
     
     def parse_directory(self, directory: Path = None) -> List[Dict[str, Any]]:
-        """解析整个directory"""
+        """Parse entire directory"""
         if directory is None:
             directory = self.input_dir
         
@@ -120,7 +120,7 @@ class TwitterParser(BaseParser):
             return []
         
         files = self._get_files_to_parse(directory)
-        print(f"\n找到 {len(files)} 个Twitter数据File")
+        print(f"\nFound {len(files)} Twitter data files")
         
         self.stats['total_files'] = len(files)
         
@@ -130,9 +130,9 @@ class TwitterParser(BaseParser):
             
             if success:
                 self.stats['successful_files'] += 1
-                print(f"✅ {file_path.name} 处理Completed")
+                print(f"✅ {file_path.name} processing completed")
             else:
                 self.stats['failed_files'] += 1
-                print(f"❌ {file_path.name} 处理Failed")
+                print(f"❌ {file_path.name} processing failed")
         
         return []

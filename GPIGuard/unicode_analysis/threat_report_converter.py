@@ -89,7 +89,7 @@ class ThreatReportConverter:
     
     def _separate_bidi_threats(self, threats_list: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
-        分离BIDI threats和non-BIDI threats
+        Separate BIDI threats and non-BIDI threats
         
         Args:
             threats_list: Threat list
@@ -112,13 +112,13 @@ class ThreatReportConverter:
     
     def _is_bidi_threat(self, threat: Dict[str, Any]) -> bool:
         """
-        Check是否为BIDI threats
+        Check if it is a BIDI threat
         
         Args:
             threat: Threat data
             
         Returns:
-            是否为BIDI threats
+            Whether it is a BIDI threat
         """
         # Method 1: Check unicode_type_id
         if threat.get('unicode_type_id') == 3:
@@ -143,14 +143,14 @@ class ThreatReportConverter:
     
     def _convert_to_standard_format(self, threats_list: List[Dict[str, Any]], is_bidi: bool = False) -> List[Dict[str, Any]]:
         """
-        转换Threat list为标准格式
+        Convert threat list to standard format
         
         Args:
             threats_list: Threat list
-            is_bidi: 是否为BIDI threats
+            is_bidi: Whether it is BIDI threats
             
         Returns:
-            标准格式的Threat list
+            Threat list in standard format
         """
         standard_threats = []
         skipped_count = 0
@@ -168,7 +168,7 @@ class ThreatReportConverter:
                 skipped_count += 1
                 continue
             
-            # Convert to standard format（参考convert_to_json.py的格式）
+            # Convert to standard format (refer to convert_to_json.py format)
             formatted_entry = {
                 'instruction': 'Compare the adversarial instruction with unicode characters and the original instruction, and determine whether the added unicode characters changed the semantics of the sentence',
                 'input': f"Original instruction: {original}\nAdversarial instruction: {adversarial}"
@@ -179,35 +179,35 @@ class ThreatReportConverter:
         
         if skipped_count > 0:
             threat_type = "BIDI" if is_bidi else "non-BIDI"
-            self.logger.info(f"{threat_type}威胁转换: 跳过{skipped_count}entries过长指令")
+            self.logger.info(f"{threat_type} threat conversion: skipped {skipped_count} entries with long instructions")
         
         return standard_threats
     
     def get_conversion_summary(self, stats: Dict[str, Any]) -> str:
         """
-        生成转换摘要信息
+        Generate conversion summary information
         
         Args:
             stats: Conversion statistics
             
         Returns:
-            摘要字符串
+            Summary string
         """
         if not stats.get('conversion_success', False):
-            return f"转换Failed: {stats.get('error', '未知Error')}"
+            return f"Conversion Failed: {stats.get('error', 'Unknown Error')}"
         
         summary = f"""
-威胁报告转换摘要:
+Threat Report Conversion Summary:
 ==========================================
-总威胁数: {stats['total_threats']}
+Total Threats: {stats['total_threats']}
   - BIDI threats: {stats['bidi_threats']} entries
   - Other threats: {stats['non_bidi_threats']} entries
 
-转换结果:
-  - BIDI标准格式: {stats['bidi_converted']} entries
-  - 其他标准格式: {stats['non_bidi_converted']} entries
+Conversion Results:
+  - BIDI standard format: {stats['bidi_converted']} entries
+  - Other standard format: {stats['non_bidi_converted']} entries
 
-输出File:
+Output Files:
   - BIDI threats: {stats.get('bidi_output_file', 'N/A')}
   - Other threats: {stats.get('suspicious_output_file', 'N/A')}
 ==========================================
@@ -216,15 +216,15 @@ class ThreatReportConverter:
         return summary.strip()
 
 
-# 示例用法
+# Example usage
 if __name__ == "__main__":
-    # 设置日志
+    # Setup logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     
-    # 创建转换器
+    # Create converter
     converter = ThreatReportConverter()
     
-    # 转换示例
+    # Conversion example
     input_file = Path("testscan_data/threat_detection_reddit/formatted_threats.json")
     output_dir = Path("testscan_data/threat_detection_reddit")
     
@@ -232,4 +232,4 @@ if __name__ == "__main__":
         stats = converter.convert_formatted_threats(input_file, output_dir)
         print(converter.get_conversion_summary(stats))
     else:
-        print(f"输入File不exists: {input_file}")
+        print(f"Input file does not exist: {input_file}")

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-XML API数据收集器
-从RSS、世界银行等数据源收集XML格式的数据
+XML API data collector
+Collect XML format data from RSS feeds, World Bank and other sources
 """
 
 import sys
@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Dict, Any
 import random
 
-# 添加项目根directory到路径
+# Add project root directory to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -23,16 +23,16 @@ from data_collection.utils.api_sources import XML_SOURCES, XML_SOURCE_GROUPS
 
 
 class XMLAPICollector(BaseCollector):
-    """XML API数据收集器"""
+    """XML API data collector"""
     
     def __init__(self):
         super().__init__('xml')
         
-        # 初始化HTTP会话
+        # Initialize HTTP session
         self.session = self._setup_session()
     
     def _setup_session(self) -> requests.Session:
-        """设置HTTP会话"""
+        """Setup HTTP session"""
         session = requests.Session()
         session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -42,17 +42,17 @@ class XMLAPICollector(BaseCollector):
         return session
     
     def validate_config(self) -> bool:
-        """验证配置 - XML收集器不需要额外配置"""
+        """Validate configuration - XML collector doesn't require additional config"""
         return True
     
     def collect(self) -> Dict[str, Any]:
-        """执行XML数据收集"""
+        """Execute XML data collection"""
         self.start_collection()
         
-        print("\nXML数据收集")
+        print("\nXML data collection")
         print("-" * 70)
         
-        # 显示子菜单
+        # Show submenu
         choice = self._show_submenu()
         
         if not choice:
@@ -63,7 +63,7 @@ class XMLAPICollector(BaseCollector):
             }
         
         try:
-            # 根据选择收集数据
+            # Collect data based on choice
             if choice == 'all':
                 self._collect_all_xml_sources()
             elif choice == 'rss':
@@ -76,7 +76,7 @@ class XMLAPICollector(BaseCollector):
             self.end_collection()
             self.log_summary()
             
-            # 统计收集的File
+            # Count collected XML files
             file_count = len(list(self.output_dir.glob('*.xml')))
             
             return {
@@ -88,7 +88,7 @@ class XMLAPICollector(BaseCollector):
             }
             
         except KeyboardInterrupt:
-            print("\n\n用户中断收集")
+            print("\n\nUser interrupted collection")
             self.end_collection()
             return {
                 'success': False,
@@ -106,17 +106,17 @@ class XMLAPICollector(BaseCollector):
             }
     
     def _show_submenu(self) -> str:
-        """显示子菜单"""
-        print("\n请选择XML数据源:")
-        print("  [1] RSS新闻源 - BBC, CNN, NASA等")
-        print("  [2] 世界银行XML - 国家列表, 经济指标")
-        print("  [3] 金融XML - 欧洲央行汇率")
-        print("  [4] 收集所有XML数据源")
-        print("  [0] 返回主菜单")
+        """Show submenu"""
+        print("\nPlease select XML data source:")
+        print("  [1] RSS news feeds - BBC, CNN, NASA, etc.")
+        print("  [2] World Bank XML - Country list, economic indicators")
+        print("  [3] Financial XML - ECB exchange rates")
+        print("  [4] Collect all XML sources")
+        print("  [0] Return to main menu")
         
         while True:
             try:
-                choice = input("\n请输入选项 [0-4]: ").strip()
+                choice = input("\nPlease enter option [0-4]: ").strip()
                 
                 if choice == '0':
                     return None
@@ -129,28 +129,28 @@ class XMLAPICollector(BaseCollector):
                 elif choice == '4':
                     return 'all'
                 else:
-                    print("Error: 无效的选项")
+                    print("Error: Invalid option")
                     
             except KeyboardInterrupt:
                 return None
     
     def _collect_all_xml_sources(self):
-        """收集所有XML数据源"""
-        print("\n开始收集所有XML数据源...")
+        """Collect all XML data sources"""
+        print("\nStarting to collect all XML sources...")
         print("-" * 70)
         
         total = 3  # RSS + WorldBank + Financial
         self.set_total_items(total)
         
         sources = [
-            ('RSS新闻源', self._collect_rss_feeds),
-            ('世界银行XML', self._collect_worldbank),
-            ('金融XML', self._collect_financial_xml)
+            ('RSS feeds', self._collect_rss_feeds),
+            ('World Bank XML', self._collect_worldbank),
+            ('Financial XML', self._collect_financial_xml)
         ]
         
         for name, collect_func in sources:
             try:
-                print(f"\n正在收集: {name}")
+                print(f"\nCollecting: {name}")
                 collect_func()
                 print(f"  Completed")
             except Exception as e:
@@ -158,8 +158,8 @@ class XMLAPICollector(BaseCollector):
                 print(f"  Failed: {e}")
     
     def _collect_rss_feeds(self):
-        """收集RSS新闻源"""
-        print("\n收集RSS新闻源...")
+        """Collect RSS news feeds"""
+        print("\nCollecting RSS news feeds...")
         
         rss_sources = XML_SOURCE_GROUPS['rss']['sources']
         
@@ -175,10 +175,10 @@ class XMLAPICollector(BaseCollector):
                 if xml_text and self._validate_xml(xml_text, source_name):
                     filename = self.output_dir / f"{source_name}.xml"
                     self._save_xml(xml_text, filename)
-                    print(f"    保存成功")
+                    print(f"    Save successful")
                     self.increment_success()
                 else:
-                    print(f"    下载或验证Failed")
+                    print(f"    Download or validation failed")
                     self.increment_failure()
                 
                 time.sleep(random.uniform(1, 2))
@@ -189,8 +189,8 @@ class XMLAPICollector(BaseCollector):
                 print(f"    Error: {e}")
     
     def _collect_worldbank(self):
-        """收集世界银行XML数据"""
-        print("\n收集世界银行XML数据...")
+        """Collect World Bank XML data"""
+        print("\nCollecting World Bank XML data...")
         
         worldbank_sources = XML_SOURCE_GROUPS['worldbank']['sources']
         
@@ -206,10 +206,10 @@ class XMLAPICollector(BaseCollector):
                 if xml_text and self._validate_xml(xml_text, source_name):
                     filename = self.output_dir / f"{source_name}.xml"
                     self._save_xml(xml_text, filename)
-                    print(f"    保存成功")
+                    print(f"    Save successful")
                     self.increment_success()
                 else:
-                    print(f"    下载或验证Failed")
+                    print(f"    Download or validation failed")
                     self.increment_failure()
                 
                 time.sleep(random.uniform(1, 2))
@@ -220,8 +220,8 @@ class XMLAPICollector(BaseCollector):
                 print(f"    Error: {e}")
     
     def _collect_financial_xml(self):
-        """收集金融XML数据"""
-        print("\n收集金融XML数据...")
+        """Collect financial XML data"""
+        print("\nCollecting financial XML data...")
         
         financial_sources = XML_SOURCE_GROUPS['financial_xml']['sources']
         
@@ -237,10 +237,10 @@ class XMLAPICollector(BaseCollector):
                 if xml_text and self._validate_xml(xml_text, source_name):
                     filename = self.output_dir / f"{source_name}.xml"
                     self._save_xml(xml_text, filename)
-                    print(f"    保存成功")
+                    print(f"    Save successful")
                     self.increment_success()
                 else:
-                    print(f"    下载或验证Failed")
+                    print(f"    Download or validation failed")
                     self.increment_failure()
                 
                 time.sleep(random.uniform(1, 2))
@@ -251,7 +251,7 @@ class XMLAPICollector(BaseCollector):
                 print(f"    Error: {e}")
     
     def _fetch_xml(self, url: str) -> str:
-        """获取XML数据"""
+        """Fetch XML data"""
         try:
             response = self.session.get(url, timeout=30)
             
@@ -266,7 +266,7 @@ class XMLAPICollector(BaseCollector):
             return None
     
     def _validate_xml(self, xml_text: str, source_name: str) -> bool:
-        """验证XML格式"""
+        """Validate XML format"""
         try:
             ET.fromstring(xml_text)
             return True
@@ -278,7 +278,7 @@ class XMLAPICollector(BaseCollector):
             return False
     
     def _save_xml(self, xml_text: str, filename: Path):
-        """保存XML数据"""
+        """Save XML data"""
         try:
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(xml_text)

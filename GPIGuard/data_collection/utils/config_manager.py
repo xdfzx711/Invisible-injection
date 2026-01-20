@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-统一配置管理器
-管理所有收集器的配置File
+Unified Config Manager
+Manage config files for all collectors
 """
 
 import json
@@ -14,7 +14,7 @@ from .path_manager import PathManager
 
 
 class ConfigManager:
-    """统一配置管理器 - Singleton Pattern"""
+    """Unified Config Manager - Singleton Pattern"""
     
     _instance = None
     
@@ -32,27 +32,27 @@ class ConfigManager:
         self.path_manager = PathManager()
         self.config_dir = self.path_manager.get_config_dir()
         
-        # 配置缓存
+        # Config cache
         self._config_cache = {}
         
         self._initialized = True
     
     def get_config(self, config_name: str, fallback_paths: list = None) -> Optional[Dict[str, Any]]:
         """
-        获取配置File
+        Get config file
         
         Args:
-            config_name: 配置File名（如：reddit_config.json）
-            fallback_paths: 备用路径列表（按优先级）
+            config_name: Config file name (e.g.: reddit_config.json)
+            fallback_paths: Fallback paths list (by priority)
         
         Returns:
-            配置字典，如果不exists返回None
+            Config dictionary, None if not exists
         """
-        # Check缓存
+        # Check cache
         if config_name in self._config_cache:
             return self._config_cache[config_name]
         
-        # 优先从新Configuration directory读取
+        # Load from config directory first
         config_path = self.config_dir / config_name
         
         if config_path.exists():
@@ -62,7 +62,7 @@ class ConfigManager:
                 self.logger.info(f"Loaded config from new location: {config_path}")
                 return config
         
-        # 尝试备用路径
+        # Try fallback paths
         if fallback_paths:
             for fallback_path in fallback_paths:
                 fallback_full = self.path_manager.get_project_root() / fallback_path
@@ -78,25 +78,25 @@ class ConfigManager:
     
     def save_config(self, config_name: str, config: Dict[str, Any]) -> bool:
         """
-        保存配置File
+        Save config file
         
         Args:
-            config_name: 配置File名
-            config: 配置字典
+            config_name: Config file name
+            config: Config dictionary
         
         Returns:
-            是否成功
+            Success status
         """
         config_path = self.config_dir / config_name
         
         try:
-            # 确保directoryexists
+            # Ensure directory exists
             config_path.parent.mkdir(parents=True, exist_ok=True)
             
             with open(config_path, 'w', encoding='utf-8') as f:
                 json.dump(config, f, ensure_ascii=False, indent=2)
             
-            # 更新缓存
+            # Update cache
             self._config_cache[config_name] = config
             
             self.logger.info(f"Saved config: {config_path}")
@@ -108,14 +108,14 @@ class ConfigManager:
     
     def validate_config(self, config: Dict[str, Any], required_keys: list) -> bool:
         """
-        验证配置是否包含必需的键
+        Validate if config contains required keys
         
         Args:
-            config: 配置字典
-            required_keys: 必需的键列表
+            config: Config dictionary
+            required_keys: Required keys list
         
         Returns:
-            是否有效
+            Validity status
         """
         if not config:
             return False
@@ -128,34 +128,34 @@ class ConfigManager:
         return True
     
     def get_web_scraping_config(self) -> Dict[str, Any]:
-        """获取HTML爬取配置"""
+        """Get web scraping config"""
         config = self.get_config(
             'web_scraping_config.json',
             fallback_paths=['web_scraping_config.json']
         )
         
-        # 如果没有配置，返回默认配置
+        # If no config exists, return default config
         if not config:
             return self._get_default_web_scraping_config()
         
         return config
     
     def get_reddit_config(self) -> Dict[str, Any]:
-        """获取Reddit配置"""
+        """Get Reddit config"""
         return self.get_config(
             'reddit_config.json',
             fallback_paths=['reddit_collect/reddit_config.json']
         )
     
     def get_twitter_config(self) -> Dict[str, Any]:
-        """获取Twitter配置"""
+        """Get Twitter config"""
         return self.get_config(
             'twitter_config.json',
             fallback_paths=['twitter_collect/twitter_config.json']
         )
     
     def _load_json(self, file_path: Path) -> Optional[Dict[str, Any]]:
-        """加载JSONFile"""
+        """Load JSON file"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
@@ -167,7 +167,7 @@ class ConfigManager:
             return None
     
     def _get_default_web_scraping_config(self) -> Dict[str, Any]:
-        """获取默认HTML爬取配置"""
+        """Get default web scraping config"""
         return {
             "request_settings": {
                 "timeout": 30,
@@ -207,29 +207,29 @@ class ConfigManager:
         }
     
     def clear_cache(self):
-        """清除配置缓存"""
+        """Clear config cache"""
         self._config_cache = {}
         self.logger.info("Config cache cleared")
     
     def reload_config(self, config_name: str) -> Optional[Dict[str, Any]]:
         """
-        重新加载配置File
+        Reload config file
         
         Args:
-            config_name: 配置File名
+            config_name: Config file name
         
         Returns:
-            新的配置字典
+            New config dictionary
         """
-        # 清除该配置的缓存
+        # Clear cache for this config
         if config_name in self._config_cache:
             del self._config_cache[config_name]
         
-        # 重新加载
+        # Reload
         return self.get_config(config_name)
     
     def list_configs(self) -> list:
-        """列出所有可用的配置File"""
+        """List all available config files"""
         config_files = []
         
         if self.config_dir.exists():

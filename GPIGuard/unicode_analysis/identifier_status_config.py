@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-标识符状态配置管理器
-基于 Unicode IdentifierStatus 标准的简化配置系统
-"""
-
 import json
 import logging
 from pathlib import Path
@@ -13,23 +8,23 @@ from typing import Dict, Any, Union, Set
 import sys
 import os
 
-# 添加项目根directory到路径
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# 导入项目工具
+
 from data_collection.utils.logger import setup_logger
 
 
 class IdentifierStatusConfig:
-    """标识符状态配置管理器"""
+
     
     def __init__(self, lookup_file: Union[str, Path] = None):
-        # 设置默认查找表File路径
+        # Set default lookup table file path
         if lookup_file is None:
-            # 从当前File位置向上找到testscandirectory
+            # Find testscan directory by going up from current file location
             current_dir = Path(__file__).parent
             testscan_dir = current_dir.parent
             lookup_file = testscan_dir / "testscan_data" / "unicode_analysis" / "identifier_status_lookup.json"
@@ -37,44 +32,44 @@ class IdentifierStatusConfig:
         self.lookup_file = Path(lookup_file)
         self.logger = setup_logger('IdentifierStatusConfig', 'identifier_status_config.log')
         
-        # 加载查找表
+        # Load lookup table
         self.allowed_characters = self._load_lookup_table()
         
-        # 检测设置（简化版）
+        # Detection settings (simplified)
         self.detection_settings = {
             "enable_identifier_status_detection": True,
-            "enable_normalization_detection": True,  # 保留规范化检测
-            "output_format": "simple"  # simple 或 detailed
+            "enable_normalization_detection": True,  # Keep normalization detection
+            "output_format": "simple"  # simple or detailed
         }
         
-        self.logger.info(f"标识符状态配置has been加载，包含 {len(self.allowed_characters)} 个允许字符")
+        self.logger.info(f"Identifier status configuration has been loaded, containing {len(self.allowed_characters)} allowed characters")
     
     def _load_lookup_table(self) -> Set[str]:
-        """加载标识符状态查找表"""
+        """Load identifier status lookup table"""
         try:
             if not self.lookup_file.exists():
-                self.logger.error(f"查找表File不exists: {self.lookup_file}")
+                self.logger.error(f"Lookup table file does not exist: {self.lookup_file}")
                 return set()
             
             with open(self.lookup_file, 'r', encoding='utf-8') as f:
                 lookup_data = json.load(f)
             
-            # 将查找表转换为集合以提高查询性能
-            # lookup_data 格式: {"U+0041": "Allowed", "U+0042": "Allowed", ...}
+            # Convert lookup table to a set for faster lookup
+            # lookup_data format: {"U+0041": "Allowed", "U+0042": "Allowed", ...}
             allowed_chars = set()
             for unicode_point, status in lookup_data.items():
                 if status == "Allowed":
                     allowed_chars.add(unicode_point)
             
-            self.logger.info(f"成功加载查找表: {self.lookup_file}")
+            self.logger.info(f"Successfully loaded lookup table: {self.lookup_file}")
             return allowed_chars
             
         except Exception as e:
-            self.logger.error(f"加载查找表Failed: {e}")
+            self.logger.error(f"Failed to load lookup table: {e}")
             return set()
     
     def is_character_allowed(self, char: str) -> bool:
-        """Check字符是否被允许使用"""
+        """Check if a character is allowed"""
         if not char:
             return False
         
@@ -82,18 +77,18 @@ class IdentifierStatusConfig:
         return unicode_point in self.allowed_characters
     
     def is_character_restricted(self, char: str) -> bool:
-        """Check字符是否被限制使用"""
+        """Check if a character is restricted"""
         return not self.is_character_allowed(char)
     
     def get_character_status(self, char: str) -> str:
-        """获取字符状态"""
+        """Get character status"""
         if self.is_character_allowed(char):
             return "Allowed"
         else:
             return "Restricted"
     
     def analyze_string_status(self, text: str) -> Dict[str, Any]:
-        """分析字符串中每个字符的状态"""
+
         if not text:
             return {
                 "total_chars": 0,
@@ -124,22 +119,22 @@ class IdentifierStatusConfig:
         }
     
     def get_detection_settings(self) -> Dict[str, Any]:
-        """获取检测设置"""
+   
         return self.detection_settings.copy()
     
     def is_detection_enabled(self, detection_type: str = "identifier_status") -> bool:
-        """Check某种检测是否启用"""
+      
         setting_key = f"enable_{detection_type}_detection"
         return self.detection_settings.get(setting_key, True)
     
     def update_detection_setting(self, detection_type: str, enabled: bool):
-        """更新检测设置"""
+      
         setting_key = f"enable_{detection_type}_detection"
         self.detection_settings[setting_key] = enabled
-        self.logger.info(f"检测设置has been更新: {setting_key} = {enabled}")
+        self.logger.info(f"Detection setting has been updated: {setting_key} = {enabled}")
     
     def get_statistics(self) -> Dict[str, Any]:
-        """获取配置Statistics"""
+        """Get configuration statistics"""
         return {
             "total_allowed_characters": len(self.allowed_characters),
             "lookup_file": str(self.lookup_file),
@@ -148,17 +143,17 @@ class IdentifierStatusConfig:
         }
     
     def reload_lookup_table(self) -> bool:
-        """重新加载查找表"""
+        """Reload lookup table"""
         try:
             self.allowed_characters = self._load_lookup_table()
-            self.logger.info("查找表重新加载成功")
+            self.logger.info("Lookup table reloaded successfully")
             return True
         except Exception as e:
-            self.logger.error(f"重新加载查找表Failed: {e}")
+            self.logger.error(f"Failed to reload lookup table: {e}")
             return False
     
     def validate_lookup_table(self) -> Dict[str, Any]:
-        """验证查找表的完整性"""
+        """Validate the integrity of the lookup table"""
         validation_result = {
             "is_valid": True,
             "errors": [],
@@ -167,26 +162,26 @@ class IdentifierStatusConfig:
         }
         
         try:
-            # CheckFile是否exists
+            # Check if file exists
             if not self.lookup_file.exists():
                 validation_result["is_valid"] = False
-                validation_result["errors"].append(f"查找表File不exists: {self.lookup_file}")
+                validation_result["errors"].append(f"Lookup table file does not exist: {self.lookup_file}")
                 return validation_result
             
-            # Check是否有数据
+            # Check if data exists
             if not self.allowed_characters:
                 validation_result["is_valid"] = False
-                validation_result["errors"].append("查找表为空")
+                validation_result["errors"].append("Lookup table is empty")
                 return validation_result
             
             # Statistics
             validation_result["statistics"] = {
                 "total_allowed_chars": len(self.allowed_characters),
                 "file_size": self.lookup_file.stat().st_size,
-                "sample_chars": list(self.allowed_characters)[:10]  # 前10个字符作为样本
+                "sample_chars": list(self.allowed_characters)[:10]  # Sample of first 10 characters
             }
             
-            # Check基本字符是否exists
+            # Check if basic characters exist
             basic_chars = ["U+0041", "U+0061", "U+0030"]  # A, a, 0
             missing_basic = []
             for char_code in basic_chars:
@@ -194,54 +189,54 @@ class IdentifierStatusConfig:
                     missing_basic.append(char_code)
             
             if missing_basic:
-                validation_result["warnings"].append(f"缺少基本字符: {missing_basic}")
+                validation_result["warnings"].append(f"Missing basic characters: {missing_basic}")
             
-            self.logger.info("查找表验证Completed")
+            self.logger.info("Lookup table validation completed")
             
         except Exception as e:
             validation_result["is_valid"] = False
-            validation_result["errors"].append(f"验证过程出错: {e}")
+            validation_result["errors"].append(f"Error during validation: {e}")
         
         return validation_result
 
 
 def main():
     """Test function"""
-    print("=== 标识符状态配置测试 ===\n")
+    print("=== Identifier Status Configuration Test ===\n")
     
-    # 创建配置管理器
+    # Create configuration manager
     config = IdentifierStatusConfig()
     
-    # 验证配置
+    # Validate configuration
     validation = config.validate_lookup_table()
-    print(f"配置验证: {'通过' if validation['is_valid'] else 'Failed'}")
+    print(f"Configuration validation: {'Passed' if validation['is_valid'] else 'Failed'}")
     if validation['errors']:
         print(f"Error: {validation['errors']}")
     if validation['warnings']:
         print(f"Warning: {validation['warnings']}")
     
-    # 获取Statistics
+    # Get statistics
     stats = config.get_statistics()
     print(f"\nStatistics:")
-    print(f"  允许字符数: {stats['total_allowed_characters']}")
-    print(f"  配置状态: {stats['config_status']}")
+    print(f"  Allowed characters: {stats['total_allowed_characters']}")
+    print(f"  Configuration status: {stats['config_status']}")
     
-    # 测试字符检测
+    # Test character status
     test_chars = ["a", "A", "1", "中", "α", "а", "🙂", "_", "-", "."]
-    print(f"\n字符状态测试:")
+    print(f"\nCharacter status test:")
     for char in test_chars:
         status = config.get_character_status(char)
         unicode_point = f"U+{ord(char):04X}"
         print(f"  '{char}' ({unicode_point}): {status}")
     
-    # 测试字符串分析
+    # Test string analysis
     test_strings = ["hello_world", "test123", "café", "测试文本", "hello-world"]
-    print(f"\n字符串分析测试:")
+    print(f"\nString analysis test:")
     for text in test_strings:
         analysis = config.analyze_string_status(text)
-        print(f"  '{text}': {analysis['allowed_chars']}/{analysis['total_chars']} 允许 "
+        print(f"  '{text}': {analysis['allowed_chars']}/{analysis['total_chars']} allowed "
               f"({analysis['allowed_percentage']:.1f}%) "
-              f"{'有限制字符' if analysis['has_restricted_chars'] else '全部允许'}")
+              f"{'with restricted characters' if analysis['has_restricted_chars'] else 'all allowed'}")
 
 
 if __name__ == "__main__":

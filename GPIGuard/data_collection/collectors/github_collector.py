@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-GitHub 数据采集器（简化版）
-- 从配置File读取仓库 URL 列表
-- 可选抓取 README（通过 raw.githubusercontent.com 直接读取）
-- 将原始数据保存到 testscan_data/origin_data/github/
-"""
 
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
@@ -27,29 +21,29 @@ class GithubCollector(BaseCollector):
     def __init__(self):
         super().__init__('github')
 
-        # 配置File路径
+        # Config file path
         self.config_file = self.get_config_path('github_config.json')
 
-        # 加载配置
+        # Load configuration
         config_loader = ConfigLoader()
         self.config = config_loader.load_json_config(self.config_file)
 
-        # 采集选项
+        # Fetch options
         self.fetch_opts = self.config.get("fetch", {})
         self.per_page = self.config.get("request", {}).get("per_page", 50)
 
-        # 过滤选项
+        # Filter options
         self.filter_opts = self.config.get("filter", {})
         self.english_only = self.filter_opts.get("english_only", False)
         self.english_threshold = self.filter_opts.get("english_threshold", 0.7)
 
     def validate_config(self) -> bool:
-        """验证配置"""
+        """Validate configuration"""
         if not self.config_file.exists():
             self.logger.warning(f"Config file not found: {self.config_file}")
-            print(f"\nWarning: 未找到GitHub配置File")
-            print(f"配置File路径: {self.config_file}")
-            print("\n示例内容:")
+            print(f"\nWarning: GitHub config file not found")
+            print(f"Config file path: {self.config_file}")
+            print("\nExample content:")
             print(json.dumps({
                 "token": "",
                 "repositories": [
@@ -72,12 +66,12 @@ class GithubCollector(BaseCollector):
                 self.logger.error("Failed to load config")
                 return False
 
-            # Check是否有仓库列表
+            # Check if repository list exists
             repos = self.config.get("repositories", [])
             if not repos:
                 self.logger.warning("No repositories configured")
-                print(f"\nWarning: 配置File中没有仓库列表")
-                print(f"请在配置File中添加 'repositories' 字段")
+                print(f"\nWarning: No repository list in config file")
+                print(f"Please add 'repositories' field to config file")
                 return False
 
             self.logger.info(f"Config validated: {len(repos)} repositories configured")
@@ -89,101 +83,101 @@ class GithubCollector(BaseCollector):
 
     def _parse_repo_url(self, url: str) -> Tuple[str, str, str, str, str]:
         """
-        从 GitHub URL 中解析 owner、repo、branch、path 和 url_type
-        支持三种格式:
-        1. 仓库URL: https://github.com/owner/repo
+        Parse owner, repo, branch, path and url_type from GitHub URL
+        Supports three formats:
+        1. Repository URL: https://github.com/owner/repo
            -> (owner, repo, None, None, 'repo')
-        2. FileURL: https://github.com/owner/repo/blob/branch/path/to/file.md
+        2. File URL: https://github.com/owner/repo/blob/branch/path/to/file.md
            -> (owner, repo, branch, path/to/file.md, 'file')
-        3. directoryURL: https://github.com/owner/repo/tree/branch/path/to/dir
+        3. Directory URL: https://github.com/owner/repo/tree/branch/path/to/dir
            -> (owner, repo, branch, path/to/dir, 'directory')
         """
         url = url.strip()
-        self.logger.debug(f"正在解析URL: '{url}' (长度: {len(url)})")
+        self.logger.debug(f"Parsing URL: '{url}' (length: {len(url)})")
 
-        # 尝试匹配FileURL格式 (/blob/)
+        # Try to match file URL format (/blob/)
         file_match = re.match(r"https?://github\.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)", url)
         if file_match:
             owner = file_match.group(1)
             repo = file_match.group(2)
             branch = file_match.group(3)
             path = file_match.group(4)
-            self.logger.info(f"识别为FileURL: {owner}/{repo}/{branch}/{path}")
+            self.logger.info(f"Identified as file URL: {owner}/{repo}/{branch}/{path}")
             return owner, repo, branch, path, 'file'
 
-        # 尝试匹配directoryURL格式 (/tree/)
+        # Try to match directory URL format (/tree/)
         dir_match = re.match(r"https?://github\.com/([^/]+)/([^/]+)/tree/([^/]+)(?:/(.+))?", url)
         if dir_match:
             owner = dir_match.group(1)
             repo = dir_match.group(2)
             branch = dir_match.group(3)
-            path = dir_match.group(4) or ""  # 可能没有子路径
-            self.logger.info(f"识别为directoryURL: {owner}/{repo}/{branch}/{path}")
+            path = dir_match.group(4) or ""  # May not have sub-path
+            self.logger.info(f"Identified as directory URL: {owner}/{repo}/{branch}/{path}")
             return owner, repo, branch, path, 'directory'
 
-        # 尝试匹配仓库URL格式
+        # Try to match repository URL format
         repo_match = re.match(r"https?://github\.com/([^/]+)/([^/]+)/?$", url)
         if repo_match:
             owner = repo_match.group(1)
             repo = repo_match.group(2)
-            self.logger.info(f"识别为仓库URL: {owner}/{repo}")
+            self.logger.info(f"Identified as repository URL: {owner}/{repo}")
             return owner, repo, None, None, 'repo'
 
-        self.logger.error(f"无法解析URL: '{url}' (repr: {repr(url)})")
-        raise ValueError(f"无法解析GitHub URL: {url}")
+        self.logger.error(f"Failed to parse URL: '{url}' (repr: {repr(url)})")
+        raise ValueError(f"Failed to parse GitHub URL: {url}")
 
     def _fetch_file(self, owner: str, repo: str, branch: str, file_path: str) -> str:
         """
-        获取指定File的原始内容
-        如果启用了 english_only，会过滤掉非英文内容
+        Fetch the raw content of a specified file
+        If english_only is enabled, non-English content will be filtered out
         """
-        # URL 编码File路径（处理空格和特殊字符）
-        # 将路径按 '/' 分割，对每个部分单独编码，然后重新组合
+        # URL encode file path (handle spaces and special characters)
+        # Split the path by '/', encode each part separately, then reassemble
         path_parts = file_path.split('/')
         encoded_parts = [urllib.parse.quote(part, safe='') for part in path_parts]
         encoded_path = '/'.join(encoded_parts)
         raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{encoded_path}"
         
         try:
-            self.logger.debug(f"正在获取File: {file_path} (URL: {raw_url})")
+            self.logger.debug(f"Fetching file: {file_path} (URL: {raw_url})")
             req = urllib.request.Request(raw_url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=15) as resp:
                 if resp.status == 200:
                     content = resp.read().decode("utf-8", errors="ignore")
 
-                    # 英文过滤
+                    # English text filtering
                     if self.english_only:
                         if not self._is_english_text(content):
-                            self.logger.info(f"跳过非英文File: {file_path}")
+                            self.logger.info(f"Skipping non-English file: {file_path}")
                             return ""
 
-                    self.logger.info(f"成功获取File: {file_path} ({len(content)} 字符)")
+                    self.logger.info(f"Successfully fetched file: {file_path} ({len(content)} characters)")
                     return content
         except urllib.error.HTTPError as e:
             self.logger.error(f"HTTPError {e.code}: {file_path} (URL: {raw_url})")
             if e.code == 404:
-                self.logger.debug(f"File不exists: {file_path}")
+                self.logger.debug(f"File does not exist: {file_path}")
         except urllib.error.URLError as e:
             self.logger.error(f"URLError: {file_path}, Error: {e}")
         except Exception as e:
-            self.logger.error(f"获取FileFailed: {file_path}, Error: {e}")
+            self.logger.error(f"Failed to fetch file: {file_path}, Error: {e}")
         return ""
 
     def _fetch_directory_fallback(self, owner: str, repo: str, branch: str, dir_path: str) -> List[Dict[str, str]]:
         """
-        降级方案：通过爬取 GitHub 网页获取File列表
-        返回File列表 [{"name": "file.md", "path": "dir/file.md"}, ...]
+        Fallback method: Fetch file list by scraping GitHub webpage
+        Returns file list [{"name": "file.md", "path": "dir/file.md"}, ...]
         """
-        # 构建 GitHub 网页 URL
+        # Build GitHub web page URL
         if dir_path:
-            # URL 编码directory路径
+            # URL encode directory path
             encoded_path = urllib.parse.quote(dir_path, safe='/')
             web_url = f"https://github.com/{owner}/{repo}/tree/{branch}/{encoded_path}"
         else:
             web_url = f"https://github.com/{owner}/{repo}/tree/{branch}"
 
         try:
-            self.logger.info(f"使用降级方案爬取网页: {web_url}")
+            self.logger.info(f"Using fallback method to scrape webpage: {web_url}")
             req = urllib.request.Request(web_url, headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             })
@@ -192,17 +186,17 @@ class GithubCollector(BaseCollector):
                 if resp.status == 200:
                     html_content = resp.read().decode("utf-8", errors="ignore")
 
-                    # 方法1: 尝试从 GitHub 的 JSON payload 中提取File列表
-                    # GitHub 页面可能包含多个 JSON 对象，我们需要找到包含File列表的那个
+                    # Method 1: Try to extract file list from GitHub's JSON payload
+                    # GitHub pages may contain multiple JSON objects, we need to find the one containing the file list
                     files = []
                     
-                    # 尝试匹配多种可能的 JSON 结构
+                    # Try to match various possible JSON structures
                     patterns = [
-                        # 新格式: "payload":{"tree":{"items":[...]}}
+                        # New format: "payload":{"tree":{"items":[...]}}
                         r'"payload":\s*\{[^}]*"tree":\s*\{[^}]*"items":\s*(\[[^\]]+\])',
-                        # 旧格式: "tree":{"items":[...]}
+                        # Old format: "tree":{"items":[...]}
                         r'"tree":\s*\{[^}]*"items":\s*(\[[^\]]+\])',
-                        # 直接匹配 items 数组
+                        # Direct match items array
                         r'"items":\s*(\[[^\]]+\])',
                     ]
                     
@@ -211,12 +205,12 @@ class GithubCollector(BaseCollector):
                         if match:
                             try:
                                 items_json = match.group(1)
-                                # 尝试解析 JSON
+                                # Try to parse JSON
                                 items = json.loads(items_json)
                                 if isinstance(items, list) and len(items) > 0:
                                     for item in items:
                                         if isinstance(item, dict):
-                                            # Check是否是File
+                                            # Check if it is a file
                                             content_type = item.get('contentType', '')
                                             item_type = item.get('type', '')
                                             if content_type == 'file' or item_type == 'file':
@@ -228,56 +222,56 @@ class GithubCollector(BaseCollector):
                                                         "path": file_path
                                                     })
                                     if files:
-                                        self.logger.info(f"降级方案找到 {len(files)} 个File（方法1）")
+                                        self.logger.info(f"Fallback method found {len(files)} files (method 1)")
                                         return files
                             except (json.JSONDecodeError, KeyError, ValueError) as e:
-                                self.logger.debug(f"方法1解析Failed: {e}")
+                                self.logger.debug(f"Method 1 parsing failed: {e}")
                                 continue
                     
-                    # 方法2: 从 HTML 中直接提取File链接
-                    # GitHub directory页面中的File链接格式: <a href="/owner/repo/blob/branch/path/to/file">
-                    self.logger.info("尝试方法2: 从HTML中提取File链接")
+                    # Method 2: Extract file links directly from HTML
+                    # File link format in GitHub directory page: <a href="/owner/repo/blob/branch/path/to/file">
+                    self.logger.info("Trying method 2: Extract file links from HTML")
                     
-                    # 更精确的模式：匹配File链接（不是directory链接）
-                    # File链接通常包含 'title=' 属性或者特定的类名
-                    # 格式: <a class="..." href="/owner/repo/blob/branch/path" title="filename">
+                    # More precise pattern: match file links (not directory links)
+                    # File links usually contain 'title=' attribute or specific class names
+                    # Format: <a class="..." href="/owner/repo/blob/branch/path" title="filename">
                     blob_url_pattern = rf'/{re.escape(owner)}/{re.escape(repo)}/blob/{re.escape(branch)}/([^"?#]+)'
                     
-                    # 查找所有匹配的blob链接
+                    # Find all matching blob links
                     blob_matches = re.finditer(blob_url_pattern, html_content)
                     seen_paths = set()
                     
                     for match in blob_matches:
                         file_path = match.group(1)
-                        # 解码URL编码的路径
+                        # Decode URL-encoded path
                         try:
                             file_path = urllib.parse.unquote(file_path)
                         except:
                             pass
                         
-                        # 过滤entries件
+                        # Filter entries
                         if not file_path or file_path in seen_paths:
                             continue
                         
-                        # 确保路径在目标directory下（如果指定了directory）
+                        # Ensure the path is in the target directory (if specified)
                         if dir_path:
                             if not file_path.startswith(dir_path):
                                 continue
                         else:
-                            # 如果没有指定directory，只获取根directory下的File
+                            # If no directory is specified, only get files in the root directory
                             if '/' in file_path:
                                 continue
                         
-                        # 提取File名
+                        # Extract file name
                         file_name = file_path.split('/')[-1]
                         
-                        # 跳过无效File名
+                        # Skip invalid file names
                         if not file_name or file_name in ['.', '..', '']:
                             continue
                         
-                        # Check是否是File（不是directory）
-                        # directory链接通常是 /tree/ 而不是 /blob/，所以这里匹配的都是File链接
-                        # 添加到File列表
+                        # Check if it is a file (not a directory)
+                        # Directory links are usually /tree/ instead of /blob/, so matches here are all file links
+                        # Add to file list
                         seen_paths.add(file_path)
                         files.append({
                             "name": file_name,
@@ -285,7 +279,7 @@ class GithubCollector(BaseCollector):
                         })
                     
                     if files:
-                        # 去重
+                        # Deduplication
                         seen = set()
                         unique_files = []
                         for f in files:
@@ -294,27 +288,27 @@ class GithubCollector(BaseCollector):
                                 seen.add(path_key)
                                 unique_files.append(f)
                         
-                        self.logger.info(f"降级方案找到 {len(unique_files)} 个File（方法2）")
+                        self.logger.info(f"Fallback method found {len(unique_files)} files (method 2)")
                         return unique_files
                     else:
-                        self.logger.warning("降级方案未能从网页中提取File列表")
+                        self.logger.warning("Fallback method failed to extract file list from webpage")
                         
         except urllib.error.HTTPError as e:
-            self.logger.error(f"降级方案HTTPError {e.code}: {web_url}")
+            self.logger.error(f"Fallback method HTTPError {e.code}: {web_url}")
         except Exception as e:
-            self.logger.error(f"降级方案Failed: {e}", exc_info=True)
+            self.logger.error(f"Fallback method failed: {e}", exc_info=True)
 
         return []
 
     def _fetch_directory(self, owner: str, repo: str, branch: str, dir_path: str) -> List[Dict[str, Any]]:
         """
-        获取directory下的所有File
-        优先使用 GitHub API，Failed时使用降级方案（爬取网页）
+        Fetch all files in a directory
+        Prioritize using GitHub API, fallback to webpage scraping on failure
         """
-        # 构建 API URL
+        # Build API URL
         api_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{dir_path}?ref={branch}"
 
-        # 添加 token（如果配置了）
+        # Add token (if configured)
         headers = {}
         token = self.config.get("token", "")
         if token:
@@ -324,7 +318,7 @@ class GithubCollector(BaseCollector):
         use_fallback = False
 
         try:
-            self.logger.info(f"正在获取directory内容: {api_url}")
+            self.logger.info(f"Fetching directory contents: {api_url}")
             req = urllib.request.Request(api_url, headers=headers)
 
             with urllib.request.urlopen(req, timeout=15) as resp:
@@ -332,22 +326,22 @@ class GithubCollector(BaseCollector):
                     content = resp.read().decode("utf-8")
                     items = json.loads(content)
 
-                    # 获取配置选项
+                    # Get configuration options
                     recursive = self.fetch_opts.get("recursive_directory", False)
                     max_files = self.fetch_opts.get("max_files_per_directory", 100)
 
-                    self.logger.info(f"directory包含 {len(items)} 个项目")
+                    self.logger.info(f"Directory contains {len(items)} items")
 
                     file_count = 0
                     for item in items:
                         if file_count >= max_files:
-                            self.logger.warning(f"has been达到最大File数限制: {max_files}")
+                            self.logger.warning(f"Reached maximum file limit: {max_files}")
                             break
 
                         if item['type'] == 'file':
-                            # 下载File内容（_fetch_file 内部会进行英文检测）
+                            # Download file content (_fetch_file performs English detection internally)
                             file_content = self._fetch_file(owner, repo, branch, item['path'])
-                            if file_content:  # 如果内容为空（被过滤或下载Failed），则跳过
+                            if file_content:  # Skip if content is empty (filtered or download failed)
                                 files_data.append({
                                     "path": item['path'],
                                     "name": item['name'],
@@ -356,83 +350,83 @@ class GithubCollector(BaseCollector):
                                     "text": file_content
                                 })
                                 file_count += 1
-                                self.logger.info(f"has been收集File {file_count}/{max_files}: {item['name']}")
+                                self.logger.info(f"Collected file {file_count}/{max_files}: {item['name']}")
 
                         elif item['type'] == 'dir' and recursive:
-                            # 递归处理子directory
-                            self.logger.info(f"递归处理子directory: {item['path']}")
+                            # Recursively process subdirectory
+                            self.logger.info(f"Recursively processing subdirectory: {item['path']}")
                             sub_files = self._fetch_directory(owner, repo, branch, item['path'])
                             files_data.extend(sub_files)
                             file_count += len(sub_files)
 
-                    self.logger.info(f"成功获取directory {dir_path}: {len(files_data)} 个File")
+                    self.logger.info(f"Successfully fetched directory {dir_path}: {len(files_data)} files")
                     return files_data
 
         except urllib.error.HTTPError as e:
             self.logger.error(f"HTTPError {e.code}: {api_url}")
             if e.code == 403:
                 if not token:
-                    self.logger.warning("遇到 API 限流（403），且未配置 GitHub token，尝试使用降级方案")
-                    self.logger.info("提示: 配置 GitHub token 可以提高API调用限制，详见配置File")
+                    self.logger.warning("Encountered API rate limit (403) without GitHub token configured, trying fallback method")
+                    self.logger.info("Tip: Configuring GitHub token can increase API call limits, see config file")
                 else:
-                    self.logger.warning("遇到 API 限流（403），即使has been配置 token，尝试使用降级方案")
+                    self.logger.warning("Encountered API rate limit (403) even with token configured, trying fallback method")
                 use_fallback = True
             elif e.code == 404:
-                self.logger.error(f"directory不exists（404）: {dir_path}")
+                self.logger.error(f"Directory does not exist (404): {dir_path}")
                 return files_data
             else:
-                self.logger.warning(f"HTTPError {e.code}，尝试使用降级方案")
+                self.logger.warning(f"HTTPError {e.code}, trying fallback method")
                 use_fallback = True
         except Exception as e:
-            self.logger.error(f"获取directoryFailed: {api_url}, Error: {e}")
-            self.logger.info("尝试使用降级方案")
+            self.logger.error(f"Failed to fetch directory: {api_url}, Error: {e}")
+            self.logger.info("Trying fallback method")
             use_fallback = True
 
-        # 使用降级方案
+        # Use fallback method
         if use_fallback:
-            self.logger.info(f"开始使用降级方案获取directory: {dir_path}")
+            self.logger.info(f"Starting to fetch directory using fallback method: {dir_path}")
             file_list = self._fetch_directory_fallback(owner, repo, branch, dir_path)
             if file_list:
-                self.logger.info(f"降级方案获取到 {len(file_list)} 个File列表，开始下载内容")
+                self.logger.info(f"Fallback method retrieved {len(file_list)} file list, starting download")
                 max_files = self.fetch_opts.get("max_files_per_directory", 100)
                 file_count = 0
 
                 for file_info in file_list:
                     if file_count >= max_files:
-                        self.logger.warning(f"has been达到最大File数限制: {max_files}")
+                        self.logger.warning(f"Reached maximum file limit: {max_files}")
                         break
 
                     file_path = file_info['path']
                     file_name = file_info['name']
 
-                    # 下载File内容
+                    # Download file content
                     file_content = self._fetch_file(owner, repo, branch, file_path)
                     if file_content:
                         files_data.append({
                             "path": file_path,
                             "name": file_name,
-                            "size": len(file_content),  # 使用实际内容长度
+                            "size": len(file_content),  # Use actual content length
                             "branch": branch,
                             "text": file_content
                         })
                         file_count += 1
-                        self.logger.info(f"has been收集File {file_count}/{max_files}: {file_name}")
+                        self.logger.info(f"Collected file {file_count}/{max_files}: {file_name}")
                     else:
-                        self.logger.debug(f"File内容为空，跳过: {file_name}")
+                        self.logger.debug(f"File content is empty, skipping: {file_name}")
 
                 if files_data:
-                    self.logger.info(f"降级方案成功获取directory {dir_path}: {len(files_data)} 个File")
+                    self.logger.info(f"Fallback method successfully fetched directory {dir_path}: {len(files_data)} files")
                 else:
-                    self.logger.warning(f"降级方案获取到File列表，但所有File内容为空或被过滤")
+                    self.logger.warning(f"Fallback method retrieved file list, but all file contents are empty or filtered")
             else:
-                self.logger.warning(f"降级方案未能获取到File列表: {dir_path}")
+                self.logger.warning(f"Fallback method failed to retrieve file list: {dir_path}")
 
         return files_data
 
     def _fetch_readme(self, owner: str, repo: str) -> str:
         """
-        简化版：直接尝试获取 HEAD 分支的 README.md 原始内容
-        如果启用了 english_only，会过滤掉非英文内容
+        Simplified version: Directly try to fetch the raw content of README.md from HEAD branch
+        If english_only is enabled, non-English content will be filtered out
         """
         raw_urls = [
             f"https://raw.githubusercontent.com/{owner}/{repo}/HEAD/README.md",
@@ -445,79 +439,79 @@ class GithubCollector(BaseCollector):
                     if resp.status == 200:
                         content = resp.read().decode("utf-8", errors="ignore")
 
-                        # 英文过滤
+                        # English text filtering
                         if self.english_only:
                             if not self._is_english_text(content):
-                                self.logger.info(f"跳过非英文 README: {owner}/{repo}")
+                                self.logger.info(f"Skipping non-English README: {owner}/{repo}")
                                 return ""
 
                         return content
             except urllib.error.HTTPError as e:
                 continue
             except Exception as e:
-                self.logger.error(f"获取 README Failed: {raw_url}, Error: {e}")
+                self.logger.error(f"Failed to fetch README: {raw_url}, Error: {e}")
         return ""
 
     def _is_english_text(self, text: str, threshold: float = None) -> bool:
         """
-        检测文本是否主要是英文
+        Detect if text is primarily English
 
         Args:
-            text: 要检测的文本
-            threshold: 英文字符占比阈值（0.0-1.0），默认使用配置中的值
+            text: Text to detect
+            threshold: English character ratio threshold (0.0-1.0), defaults to value in config
 
         Returns:
-            True 如果英文字符占比 >= threshold
+            True if English character ratio >= threshold
         """
         if threshold is None:
             threshold = self.english_threshold
 
         if not text or not text.strip():
-            return True  # 空文本视为英文
+            return True  # Empty text is considered English
 
-        # 统计各类字符
+        # Count various character types
         english_chars = 0
         total_chars = 0
 
         for char in text:
-            # 跳过空白字符、标点符号和数字
+            # Skip whitespace, punctuation and numbers
             if char.isspace() or char in string.punctuation or char.isdigit():
                 continue
 
             total_chars += 1
 
-            # 英文字符判断：
-            # - 基本拉丁字母 (A-Z, a-z): 0x0041-0x005A, 0x0061-0x007A
-            # - 扩展拉丁字母 (带音标等): 0x00C0-0x024F
+            # English character judgment:
+            # - Basic Latin letters (A-Z, a-z): 0x0041-0x005A, 0x0061-0x007A
+            # - Extended Latin letters (with diacritics etc): 0x00C0-0x024F
             code_point = ord(char)
-            if (code_point < 0x0080 or  # ASCII 范围
-                (0x00C0 <= code_point <= 0x024F)):  # 扩展拉丁字母
+            if (code_point < 0x0080 or  # ASCII range
+                (0x00C0 <= code_point <= 0x024F)):  # Extended Latin letters
                 english_chars += 1
 
         if total_chars == 0:
-            return True  # 只有标点、空格和数字，视为英文
+            return True  # Only punctuation, spaces and numbers, treat as English
 
         ratio = english_chars / total_chars
 
-        # 记录检测结果（仅在启用过滤时）
+        # Log detection result (only when filtering is enabled)
         if self.english_only:
-            self.logger.debug(f"英文检测: {english_chars}/{total_chars} = {ratio:.2%} (阈值: {threshold:.0%})")
+            self.logger.debug(f"English detection: {english_chars}/{total_chars} = {ratio:.2%} (threshold: {threshold:.0%})")
 
         return ratio >= threshold
 
     def collect(self) -> Dict[str, Any]:
         """
-        执行采集：按仓库保存一个 JSON File
-        支持三种URL格式：
-        1. 仓库URL: 收集README
-        2. FileURL: 收集指定File
-        3. directoryURL: 收集directory下所有File
+        Execute collection: Save one JSON file per repository
+        Supports three URL formats:
+        1. Repository URL: Collect README
+        2. File URL: Collect specified file
+        3. Directory URL: Collect all files under directory
         """
         self.start_collection()
 
         repos: List[str] = self.config.get("repositories", [])
         if not repos:
-            msg = "配置File中未提供 repositories"
+            msg = "repositories not provided in config file"
             self.logger.error(msg)
             return {"success": False, "message": msg, "stats": self.get_stats()}
 
@@ -542,10 +536,10 @@ class GithubCollector(BaseCollector):
                     "fetch_options": self.fetch_opts
                 }
 
-                # 根据 URL 类型处理
+                # Process based on URL type
                 if url_type == 'file':
-                    # 单个File
-                    self.logger.info(f"检测到FileURL，将获取: {path}")
+                    # Single file
+                    self.logger.info(f"Detected file URL, will fetch: {path}")
                     file_content = self._fetch_file(owner, repo, branch, path)
                     if file_content:
                         record["fetched"]["files"].append({
@@ -554,32 +548,32 @@ class GithubCollector(BaseCollector):
                             "branch": branch,
                             "text": file_content
                         })
-                        self.logger.info(f"成功获取File: {path}")
+                        self.logger.info(f"Successfully fetched file: {path}")
                     else:
-                        self.logger.warning(f"未能获取File: {path}")
+                        self.logger.warning(f"Failed to fetch file: {path}")
 
                 elif url_type == 'directory':
                     # directory
-                    self.logger.info(f"检测到directoryURL，将获取directory: {path or '(根directory)'}")
+                    self.logger.info(f"Detected directory URL, will fetch directory: {path or '(root directory)'}")
                     files = self._fetch_directory(owner, repo, branch, path)
                     if files:
                         record["fetched"]["files"] = files
-                        self.logger.info(f"成功获取directory，共 {len(files)} 个File")
+                        self.logger.info(f"Successfully fetched directory, total {len(files)} files")
                     else:
-                        self.logger.warning(f"未能获取directory内容: {path}")
+                        self.logger.warning(f"Failed to fetch directory contents: {path}")
 
                 elif url_type == 'repo':
-                    # 仓库（获取README）
+                    # Repository (fetch README)
                     if self.fetch_opts.get("readme", True):
                         readme = self._fetch_readme(owner, repo)
                         if readme:
                             record["fetched"]["readme"] = {"text": readme, "path": "README.md"}
 
-                # 预留 issues/PRs/commits：需要 GitHub API/GraphQL，后续可扩展
+                # Reserved for issues/PRs/commits: Requires GitHub API/GraphQL, can be extended later
 
-                # 生成输出File名
+                # Generate output file name
                 if url_type == 'directory' and path:
-                    # directoryURL：使用directory名作为File名的一部分
+                    # Directory URL: Use directory name as part of file name
                     safe_path = path.replace('/', '_')
                     out_file = self.output_dir / f"{owner}_{repo}_{safe_path}_data.json"
                 else:
@@ -587,10 +581,10 @@ class GithubCollector(BaseCollector):
 
                 with open(out_file, "w", encoding="utf-8") as f:
                     json.dump(record, f, ensure_ascii=False, indent=2)
-                self.logger.info(f"has been保存: {out_file}")
+                self.logger.info(f"Saved: {out_file}")
                 self.stats['successful_items'] += 1
             except Exception as e:
-                self.logger.error(f"采集Failed {repo_url}: {e}")
+                self.logger.error(f"Collection failed {repo_url}: {e}")
                 import traceback
                 self.logger.error(traceback.format_exc())
                 self.stats['failed_items'] += 1
@@ -599,7 +593,7 @@ class GithubCollector(BaseCollector):
 
         return {
             "success": True,
-            "message": f"成功收集 {self.stats['successful_items']} 个资源",
+            "message": f"Successfully collected {self.stats['successful_items']} resources",
             "stats": self.get_stats(),
             "output_dir": str(self.output_dir)
         }

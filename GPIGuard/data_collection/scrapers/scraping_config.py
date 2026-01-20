@@ -7,11 +7,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
 import random
 
-# 导入 logger
+# Import logger
 from data_collection.utils.logger import setup_logger
 
 class ScrapingConfig:
-    """网页爬取配置管理器"""
+    """Web scraping configuration manager"""
     
     def __init__(self, config_file: Union[str, Path] = "web_scraping_config.json"):
         self.config_file = Path(config_file)
@@ -21,23 +21,23 @@ class ScrapingConfig:
         self.config = self._load_config()
     
     def _load_config(self) -> Dict[str, Any]:
-        """加载爬取配置File"""
+        """Load scraping configuration file"""
         try:
             if self.config_file.exists():
                 with open(self.config_file, 'r', encoding='utf-8') as f:
                     config = json.load(f)
-                self.logger.info(f"成功加载配置File: {self.config_file}")
+                self.logger.info(f"Successfully loaded config file: {self.config_file}")
                 return config
             else:
-                self.logger.info("配置File不exists，使用默认配置")
+                self.logger.info("Config file does not exist, using default configuration")
                 return self._get_default_config()
                 
         except Exception as e:
-            self.logger.error(f"加载配置FileFailed: {e}")
+            self.logger.error(f"Failed to load config file: {e}")
             return self._get_default_config()
     
     def _get_default_config(self) -> Dict[str, Any]:
-        """获取默认配置"""
+        """Get default configuration"""
         return {
             "request_settings": {
                 "timeout": 30,
@@ -92,7 +92,7 @@ class ScrapingConfig:
             },
             "safety_settings": {
                 "respect_robots_txt": True,
-                "check_robots_txt": False,  # 简化版本暂时关闭
+                "check_robots_txt": False,  # Simplified version temporarily disabled
                 "avoid_honeypots": True,
                 "max_concurrent_requests": 1,
                 "blacklisted_domains": [
@@ -102,38 +102,38 @@ class ScrapingConfig:
         }
     
     def get_request_settings(self) -> Dict[str, Any]:
-        """获取请求设置"""
+        """Get request settings"""
         return self.config.get("request_settings", {})
     
     def get_random_user_agent(self) -> str:
-        """获取随机User-Agent"""
+        """Get random User-Agent"""
         user_agents = self.config.get("user_agents", [])
         if user_agents:
             return random.choice(user_agents)
         return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     
     def get_scraping_rules(self) -> Dict[str, Any]:
-        """获取爬取规则"""
+        """Get scraping rules"""
         return self.config.get("scraping_rules", {})
     
     def get_secondary_page_config(self) -> Dict[str, Any]:
-        """获取二级页面发现配置"""
+        """Get secondary page discovery configuration"""
         return self.config.get("secondary_page_discovery", {})
     
     def get_content_extraction_config(self) -> Dict[str, Any]:
-        """获取内容提取配置"""
+        """Get content extraction configuration"""
         return self.config.get("content_extraction", {})
     
     def get_output_settings(self) -> Dict[str, Any]:
-        """获取输出设置"""
+        """Get output settings"""
         return self.config.get("output_settings", {})
     
     def get_safety_settings(self) -> Dict[str, Any]:
-        """获取安全设置"""
+        """Get safety settings"""
         return self.config.get("safety_settings", {})
     
     def is_domain_blacklisted(self, domain: str) -> bool:
-        """Check域名是否在黑名单中"""
+        """Check if domain is in blacklist"""
         blacklist = self.get_safety_settings().get("blacklisted_domains", [])
         domain_lower = domain.lower()
         
@@ -143,7 +143,7 @@ class ScrapingConfig:
         return False
     
     def should_extract_content_type(self, content_type: str) -> bool:
-        """Check是否应该提取某种类型的内容"""
+        """Check if should extract certain type of content"""
         extraction_config = self.get_content_extraction_config()
         
         type_mapping = {
@@ -162,17 +162,17 @@ class ScrapingConfig:
         return True
     
     def get_request_delay(self) -> float:
-        """获取请求延迟时间"""
+        """Get request delay time"""
         settings = self.get_request_settings()
         min_delay = settings.get("request_delay_min", 1)
         max_delay = settings.get("request_delay_max", 3)
         return random.uniform(min_delay, max_delay)
     
     def should_include_link(self, link_text: str, link_url: str) -> bool:
-        """判断是否应该包含某个链接"""
+        """Determine if a link should be included"""
         secondary_config = self.get_secondary_page_config()
         
-        # Check排除模式
+        # Check exclusion patterns
         exclude_patterns = secondary_config.get("exclude_patterns", [])
         link_text_lower = link_text.lower()
         link_url_lower = link_url.lower()
@@ -181,50 +181,50 @@ class ScrapingConfig:
             if pattern.lower() in link_text_lower or pattern.lower() in link_url_lower:
                 return False
         
-        # Check优先模式
+        # Check preferred patterns
         preferred_patterns = secondary_config.get("preferred_link_patterns", [])
         for pattern in preferred_patterns:
             if pattern.lower() in link_text_lower or pattern.lower() in link_url_lower:
                 return True
         
-        # 默认策略
+        # Default strategy
         strategy = secondary_config.get("link_selection_strategy", "mixed")
         if strategy == "priority":
-            return False  # 只选择优先模式匹配的链接
+            return False  # Only select links matching preferred patterns
         
-        return True  # mixed或random策略接受其他链接
+        return True  # mixed or random strategy accepts other links
     
     def save_config(self, output_file: Union[str, Path] = None) -> bool:
-        """保存配置到File"""
+        """Save configuration to file"""
         try:
             output_file = Path(output_file) if output_file else self.config_file
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=2)
             
-            self.logger.info(f"配置has been保存到: {output_file}")
+            self.logger.info(f"Config has been saved to: {output_file}")
             return True
             
         except Exception as e:
-            self.logger.error(f"保存配置Failed: {e}")
+            self.logger.error(f"Failed to save config: {e}")
             return False
     
     def update_setting(self, section: str, key: str, value: Any) -> bool:
-        """更新配置设置"""
+        """Update configuration setting"""
         try:
             if section not in self.config:
                 self.config[section] = {}
             
             self.config[section][key] = value
-            self.logger.info(f"更新配置: {section}.{key} = {value}")
+            self.logger.info(f"Updated config: {section}.{key} = {value}")
             return True
             
         except Exception as e:
-            self.logger.error(f"更新配置Failed: {e}")
+            self.logger.error(f"Failed to update config: {e}")
             return False
     
     def get_statistics(self) -> Dict[str, Any]:
-        """获取配置Statistics"""
+        """Get configuration statistics"""
         return {
             "total_user_agents": len(self.config.get("user_agents", [])),
             "max_sites_per_session": self.get_scraping_rules().get("max_sites_per_session", 0),
@@ -235,16 +235,16 @@ class ScrapingConfig:
         }
     
     def print_config_summary(self):
-        """打印配置摘要"""
+        """Print configuration summary"""
         stats = self.get_statistics()
         
         print("\n" + "="*50)
-        print("🔧 网页爬取配置摘要")
+        print("🔧 Web Scraping Configuration Summary")
         print("="*50)
-        print(f"🌐 User-Agent数量: {stats['total_user_agents']}")
-        print(f"📊 最大网站数: {stats['max_sites_per_session']}")
-        print(f"📄 每站最大页面数: {stats['max_pages_per_site']}")
-        print(f"🚫 黑名单域名: {stats['blacklisted_domains']} 个")
-        print(f"⭐ 优先链接模式: {stats['preferred_link_patterns']} 个")
-        print(f"🛡️  安全模式: {'启用' if stats['safety_enabled'] else '禁用'}")
+        print(f"🌐 Number of User-Agents: {stats['total_user_agents']}")
+        print(f"📊 Max number of sites: {stats['max_sites_per_session']}")
+        print(f"📄 Max pages per site: {stats['max_pages_per_site']}")
+        print(f"🚫 Blacklisted domains: {stats['blacklisted_domains']} items")
+        print(f"⭐ Preferred link patterns: {stats['preferred_link_patterns']} items")
+        print(f"🛡️  Safety mode: {'Enabled' if stats['safety_enabled'] else 'Disabled'}")
         print("="*50)

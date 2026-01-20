@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Reddit Data Parsing器
-从Reddit JSONFile中提取帖子和评论文本
+Reddit data parser
+Extract posts and comments text from Reddit JSON files
 """
 
 import json
@@ -21,29 +21,29 @@ from data_parsing.utils import FileUtils
 
 
 class RedditParser(BaseParser):
-    """Reddit Data Parsing器（兼容旧格式）"""
+    """Reddit data parser (compatible with old format)"""
     
     def __init__(self, enable_interference_filter: bool = True, filter_config: Dict[str, Any] = None):
         super().__init__('reddit', enable_interference_filter, filter_config)
     
     def decode_text(self, text: str) -> str:
-        """基础文本解码处理"""
+        """Basic text decoding processing"""
         if not text:
             return ""
         
-        # HTML实体解码
+        # HTML entity decoding
         text = html.unescape(text)
         
-        # 清理多余空白
+        # Clean up extra whitespace
         text = re.sub(r'\s+', ' ', text).strip()
         
-        # 应用干扰字符过滤器
+        # Apply interference character filter
         text = self._process_extracted_text(text)
         
         return text
     
     def extract_text_content(self, post: Dict) -> str:
-        """合并帖子的所有文本内容"""
+        """Merge all text content from posts"""
         text_parts = []
         
         if post.get('title'):
@@ -55,11 +55,11 @@ class RedditParser(BaseParser):
         return ' '.join(text_parts).strip()
     
     def process_posts(self, submissions: List[Dict], subreddit_name: str, source_file: str) -> Dict[str, Any]:
-        """处理帖子数据（兼容旧格式）"""
+        """Process post data (compatible with old format)"""
         processed_posts = []
         
         for post in submissions:
-            # 只保留有用字段并解码
+            # Keep only useful fields and decode
             cleaned_post = {
                 'id': post['id'],
                 'title': self.decode_text(post.get('title', '')),
@@ -69,7 +69,7 @@ class RedditParser(BaseParser):
                 'permalink': post.get('permalink', '')
             }
             
-            # 添加处理后的元数据
+            # Add processed metadata
             cleaned_post['text_content'] = self.extract_text_content(cleaned_post)
             cleaned_post['content_length'] = len(cleaned_post['text_content'])
             
@@ -89,11 +89,11 @@ class RedditParser(BaseParser):
         return output_data
     
     def process_comments(self, comments: List[Dict], subreddit_name: str, source_file: str) -> Dict[str, Any]:
-        """处理评论数据（兼容旧格式）"""
+        """Process comment data (compatible with old format)"""
         processed_comments = []
         
         for comment in comments:
-            # 只保留有用字段并解码
+            # Keep only useful fields and decode
             cleaned_comment = {
                 'id': comment['id'],
                 'submission_id': comment.get('submission_id', ''),
@@ -102,13 +102,13 @@ class RedditParser(BaseParser):
                 'permalink': comment.get('permalink', '')
             }
             
-            # 添加处理后的元数据
+            # Add processed metadata
             cleaned_comment['text_content'] = cleaned_comment['body']
             cleaned_comment['content_length'] = len(cleaned_comment['text_content'])
             
             processed_comments.append(cleaned_comment)
         
-        # 构建输出数据（与旧格式完全相同）
+        # Build output data (identical to old format)
         output_data = {
             "parsing_info": {
                 "subreddit": subreddit_name,
@@ -122,7 +122,7 @@ class RedditParser(BaseParser):
         return output_data
     
     def extract_subreddit_name(self, filename: str) -> str:
-        """从File名提取subreddit名称"""
+        """Extract subreddit name from filename"""
         # chatgpt_promptDesign_data.json -> chatgpt_promptDesign
         # unicode_data.json -> unicode
         base_name = filename.replace('_data.json', '')
@@ -130,57 +130,57 @@ class RedditParser(BaseParser):
     
     def parse_file(self, file_path: Path) -> bool:
         """
-        解析单个Reddit JSONFile
-        返回布尔值表示成功/Failed
+        Parse a single Reddit JSON file
+        Return boolean indicating success/failure
         """
         self.logger.info(f"Parsing Reddit file: {file_path}")
-        print(f"🔍 处理File: {file_path.name}")
+        print(f"🔍 Processing file: {file_path.name}")
         
         try:
-            # 读取JSONFile
+            # Read JSON file
             content = FileUtils.safe_read_file(file_path)
             data = json.loads(content)
             
-            # 提取subreddit名称
+            # Extract subreddit name
             subreddit_name = self.extract_subreddit_name(file_path.name)
             
-            # 处理帖子
+            # Process posts
             if 'submissions' in data and data['submissions']:
                 posts_data = self.process_posts(data['submissions'], subreddit_name, file_path.name)
                 posts_filename = f"{subreddit_name}_posts_parsed.json"
                 posts_path = self.output_dir / posts_filename
                 self.save_parsed_data(posts_data, posts_path)
                 
-                print(f"   📋 处理帖子: {len(data['submissions'])} 个")
+                print(f"   📋 Processing posts: {len(data['submissions'])} items")
             
-            # 处理评论
+            # Process comments
             if 'comments' in data and data['comments']:
                 comments_data = self.process_comments(data['comments'], subreddit_name, file_path.name)
                 comments_filename = f"{subreddit_name}_comments_parsed.json"
                 comments_path = self.output_dir / comments_filename
                 self.save_parsed_data(comments_data, comments_path)
                 
-                print(f"   💬 处理评论: {len(data['comments'])} 个")
+                print(f"   💬 Processing comments: {len(data['comments'])} items")
             
             self.logger.info(f"Successfully parsed {file_path.name}")
             return True
             
         except json.JSONDecodeError as e:
             self.logger.error(f"JSON decode error in {file_path}: {e}")
-            print(f"   ❌ JSON格式Error: {e}")
+            print(f"   ❌ JSON format error: {e}")
             return False
         except Exception as e:
             self.logger.error(f"Error parsing {file_path}: {e}")
-            print(f"   ❌ 解析Error: {e}")
+            print(f"   ❌ Parsing error: {e}")
             return False
     
     def _get_files_to_parse(self, directory: Path) -> List[Path]:
-        """获取所有Reddit JSONFile"""
+        """Get all Reddit JSON files"""
         return list(directory.glob('*_data.json'))
     
     def parse_directory(self, directory: Path = None) -> List[Dict[str, Any]]:
         """
-        解析整个directory
+        Parse entire directory
         """
         if directory is None:
             directory = self.input_dir
@@ -191,7 +191,7 @@ class RedditParser(BaseParser):
         
         files = self._get_files_to_parse(directory)
         self.logger.info(f"Found {len(files)} files to parse in {directory}")
-        print(f"\n找到 {len(files)} 个Reddit数据File")
+        print(f"\nFound {len(files)} Reddit data files")
         
         self.stats['total_files'] = len(files)
         
@@ -204,21 +204,21 @@ class RedditParser(BaseParser):
                 self.stats['successful_files'] += 1
                 subreddit_name = self.extract_subreddit_name(file_path.name)
                 subreddits.append(subreddit_name)
-                print(f"✅ {file_path.name} 处理Completed")
+                print(f"✅ {file_path.name} processing completed")
             else:
                 self.stats['failed_files'] += 1
-                print(f"❌ {file_path.name} 处理Failed")
+                print(f"❌ {file_path.name} processing failed")
         
-        # 生成汇总报告
+        # Generate summary report
         if subreddits:
             self._generate_summary_report(subreddits)
         
-        # 注意：这里返回空列表，因为结果has been经分别保存到不同File
-        # 不需要批量汇总
+        # Note: Returns empty list here because results have been saved separately to different files
+        # No need for batch summary
         return []
     
     def _generate_summary_report(self, subreddits: List[str]):
-        """生成解析汇总报告"""
+        """Generate parsing summary report"""
         summary = {
             "processing_info": {
                 "timestamp": datetime.now().isoformat(),
@@ -232,7 +232,7 @@ class RedditParser(BaseParser):
             "output_files": []
         }
         
-        # 列出生成的File
+        # List generated files
         for subreddit in set(subreddits):
             summary["output_files"].extend([
                 f"{subreddit}_posts_parsed.json",
@@ -241,4 +241,4 @@ class RedditParser(BaseParser):
         
         summary_path = self.output_dir / "reddit_parsing_summary.json"
         self.save_parsed_data(summary, summary_path)
-        print(f"\n💾 汇总报告has been保存: reddit_parsing_summary.json")
+        print(f"\n💾 Summary report saved: reddit_parsing_summary.json")

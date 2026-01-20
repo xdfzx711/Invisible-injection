@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-干扰字符过滤器
-移除干扰字符（emoji、数学符号、kaomoji等），保留正常字符和攻击字符
-"""
-
 import re
 import unicodedata
 from typing import Dict, List, Any, Tuple
 from pathlib import Path
 import sys
 
-# 添加项目根directory到路径
+# Add project root directory to path
 current_dir = Path(__file__).parent
 project_root = current_dir.parent.parent
 if str(project_root) not in sys.path:
@@ -30,31 +25,31 @@ from .filter_config import (
 
 
 class InterferenceCharacterFilter:
-    """干扰字符过滤器"""
+    """Interference Character Filter"""
 
     def __init__(self, config: Dict[str, Any] = None):
         """
-        初始化过滤器
+        Initialize filter
 
         Args:
-            config: 过滤器配置，如果为None则使用默认配置
+            config: Filter config, use default if None
         """
         self.config = config or INTERFERENCE_FILTER_CONFIG.copy()
         self.logger = setup_logger('InterferenceCharacterFilter')
 
-        # 干扰字符范围
+        # Interference character ranges
         self.interference_ranges = INTERFERENCE_RANGES
         
-        # 干扰字符集合
+        # Interference character set
         self.interference_chars = INTERFERENCE_CHARS
         
-        # 受保护的攻击字符范围
+        # Protected attack character ranges
         self.protected_attack_ranges = PROTECTED_ATTACK_RANGES
         
-        # Kaomoji模式
+        # Kaomoji patterns
         self.kaomoji_patterns = [re.compile(pattern) for pattern in KAOMOJI_PATTERNS]
         
-        # 需要保留的格式控制字符
+        # Format control characters to preserve
         self.preserved_format_chars = PRESERVED_FORMAT_CHARS
 
         # Statistics
@@ -67,23 +62,23 @@ class InterferenceCharacterFilter:
             'filtered_char_details': []
         }
 
-        self.logger.info("干扰字符过滤器初始化Completed")
-        self.logger.info(f"配置: {self.config}")
+        self.logger.info("Interference character filter initialization completed")
+        self.logger.info(f"Config: {self.config}")
 
     def _is_interference_char(self, char: str) -> bool:
-        """Check字符是否是干扰字符"""
-        # 首先Check是否在具体的干扰字符集合中
+        """Check if character is an interference character"""
+        # First check if in specific interference character set
         if char in self.interference_chars:
             return True
             
         code_point = ord(char)
         
-        # Check是否在干扰字符范围内
+        # Check if in interference character ranges
         for start, end in self.interference_ranges:
             if start <= code_point <= end:
                 return True
         
-        # Check是否匹配kaomoji模式
+        # Check if matches kaomoji patterns
         for pattern in self.kaomoji_patterns:
             if pattern.search(char):
                 return True
@@ -91,10 +86,10 @@ class InterferenceCharacterFilter:
         return False
 
     def _is_protected_char(self, char: str) -> bool:
-        """Check字符是否是受保护的攻击字符"""
+        """Check if character is a protected attack character"""
         code_point = ord(char)
         
-        # Check是否在受保护的攻击字符范围内
+        # Check if in protected attack character ranges
         for start, end in self.protected_attack_ranges:
             if start <= code_point <= end:
                 return True
@@ -103,13 +98,13 @@ class InterferenceCharacterFilter:
 
     def clean_text(self, text: str) -> str:
         """
-        清理文本中的干扰字符
+        Clean interference characters from text
 
         Args:
-            text: 输入文本
+            text: Input text
 
         Returns:
-            清理后的文本
+            Cleaned text
         """
         if not text or not self.config.get('enabled', False):
             return text
@@ -122,21 +117,21 @@ class InterferenceCharacterFilter:
         for i, char in enumerate(text):
             self.stats['total_chars_processed'] += 1
 
-            # 1. 首先Check是否是格式控制字符（始终保留）
+            # 1. First check if format control character (always preserve)
             if char in self.preserved_format_chars:
                 preserved_chars.append(char)
                 continue
 
-            # 2. Check是否是受保护的攻击字符（始终保留）
+            # 2. Check if protected attack character (always preserve)
             if self._is_protected_char(char):
                 preserved_chars.append(char)
                 self.stats['attack_chars_preserved'] += 1
                 
                 if self.config.get('log_filtered_chars', False):
-                    self.logger.debug(f"保留攻击字符: '{char}' (U+{ord(char):04X}) at position {i}")
+                    self.logger.debug(f"Preserve attack character: '{char}' (U+{ord(char):04X}) at position {i}")
                 continue
 
-            # 3. Check是否是干扰字符（移除）
+            # 3. Check if interference character (remove)
             if self._is_interference_char(char):
                 removed_details.append({
                     'char': char,
@@ -148,10 +143,10 @@ class InterferenceCharacterFilter:
                 self.stats['interference_chars_removed'] += 1
                 
                 if self.config.get('log_filtered_chars', False):
-                    self.logger.debug(f"移除干扰字符: '{char}' (U+{ord(char):04X}) at position {i}")
+                    self.logger.debug(f"Remove interference character: '{char}' (U+{ord(char):04X}) at position {i}")
                 continue
 
-            # 4. 其他字符（正常字符）保留
+            # 4. Other characters (normal text) preserve
             preserved_chars.append(char)
             self.stats['normal_chars_preserved'] += 1
 
@@ -168,16 +163,16 @@ class InterferenceCharacterFilter:
             })
 
         if removed_details:
-            self.logger.info(f"从文本中移除了 {len(removed_details)} 个干扰字符")
+            self.logger.info(f"Removed {len(removed_details)} interference characters from text")
 
         return result_text
 
     def clean_text_list(self, texts: List[str]) -> List[str]:
-        """批量清理文本列表"""
+        """Batch clean text list"""
         return [self.clean_text(text) for text in texts]
 
     def get_statistics(self) -> Dict[str, Any]:
-        """获取过滤Statistics"""
+        """Get filter statistics"""
         return {
             'config': self.config,
             'stats': self.stats.copy(),
@@ -187,7 +182,7 @@ class InterferenceCharacterFilter:
         }
 
     def generate_filter_report(self) -> Dict[str, Any]:
-        """生成详细的过滤报告"""
+        """Generate detailed filter report"""
         stats = self.get_statistics()
 
         char_distribution = {}
@@ -231,7 +226,7 @@ class InterferenceCharacterFilter:
         return report
 
     def reset_statistics(self):
-        """重置Statistics"""
+        """Reset statistics"""
         self.stats = {
             'total_chars_processed': 0,
             'interference_chars_removed': 0,
@@ -240,22 +235,22 @@ class InterferenceCharacterFilter:
             'texts_processed': 0,
             'filtered_char_details': []
         }
-        self.logger.info("Statisticshas been重置")
+        self.logger.info("Statistics have been reset")
 
 
 def create_default_filter() -> InterferenceCharacterFilter:
-    """创建默认配置的干扰字符过滤器"""
+    """Create default filter with default config"""
     return InterferenceCharacterFilter()
 
 
 def create_enabled_filter() -> InterferenceCharacterFilter:
-    """创建启用的干扰字符过滤器"""
+    """Create enabled filter with default config"""
     config = INTERFERENCE_FILTER_CONFIG.copy()
     config['enabled'] = True
     return InterferenceCharacterFilter(config)
 
 if __name__ == "__main__":
-    # 测试代码
+    # Test code
     filter_instance = create_enabled_filter()
 
     test_texts = [
@@ -269,17 +264,17 @@ if __name__ == "__main__":
         "Normal text with punctuation: Hello, world! How are you?"
     ]
 
-    print("=== 干扰字符过滤器测试 ===")
+    print("=== Interference Character Filter Test ===")
     for i, text in enumerate(test_texts, 1):
-        print(f"\n测试 {i}:")
-        print(f"原文: {text}")
+        print(f"\nTest {i}:")
+        print(f"Original: {text}")
         cleaned = filter_instance.clean_text(text)
-        print(f"清理后: {cleaned}")
+        print(f"Cleaned: {cleaned}")
 
     print("\n=== Statistics ===")
     stats = filter_instance.get_statistics()
-    print(f"处理文本数: {stats['stats']['texts_processed']}")
-    print(f"处理字符数: {stats['stats']['total_chars_processed']}")
-    print(f"移除干扰字符数: {stats['stats']['interference_chars_removed']}")
-    print(f"保留攻击字符数: {stats['stats']['attack_chars_preserved']}")
-    print(f"保留正常字符数: {stats['stats']['normal_chars_preserved']}")
+    print(f"Texts processed: {stats['stats']['texts_processed']}")
+    print(f"Characters processed: {stats['stats']['total_chars_processed']}")
+    print(f"Interference characters removed: {stats['stats']['interference_chars_removed']}")
+    print(f"Attack characters preserved: {stats['stats']['attack_chars_preserved']}")
+    print(f"Normal characters preserved: {stats['stats']['normal_chars_preserved']}")

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-CSV数据解析器
-Parse CSV格式的数据File
+CSV Data Parser
+Parse CSV format data file
 """
 
 import csv
@@ -58,7 +58,7 @@ class CSVParser(BaseParser):
             csv_file = StringIO(content)
             reader = csv.reader(csv_file, dialect=dialect)
             
-            # 读取表头
+            # Read headers
             try:
                 headers = next(reader)
                 for col_index, header in enumerate(headers):
@@ -74,7 +74,7 @@ class CSVParser(BaseParser):
             except StopIteration:
                 headers = []
             
-            # 读取数据行
+            # Read data rows
             for row_index, row in enumerate(reader, 1):
                 row_count = row_index
                 
@@ -92,7 +92,7 @@ class CSVParser(BaseParser):
                             'length': len(cell_value)
                         })
             
-            # 构建解析结果（与旧格式相同）
+            # Build parsing result (same format as old format)
             result = {
                 'file_info': FileUtils.get_file_info(file_path),
                 'parsing_info': {
@@ -111,14 +111,14 @@ class CSVParser(BaseParser):
             
         except Exception as e:
             self.logger.error(f"Error parsing {file_path}: {e}")
-            return self._create_error_result(file_path, f"解析Error: {e}")
+            return self._create_error_result(file_path, f"Parsing error: {e}")
     
     def _get_files_to_parse(self, directory: Path) -> List[Path]:
-        """获取所有CSVFile"""
+        """Get all CSV files"""
         return list(directory.glob('*.csv'))
     
     def _create_error_result(self, file_path: Path, error_message: str) -> Dict[str, Any]:
-        """创建Error结果"""
+        """Create error result"""
         return {
             'file_info': FileUtils.get_file_info(file_path),
             'parsing_info': {
@@ -130,7 +130,7 @@ class CSVParser(BaseParser):
         }
     
     def parse_directory(self, directory: Path = None) -> List[Dict[str, Any]]:
-        """解析整个directory（单File单独保存）"""
+        """Parse entire directory (save each file separately)"""
         if directory is None:
             directory = self.input_dir
         
@@ -139,14 +139,14 @@ class CSVParser(BaseParser):
             return []
         
         files = self._get_files_to_parse(directory)
-        print(f"\n找到 {len(files)} 个CSVFile待解析")
+        print(f"\nFound {len(files)} CSV files to parse")
         
         self.stats['total_files'] = len(files)
         results = []
         
         for i, file_path in enumerate(files, 1):
             try:
-                print(f"[{i}/{len(files)}] 解析: {file_path.name}")
+                print(f"[{i}/{len(files)}] Parsing: {file_path.name}")
                 result = self.parse_file(file_path)
                 
                 if result and result.get('parsing_info', {}).get('status') != 'failed':
@@ -157,7 +157,7 @@ class CSVParser(BaseParser):
                     results.append(result)
                     self.stats['successful_files'] += 1
                     self.stats['total_texts_extracted'] += len(result.get('text_entries', []))
-                    print(f"  成功: {len(result.get('text_entries', []))} 个文本entries目")
+                    print(f"  Success: {len(result.get('text_entries', []))} text entries")
                 else:
                     self.stats['failed_files'] += 1
                     

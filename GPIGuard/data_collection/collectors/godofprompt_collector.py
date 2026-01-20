@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-GodOfPrompt.ai 数据收集器
-抓取网站上的免费提示词
-注意：此网站使用JavaScript动态加载内容，需要使用Selenium
-"""
+ 
 
 import time
 import json
@@ -37,29 +33,29 @@ from ..base_collector import BaseCollector
 
 
 class GodOfPromptCollector(BaseCollector):
-    """GodOfPrompt.ai 数据收集器"""
+    """GodOfPrompt.ai data collector"""
 
     def __init__(self):
         super().__init__('godofprompt')
         self.base_url = "https://www.godofprompt.ai"
-        self.request_delay = 2.0  # 请求间隔（秒）
+        self.request_delay = 2.0  # Request interval (seconds)
         self.driver = None
         
         if not SELENIUM_AVAILABLE:
             self.logger.warning("Selenium not available. Please install: pip install selenium")
 
     def validate_config(self) -> bool:
-        """验证配置（对于此特定收集器，配置是硬编码的）"""
+        """Validate configuration (for this specific collector, configuration is hardcoded)"""
         if not SELENIUM_AVAILABLE:
-            print("\nError: 需要安装 Selenium 来处理JavaScript动态内容")
-            print("请运行: pip install selenium")
+            print("\nError: Selenium installation required to handle JavaScript dynamic content")
+            print("Please run: pip install selenium")
             return False
         
-        # 初始化浏览器驱动
-        print("\n正在初始化浏览器驱动...")
+        # Initialize browser driver
+        print("\nInitializing browser driver...")
         try:
             chrome_options = Options()
-            chrome_options.add_argument('--headless')  # 无头模式
+            chrome_options.add_argument('--headless')  # Headless mode
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
             chrome_options.add_argument('--disable-gpu')
@@ -69,49 +65,49 @@ class GodOfPromptCollector(BaseCollector):
             chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
             chrome_options.add_experimental_option('useAutomationExtension', False)
             
-            print("正在启动 Chrome 浏览器...")
+            print("Starting Chrome browser...")
             
-            # 优先使用 webdriver-manager 自动管理驱动
+            # Prioritize webdriver-manager for automatic driver management
             if WEBDRIVER_MANAGER_AVAILABLE:
                 try:
-                    print("使用 webdriver-manager 自动管理 ChromeDriver...")
+                    print("Using webdriver-manager to automatically manage ChromeDriver...")
                     service = ChromeService(ChromeDriverManager().install())
                     self.driver = webdriver.Chrome(service=service, options=chrome_options)
-                    print("✓ ChromeDriver has been自动下载并配置")
+                    print("✓ ChromeDriver automatically downloaded and configured")
                 except Exception as e:
                     self.logger.warning(f"webdriver-manager failed, trying direct Chrome: {e}")
-                    # 如果 webdriver-manager Failed，尝试直接使用系统PATH中的ChromeDriver
+                    # If webdriver-manager failed, try using ChromeDriver directly from system PATH
                     self.driver = webdriver.Chrome(options=chrome_options)
             else:
-                # 如果没有 webdriver-manager，尝试直接使用系统PATH中的ChromeDriver
-                print("尝试使用系统 PATH 中的 ChromeDriver...")
+                # If webdriver-manager not available, try using ChromeDriver directly from system PATH
+                print("Trying to use ChromeDriver from system PATH...")
                 self.driver = webdriver.Chrome(options=chrome_options)
             
-            self.driver.set_page_load_timeout(30)  # 设置页面加载超时
-            self.driver.implicitly_wait(5)  # 减少隐式等待时间
-            print("✓ 浏览器驱动初始化成功")
+            self.driver.set_page_load_timeout(30)  # Set page load timeout
+            self.driver.implicitly_wait(5)  # Reduce implicit wait time
+            print("✓ Browser driver initialized successfully")
             self.logger.info("Selenium WebDriver initialized successfully")
             return True
         except Exception as e:
             self.logger.error(f"Failed to initialize WebDriver: {e}", exc_info=True)
-            print(f"\n✗ Error: 无法初始化浏览器驱动: {e}")
-            print("\n可能的解决方案:")
-            print("1. 确保has been安装 Chrome 浏览器")
+            print(f"\n✗ Error: Cannot initialize browser driver: {e}")
+            print("\nPossible solutions:")
+            print("1. Make sure Chrome browser is installed")
             if not WEBDRIVER_MANAGER_AVAILABLE:
-                print("2. 安装 webdriver-manager 自动管理驱动（推荐）:")
+                print("2. Install webdriver-manager to automatically manage drivers (recommended):")
                 print("   pip install webdriver-manager")
-            print("3. 或者手动安装 ChromeDriver:")
-            print("   - 下载与您的 Chrome 版本匹配的 ChromeDriver")
-            print("   - 将 ChromeDriver 添加到系统 PATH")
-            print("   - 或将其放在项目directory中")
+            print("3. Or manually install ChromeDriver:")
+            print("   - Download ChromeDriver matching your Chrome version")
+            print("   - Add ChromeDriver to system PATH")
+            print("   - Or place it in the project directory")
             return False
 
     def collect(self) -> Dict[str, Any]:
-        """执行数据收集"""
-        # Checkdriver是否has been初始化
+        """Execute data collection"""
+        # Check if driver has been initialized
         if not self.driver:
-            print("\nError: 浏览器驱动未初始化")
-            print("请确保 validate_config() has been成功执行")
+            print("\nError: Browser driver not initialized")
+            print("Please ensure validate_config() executed successfully")
             return {
                 'success': False,
                 'message': 'Browser driver not initialized',
@@ -122,42 +118,42 @@ class GodOfPromptCollector(BaseCollector):
         self.start_collection()
         self.logger.info("Starting GodOfPrompt.ai collection...")
         print("\n" + "="*70)
-        print("开始抓取 GodOfPrompt.ai 免费提示词")
+        print("Starting to scrape GodOfPrompt.ai free prompts")
         print("="*70)
 
         try:
-            # 步骤 1: 获取所有分类
-            print("\n[步骤 1/4] 获取分类列表...")
+            # Step 1: Get all categories
+            print("\n[Step 1/4] Getting category list...")
             categories = self._get_categories()
             if not categories:
-                raise Exception("未能获取分类列表")
+                raise Exception("Failed to get category list")
             
-            print(f"✓ 成功获取 {len(categories)} 个分类")
+            print(f"✓ Successfully got {len(categories)} categories")
             for cat in categories:
                 print(f"  - {cat['name']} ({cat['slug']})")
             
-            # 步骤 2: 获取所有提示词的 slugs
-            print("\n[步骤 2/4] 收集所有提示词链接...")
+            # Step 2: Get all prompt slugs
+            print("\n[Step 2/4] Collecting all prompt links...")
             all_prompt_slugs = []
             for category in categories:
-                print(f"\n正在处理分类: {category['name']}")
+                print(f"\nProcessing category: {category['name']}")
                 slugs = self._get_prompt_slugs_for_category(category['slug'])
                 for slug in slugs:
                     all_prompt_slugs.append({
                         'category': category['name'],
                         'slug': slug
                     })
-                print(f"  ✓ 找到 {len(slugs)} 个提示词")
+                print(f"  ✓ Found {len(slugs)} prompts")
                 time.sleep(self.request_delay)
             
             self.set_total_items(len(all_prompt_slugs))
-            print(f"\n✓ 总共找到 {len(all_prompt_slugs)} 个免费提示词")
+            print(f"\n✓ Found total {len(all_prompt_slugs)} free prompts")
             
-            # 步骤 3: 抓取每个提示词的内容
-            print("\n[步骤 3/4] 抓取提示词内容...")
+            # Step 3: Scrape prompt content
+            print("\n[Step 3/4] Scraping prompt content...")
             final_prompts = []
             for i, item in enumerate(all_prompt_slugs, 1):
-                print(f"\r进度: [{i}/{len(all_prompt_slugs)}] {item['slug'][:50]}...", end='', flush=True)
+                print(f"\rProgress: [{i}/{len(all_prompt_slugs)}] {item['slug'][:50]}...", end='', flush=True)
                 
                 prompt_content = self._get_prompt_content(item['slug'])
                 if prompt_content:
@@ -173,12 +169,12 @@ class GodOfPromptCollector(BaseCollector):
                 
                 time.sleep(self.request_delay)
             
-            print(f"\n✓ 成功抓取 {len(final_prompts)} 个提示词")
+            print(f"\n✓ Successfully scraped {len(final_prompts)} prompts")
             
-            # 步骤 4: 保存结果
-            print("\n[步骤 4/4] 保存数据...")
+            # Step 4: Save results
+            print("\n[Step 4/4] Saving data...")
             output_file = self._save_prompts(final_prompts)
-            print(f"✓ 数据has been保存到: {output_file}")
+            print(f"✓ Data saved to: {output_file}")
             
             self.end_collection()
             self.log_summary()
@@ -187,9 +183,9 @@ class GodOfPromptCollector(BaseCollector):
             total_size = output_file.stat().st_size if output_file.exists() else 0
             
             print("\n" + "="*70)
-            print("抓取Completed！")
-            print(f"成功: {self.stats['successful_items']} | Failed: {self.stats['failed_items']}")
-            print(f"耗时: {self.stats['duration_seconds']:.2f} 秒")
+            print("Scraping completed!")
+            print(f"Success: {self.stats['successful_items']} | Failed: {self.stats['failed_items']}")
+            print(f"Time taken: {self.stats['duration_seconds']:.2f} seconds")
             print("="*70 + "\n")
 
             return {
@@ -203,7 +199,7 @@ class GodOfPromptCollector(BaseCollector):
             }
 
         except KeyboardInterrupt:
-            print("\n\n用户中断操作")
+            print("\n\nUser interrupted operation")
             self.end_collection()
             return {
                 'success': False,
@@ -222,7 +218,7 @@ class GodOfPromptCollector(BaseCollector):
                 'stats': self.get_stats()
             }
         finally:
-            # 关闭浏览器
+            # Close browser
             if self.driver:
                 try:
                     self.driver.quit()
@@ -231,57 +227,57 @@ class GodOfPromptCollector(BaseCollector):
 
     def _get_categories(self) -> List[Dict[str, str]]:
         """
-        从主页获取所有分类（使用Selenium等待JavaScript加载）
+        Get all categories from main page (use Selenium to wait for JavaScript to load)
         
         Returns:
-            分类列表，每个分类包含 name 和 slug
+            Category list, each category contains name and slug
         """
         url = f"{self.base_url}/prompt-library"
         self.logger.info(f"Fetching categories from: {url}")
-        print(f"正在访问: {url}...")
+        print(f"Accessing: {url}...")
         
         try:
             self.driver.get(url)
-            print("等待页面加载...")
-            # 等待页面加载
+            print("Waiting for page to load...")
+            # Wait for page to load
             time.sleep(3)
             
-            # 等待分类链接出现
-            print("等待页面内容加载...")
+            # Wait for category links to appear
+            print("Waiting for page content to load...")
             try:
                 WebDriverWait(self.driver, 15).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "a[href*='category='], [wized*='category'], .category-link"))
                 )
-                print("✓ 页面内容has been加载")
+                print("✓ Page content loaded")
             except TimeoutException:
                 self.logger.warning("Category links not found, trying alternative method")
-                print("⚠ 未找到分类链接，尝试备用方法...")
+                print("⚠ Category links not found, trying alternative method...")
             
-            # 获取页面源码
+            # Get page source
             page_source = self.driver.page_source
             soup = BeautifulSoup(page_source, 'html.parser')
             categories = []
             
-            # 查找所有包含category的链接
+            # Find all links containing category
             category_links = soup.find_all('a', href=lambda x: x and 'category=' in str(x).lower())
             
             for link in category_links:
                 href = link.get('href', '')
                 if 'category=' in href.lower():
-                    # 提取 slug
+                    # Extract slug
                     try:
                         if 'category=' in href:
                             slug = href.split('category=')[1].split('&')[0].split('#')[0]
                         else:
                             continue
                         
-                        # 提取名称
+                        # Extract name
                         name = link.get_text(strip=True)
                         if not name or len(name) < 2:
-                            # 尝试从href中提取
+                            # Try to extract from href
                             name = slug.replace('-', ' ').title()
                         
-                        # 避免重复和无效项
+                        # Avoid duplicates and invalid items
                         if slug and slug not in [cat['slug'] for cat in categories]:
                             categories.append({
                                 'name': name or slug.capitalize(),
@@ -291,13 +287,13 @@ class GodOfPromptCollector(BaseCollector):
                         self.logger.debug(f"Error parsing category link {href}: {e}")
                         continue
             
-            # 如果没找到，尝试从URL参数中提取
+            # If not found, try extracting from URL parameters
             if not categories:
-                # 尝试访问分类页面，从页面中提取
+                # Try accessing category page, extract from page
                 test_url = f"{self.base_url}/prompts?category=marketing&premium=false"
                 self.driver.get(test_url)
                 time.sleep(2)
-                # Check页面是否有分类选择器
+                # Check if page has category selector
                 try:
                     category_elements = self.driver.find_elements(By.CSS_SELECTOR, "[wized*='category'], .category-link, a[href*='/prompts?category=']")
                     for elem in category_elements:
@@ -325,64 +321,64 @@ class GodOfPromptCollector(BaseCollector):
 
     def _get_prompt_slugs_for_category(self, category_slug: str) -> List[str]:
         """
-        获取某个分类下的所有提示词 slugs（使用Selenium处理动态内容）
-        通过点击"下一页"按钮实现分页，因为分页不会改变URL
+        Get all prompt slugs under a category (using Selenium to handle dynamic content)
+        Implement pagination by clicking the 'next page' button, because pagination does not change the URL
         
         Args:
-            category_slug: 分类的 slug
+            category_slug: Category slug
             
         Returns:
-            提示词 slug 列表
+            List of prompt slugs
         """
         all_slugs = []
         page = 1
-        max_pages = 100  # 防止无限循环
+        max_pages = 100  # Prevent infinite loop
         
-        # 访问第一页
+        # Visit first page
         url = f"{self.base_url}/prompts?category={category_slug}&premium=false"
         self.logger.info(f"Fetching prompts from: {url}")
         
         try:
             self.driver.get(url)
-            # 等待内容加载
+            # Wait for content to load
             time.sleep(3)
             
-            # 等待提示词卡片出现
+            # Wait for prompt cards to appear
             try:
                 WebDriverWait(self.driver, 15).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "[wized*='prompt'], .new-prompt-card, a[href*='prompt']"))
                 )
             except TimeoutException:
                 self.logger.warning(f"No prompts found on first page")
-                print(f"  ⚠ 第 1 页未找到提示词，可能页面结构has been改变")
+                print(f"  ⚠ No prompts found on page 1, page structure may have changed")
                 return []
             
             while page <= max_pages:
-                print(f"  正在处理第 {page} 页...")
+                print(f"  Processing page {page}...")
                 
-                # 获取当前页面的提示词
+                # Get prompts from current page
                 page_source = self.driver.page_source
                 soup = BeautifulSoup(page_source, 'html.parser')
                 
-                # 查找提示词链接 - 尝试多种选择器
+                # Find prompt links - try multiple selectors
                 prompt_links = []
                 
-                # 方法1: 查找包含wized属性的链接
+                # Method 1: Find links containing wized attributes
                 wized_links = soup.find_all('a', attrs=lambda x: x and 'wized' in str(x).lower() and 'prompt' in str(x).lower())
                 prompt_links.extend(wized_links)
                 
-                # 方法2: 查找href包含prompt的链接
+                # Method 2: Find links with prompt in href
                 href_links = soup.find_all('a', href=lambda x: x and ('prompt=' in str(x).lower() or '/prompt' in str(x).lower()))
                 prompt_links.extend(href_links)
                 
-                # 方法3: 从提示词卡片中查找链接
+                # Method 3: Find links from prompt cards
                 cards = soup.find_all(attrs={'wized': lambda x: x and 'prompt' in str(x).lower()})
                 for card in cards:
                     link = card.find('a', href=True)
                     if link:
                         prompt_links.append(link)
                 
-                # 去重并提取slugs
+                # Deduplicate and extract slugs
                 page_slugs = []
                 seen_hrefs = set()
                 
@@ -392,7 +388,7 @@ class GodOfPromptCollector(BaseCollector):
                         continue
                     seen_hrefs.add(href)
                     
-                    # 提取slug
+                    # Extract slug
                     slug = None
                     if 'prompt=' in href:
                         slug = href.split('prompt=')[1].split('&')[0].split('#')[0]
@@ -406,45 +402,45 @@ class GodOfPromptCollector(BaseCollector):
                         page_slugs.append(slug)
                 
                 self.logger.info(f"Found {len(page_slugs)} new prompts on page {page} (total: {len(all_slugs)})")
-                print(f"  ✓ 第 {page} 页找到 {len(page_slugs)} 个新提示词（累计: {len(all_slugs)}）")
+                print(f"  ✓ Found {len(page_slugs)} new prompts on page {page} (total: {len(all_slugs)})")
                 
-                # Check是否有下一页
+                # Check if there is a next page
                 has_next = False
                 cur_page = None
                 all_pages = None
                 
                 try:
-                    # 查找分页容器
+                    # Find pagination container
                     pagination_div = self.driver.find_element(By.CSS_SELECTOR, "[wized='pagination']")
                     
-                    # 优先通过页数判断（最准确）
+                    # Determine by page numbers first (most accurate)
                     try:
                         cur_page_elem = pagination_div.find_element(By.CSS_SELECTOR, "[wized='pagin-cur-page']")
                         all_pages_elem = pagination_div.find_element(By.CSS_SELECTOR, "[wized='pagin-all-pages']")
                         cur_page = int(cur_page_elem.text.strip())
                         all_pages = int(all_pages_elem.text.strip())
-                        print(f"  当前页: {cur_page}/{all_pages}")
+                        print(f"  Current page: {cur_page}/{all_pages}")
                         
-                        # 如果当前页has been经等于或大于总页数，说明没有下一页
+                        # If current page is equal to or greater than total pages, there is no next page
                         if cur_page >= all_pages:
                             has_next = False
-                            print(f"  ✓ has been到达最后一页（通过页数判断）")
+                            print(f"  ✓ Reached last page (determined by page numbers)")
                         elif cur_page < all_pages:
                             has_next = True
                     except Exception as e:
                         self.logger.debug(f"Could not get page numbers: {e}")
-                        # 如果无法获取页数，尝试通过按钮状态判断
+                        # If unable to get page numbers, try to determine by button state
                         cur_page = None
                         all_pages = None
                     
-                    # 如果通过页数无法判断，才通过按钮状态判断
+                    # If cannot determine by page numbers, then determine by button state
                     if cur_page is None or all_pages is None:
-                        # 查找下一页按钮
+                        # Find next page button
                         next_button = pagination_div.find_element(By.CSS_SELECTOR, "[wized='pagin-next'], #pag-next-button, .pagination-button-new.next")
                         
-                        # Check按钮是否可点击
+                        # Check if button is clickable
                         if next_button and next_button.is_enabled() and next_button.is_displayed():
-                            # Check按钮是否被禁用（可能通过CSS类）
+                            # Check if button is disabled (may be through CSS class)
                             classes = next_button.get_attribute('class') or ''
                             if 'disabled' not in classes.lower():
                                 has_next = True
@@ -458,19 +454,19 @@ class GodOfPromptCollector(BaseCollector):
                     self.logger.warning(f"Error checking pagination: {e}")
                     has_next = False
                 
-                # 如果没有下一页，退出循环
+                # If there is no next page, exit loop
                 if not has_next:
-                    print(f"  ✓ has been到达最后一页，停止分页")
+                    print(f"  ✓ Reached last page, stop pagination")
                     break
                 
-                # 额外Check：如果当前页数has been经等于总页数，强制停止（防止按钮状态判断Error）
+                # Extra check: If current page number equals total pages, force stop (prevent button state judgment error)
                 if cur_page is not None and all_pages is not None and cur_page >= all_pages:
-                    print(f"  ✓ 当前页 {cur_page} has been等于或超过总页数 {all_pages}，强制停止")
+                    print(f"  ✓ Current page {cur_page} equals or exceeds total pages {all_pages}, force stop")
                     break
                 
-                # 点击下一页按钮
+                # Click next page button
                 try:
-                    # 记录点击前的当前页数
+                    # Record current page number before clicking
                     old_page_num = None
                     try:
                         old_page_elem = self.driver.find_element(By.CSS_SELECTOR, "[wized='pagin-cur-page']")
@@ -480,35 +476,35 @@ class GodOfPromptCollector(BaseCollector):
                     
                     next_button = self.driver.find_element(By.CSS_SELECTOR, "[wized='pagin-next'], #pag-next-button")
                     
-                    # 滚动到按钮位置，确保可见
+                    # Scroll to button position, ensure visibility
                     self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", next_button)
                     time.sleep(0.5)
                     
-                    # 点击按钮
+                    # Click button
                     next_button.click()
-                    print(f"  → has been点击下一页按钮")
+                    print(f"  → Clicked next page button")
                     
-                    # 等待新内容加载
+                    # Wait for new content to load
                     time.sleep(2)
                     
-                    # 等待页面内容更新（通过Check当前页数是否变化）
+                    # Wait for page content to update (by checking if current page number changes)
                     if old_page_num is not None:
                         try:
-                            # 等待页数增加
+                            # Wait for page number to increase
                             WebDriverWait(self.driver, 20).until(
                                 lambda driver: int(driver.find_element(By.CSS_SELECTOR, "[wized='pagin-cur-page']").text.strip()) > old_page_num
                             )
-                            # 再等待一下确保内容完全加载
+                            # Wait a bit more to ensure content is fully loaded
                             time.sleep(2)
-                            print(f"  ✓ 页面has been更新到新页")
+                            print(f"  ✓ Page updated to new page")
                         except TimeoutException:
                             self.logger.warning(f"Page number did not change after clicking next, waiting for content update")
-                            # 如果页数没变化，等待提示词卡片更新
+                            # If page number doesn't change, wait for prompt card update
                             WebDriverWait(self.driver, 15).until(
                                 EC.presence_of_element_located((By.CSS_SELECTOR, "[wized*='prompt'], .new-prompt-card"))
                             )
                     else:
-                        # 如果无法获取页数，等待提示词卡片更新
+                        # If unable to get page number, wait for prompt card update
                         time.sleep(3)
                         WebDriverWait(self.driver, 15).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, "[wized*='prompt'], .new-prompt-card"))
@@ -519,49 +515,49 @@ class GodOfPromptCollector(BaseCollector):
                     
                 except Exception as e:
                     self.logger.error(f"Failed to click next button on page {page}: {e}")
-                    print(f"  ✗ 点击下一页按钮Failed: {e}")
+                    print(f"  ✗ Failed to click next page button: {e}")
                     break
         
         except Exception as e:
             self.logger.error(f"Failed to get prompts for category {category_slug}: {e}", exc_info=True)
-            print(f"  ✗ 获取分类 {category_slug} 的提示词Failed: {e}")
+            print(f"  ✗ Failed to get prompts for category {category_slug}: {e}")
         
         return all_slugs
 
     def _get_prompt_content(self, prompt_slug: str) -> Optional[str]:
         """
-        获取单个提示词的内容（使用Selenium）
+        Get content of a single prompt (using Selenium)
         
         Args:
-            prompt_slug: 提示词的 slug
+            prompt_slug: Slug of the prompt
             
         Returns:
-            提示词内容文本，Failed返回 None
+            Prompt content text, returns None if failed
         """
         url = f"{self.base_url}/prompt?prompt={prompt_slug}"
         
         try:
             self.driver.get(url)
-            # 等待内容加载
+            # Wait for content to load
             time.sleep(2)
             
-            # 等待提示词内容出现 - 优先等待 wized="pcp_gpt_content" 元素
+            # Wait for prompt content to appear - prioritize waiting for wized="pcp_gpt_content" element
             try:
                 WebDriverWait(self.driver, 15).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "[wized='pcp_gpt_content'], div.code-block-text-cms, pre, code"))
                 )
-                print(f"  ✓ 页面内容has been加载")
+                print(f"  ✓ Page content loaded")
             except TimeoutException:
                 self.logger.warning(f"Timeout waiting for prompt content on page: {url}")
-                # 继续尝试提取，可能元素has been经exists但选择器不对
+                # Continue trying to extract, element may already exist but selector is incorrect
             
-            # 获取页面源码
+            # Get page source
             page_source = self.driver.page_source
             soup = BeautifulSoup(page_source, 'html.parser')
             
             content = None
             
-            # 方法1: 优先查找 wized="pcp_gpt_content" 的元素（最准确）
+            # Method 1: Prioritize finding wized="pcp_gpt_content" element (most accurate)
             try:
                 element = soup.find('div', {'wized': 'pcp_gpt_content'})
                 if element:
@@ -571,7 +567,7 @@ class GodOfPromptCollector(BaseCollector):
             except Exception as e:
                 self.logger.debug(f"Error finding wized='pcp_gpt_content': {e}")
             
-            # 方法2: 如果方法1Failed，尝试通过 class 查找
+            # Method 2: If method 1 failed, try finding by class
             if not content:
                 try:
                     element = soup.find('div', class_=lambda x: x and 'code-block-text-cms' in ' '.join(x) if isinstance(x, list) else 'code-block-text-cms' in str(x))
@@ -582,7 +578,7 @@ class GodOfPromptCollector(BaseCollector):
                 except Exception as e:
                     self.logger.debug(f"Error finding code-block-text-cms: {e}")
             
-            # 方法3: 尝试其他可能的选择器
+            # Method 3: Try other possible selectors
             if not content:
                 selectors = [
                     {'wized': lambda x: x and 'gpt_content' in str(x).lower()},
@@ -603,13 +599,13 @@ class GodOfPromptCollector(BaseCollector):
                     except:
                         continue
             
-            # 方法4: 如果上述方法都Failed，尝试查找包含提示词特征的内容
-            # 提示词通常包含 #CONTEXT: 或 #GOAL: 等标记
+            # Method 4: If above methods all failed, try to find content with typical prompt features
+            # Prompts usually contain markers like #CONTEXT: or #GOAL:
             if not content:
                 all_divs = soup.find_all('div')
                 for div in all_divs:
                     text = div.get_text(separator='\n', strip=True)
-                    # Check是否包含提示词的典型特征
+                    # Check if contains typical features of prompts
                     if text and len(text) > 100:
                         if any(marker in text for marker in ['#CONTEXT:', '#GOAL:', '#INFORMATION', 'Adopt the role', 'You are']):
                             content = text

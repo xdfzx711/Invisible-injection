@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-JSON数据解析器
-解析JSON格式的数据File
+JSON data parser
+Parse JSON formatted data files
 """
 
 import json
@@ -18,17 +18,17 @@ from data_parsing.utils import TextExtractor, FileUtils
 
 
 class JSONParser(BaseParser):
-    """JSONFile解析器"""
+    """JSON file parser"""
     
     def __init__(self):
         super().__init__('json')
     
     def parse_file(self, file_path: Path) -> Dict[str, Any]:
         """
-        解析单个JSONFile
+        Parse a single JSON file
         
         Args:
-            file_path: JSONFile路径
+            file_path: JSON file path
         
         Returns:
             Parsing result dictionary (compatible with old format)
@@ -36,17 +36,17 @@ class JSONParser(BaseParser):
         self.logger.info(f"Parsing JSON file: {file_path}")
         
         try:
-            # 读取File内容
+            # Read file content
             content = FileUtils.safe_read_file(file_path)
             
-            # 解析JSON
+            # Parse JSON
             data = json.loads(content)
             
-            # 提取文本entries目（保留详细结构，兼容旧格式）
+            # Extract text entries (preserve detailed structure, compatible with old format)
             text_entries = []
             self._extract_text_recursive(data, text_entries, "")
             
-            # 构建解析结果（与旧格式完全相同）
+            # Build parsing result (identical to old format)
             result = {
                 'file_info': FileUtils.get_file_info(file_path),
                 'parsing_info': {
@@ -63,18 +63,18 @@ class JSONParser(BaseParser):
             
         except json.JSONDecodeError as e:
             self.logger.error(f"JSON decode error in {file_path}: {e}")
-            return self._create_error_result(file_path, f"JSON格式Error: {e}")
+            return self._create_error_result(file_path, f"JSON format error: {e}")
         except Exception as e:
             self.logger.error(f"Error parsing {file_path}: {e}")
-            return self._create_error_result(file_path, f"解析Error: {e}")
+            return self._create_error_result(file_path, f"Parsing error: {e}")
     
     def _extract_text_recursive(self, obj: Any, text_entries: List[Dict], json_path: str, parent_key: str = ""):
-        """递归提取JSON中的所有文本内容（兼容旧格式）"""
+        """Recursively extract all text content from JSON (compatible with old format)"""
         if isinstance(obj, dict):
             for key, value in obj.items():
                 current_path = f"{json_path}.{key}" if json_path else key
                 
-                # 如果键本身包含文本，也要提取
+                # Extract if the key itself contains text
                 if isinstance(key, str) and key.strip():
                     text_entries.append({
                         'json_path': f"{json_path}.<key>",
@@ -93,7 +93,7 @@ class JSONParser(BaseParser):
                 self._extract_text_recursive(item, text_entries, current_path, parent_key)
                 
         elif isinstance(obj, str) and obj.strip():
-            # 提取字符串值
+            # Extract string values
             text_entries.append({
                 'json_path': json_path,
                 'value': obj,
@@ -105,7 +105,7 @@ class JSONParser(BaseParser):
             })
         
         elif isinstance(obj, (int, float, bool)) and obj is not None:
-            # 提取数值和布尔值
+            # Extract numeric and boolean values
             text_entries.append({
                 'json_path': json_path,
                 'value': str(obj),
@@ -117,11 +117,11 @@ class JSONParser(BaseParser):
             })
     
     def _get_files_to_parse(self, directory: Path) -> List[Path]:
-        """获取所有JSONFile"""
+        """Get all JSON files"""
         return list(directory.glob('*.json'))
     
     def _calculate_depth(self, obj: Any, current_depth: int = 0) -> int:
-        """计算JSON结构的深度"""
+        """Calculate the depth of JSON structure"""
         if isinstance(obj, dict):
             if not obj:
                 return current_depth
@@ -134,7 +134,7 @@ class JSONParser(BaseParser):
             return current_depth
     
     def _create_error_result(self, file_path: Path, error_message: str) -> Dict[str, Any]:
-        """创建Error结果"""
+        """Create error result"""
         return {
             'file_info': FileUtils.get_file_info(file_path),
             'parsing_info': {
@@ -147,13 +147,13 @@ class JSONParser(BaseParser):
     
     def parse_directory(self, directory: Path = None) -> List[Dict[str, Any]]:
         """
-        解析整个directory（重写以支持单File单独保存）
+        Parse entire directory (override to support individual file saving)
         
         Args:
-            directory: directory路径
+            directory: directory path
         
         Returns:
-            解析结果列表
+            List of parsing results
         """
         if directory is None:
             directory = self.input_dir
@@ -164,7 +164,7 @@ class JSONParser(BaseParser):
         
         files = self._get_files_to_parse(directory)
         self.logger.info(f"Found {len(files)} files to parse in {directory}")
-        print(f"\n找到 {len(files)} 个JSONFile待解析")
+        print(f"\nFound {len(files)} JSON files to parse")
         
         self.stats['total_files'] = len(files)
         self.stats['start_time'] = Path(__file__).parent
@@ -172,11 +172,11 @@ class JSONParser(BaseParser):
         results = []
         for i, file_path in enumerate(files, 1):
             try:
-                print(f"[{i}/{len(files)}] 解析: {file_path.name}")
+                print(f"[{i}/{len(files)}] Parsing: {file_path.name}")
                 result = self.parse_file(file_path)
                 
                 if result and result.get('parsing_info', {}).get('status') != 'failed':
-                    # 单独保存每个File的解析结果
+                    # Save parsing results for each file separately
                     output_filename = f"{file_path.stem}_parsed.json"
                     output_path = self.output_dir / output_filename
                     self.save_parsed_data(result, output_path)
@@ -184,7 +184,7 @@ class JSONParser(BaseParser):
                     results.append(result)
                     self.stats['successful_files'] += 1
                     self.stats['total_texts_extracted'] += len(result.get('text_entries', []))
-                    print(f"  成功: {len(result.get('text_entries', []))} 个文本entries目")
+                    print(f"  Success: {len(result.get('text_entries', []))} text entries extracted")
                 else:
                     self.stats['failed_files'] += 1
                     print(f"  Failed")

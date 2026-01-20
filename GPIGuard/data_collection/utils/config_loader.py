@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-配置File加载器
-统一的配置File加载和管理
+Config File Loader
+Unified config file loading and management
 """
 
 import json
@@ -14,21 +14,21 @@ from .logger import setup_logger
 
 
 class ConfigLoader:
-    """配置File加载器"""
+    """Config File Loader"""
     
     def __init__(self):
         self.logger = setup_logger('ConfigLoader', console_output=False)
     
     def load_json_config(self, config_path: Union[str, Path], default_config: Dict[str, Any] = None) -> Dict[str, Any]:
         """
-        加载JSON配置File
+        Load JSON config file
         
         Args:
-            config_path: 配置File路径
-            default_config: 默认配置（可选）
+            config_path: Config file path
+            default_config: Default configuration (optional)
         
         Returns:
-            配置字典
+            Config dictionary
         """
         config_path = Path(config_path)
         
@@ -58,14 +58,14 @@ class ConfigLoader:
     
     def save_json_config(self, config: Dict[str, Any], config_path: Union[str, Path]) -> bool:
         """
-        保存JSON配置File
+        Save JSON config file
         
         Args:
-            config: 配置字典
-            config_path: 配置File路径
+            config: Config dictionary
+            config_path: Config file path
         
         Returns:
-            是否成功
+            Success status
         """
         config_path = Path(config_path)
         

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-统一Path Manager
+Unified Path Manager
 Solve path confusion problem, provide unified path access interface
 """
 
@@ -74,7 +74,7 @@ class PathManager:
         Get parsed data directory
         
         Args:
-            data_type: Data type（json, csv, xml, html, reddit, twitter, github）
+            data_type: Data type (json, csv, xml, html, reddit, twitter, github)
                       If provided, return parsed_data/{data_type}_analysis
                       If None, return parsed_data
         
@@ -92,19 +92,19 @@ class PathManager:
         return self.unicode_analysis_dir
     
     def get_config_dir(self) -> Path:
-        """获取Configuration directory"""
+        """Get configuration directory"""
         return self.config_dir
     
     def get_log_dir(self) -> Path:
-        """获取Log directory"""
+        """Get log directory"""
         return self.log_dir
     
     def get_project_root(self) -> Path:
-        """获取项目根directory"""
+        """Get project root directory"""
         return self.project_root
     
     def ensure_dirs_exist(self):
-        """确保所有必要的directoryexists"""
+        """Ensure all necessary directories exist"""
         dirs = [
             self.data_root,
             self.origin_data_dir,
@@ -118,7 +118,7 @@ class PathManager:
             directory.mkdir(parents=True, exist_ok=True)
     
     def get_websites_dir(self) -> Path:
-        """获取网站列表Filedirectory"""
+        """Get websites list file directory"""
         return self.project_root / "websites"
     
     def __repr__(self):

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Reddit数据收集器
-通过Reddit API收集指定subreddit的帖子和评论数据
+Reddit data collector
+Collect posts and comments data from specified subreddits via Reddit API
 """
 
 import json
@@ -23,38 +23,38 @@ from data_collection.base_collector import BaseCollector
 
 
 class RedditCollector(BaseCollector):
-    """Reddit数据收集器"""
+    """Reddit data collector"""
     
     def __init__(self):
         super().__init__('reddit')
         
-        # Checkpraw是否可用
+        # Check if praw is available
         if not PRAW_AVAILABLE:
             self.logger.error("praw library not installed. Install with: pip install praw")
             raise ImportError("praw library required for Reddit collection")
         
-        # 配置File路径
+        # Config file path
         self.config_file = self.get_config_path('reddit_config.json')
         
-        # 如果配置不在新位置，尝试从旧位置读取
+        # If config is not in new location, try reading from old location
         if not self.config_file.exists():
             old_config = self.path_manager.get_project_root() / "reddit_collect" / "reddit_config.json"
             if old_config.exists():
                 self.config_file = old_config
                 self.logger.info(f"Using config from old location: {old_config}")
         
-        # Reddit API对象（延迟初始化）
+        # Reddit API object (lazy initialization)
         self.reddit = None
         self.config = None
     
     def validate_config(self) -> bool:
-        """验证配置"""
+        """Validate configuration"""
         if not self.config_file.exists():
             self.logger.error(f"Config file not found: {self.config_file}")
-            print(f"\nError: 未找到Reddit配置File")
-            print(f"请创建配置File: {self.config_file}")
-            print(f"或: reddit_collect/reddit_config.json")
-            print("\n示例内容:")
+            print(f"\nError: Reddit config file not found")
+            print(f"Please create config file: {self.config_file}")
+            print(f"Or: reddit_collect/reddit_config.json")
+            print("\nExample content:")
             print(json.dumps({
                 "client_id": "your_client_id",
                 "client_secret": "your_client_secret",
@@ -80,7 +80,7 @@ class RedditCollector(BaseCollector):
             return False
     
     def _authenticate(self) -> bool:
-        """认证Reddit API"""
+        """Authenticate Reddit API"""
         if not self.config:
             if not self.validate_config():
                 return False
@@ -94,23 +94,23 @@ class RedditCollector(BaseCollector):
             
             # 测试连接
             self.reddit.user.me()
-            print("✅ Reddit API认证成功")
+            print("✅ Reddit API authentication successful")
             self.logger.info("Reddit API authenticated successfully")
             return True
             
         except Exception as e:
             self.logger.error(f"Reddit API authentication failed: {e}")
-            print(f"Error: Reddit API认证Failed - {e}")
+            print(f"Error: Reddit API authentication failed - {e}")
             return False
     
     def _parse_target(self, target_str: str) -> tuple:
-        """解析目标字符串，返回(类型, 名称)
+        """Parse target string, return (type, name)
         
         Args:
-            target_str: 目标字符串，如 "r/python" 或 "u/spez"
+            target_str: Target string like "r/python" or "u/spez"
             
         Returns:
-            (type, name): 例如 ("subreddit", "python") 或 ("user", "spez")
+            (type, name): For example ("subreddit", "python") or ("user", "spez")
         """
         target_str = target_str.strip()
         
@@ -119,11 +119,11 @@ class RedditCollector(BaseCollector):
         elif target_str.startswith('u/'):
             return ('user', target_str[2:])
         else:
-            # 默认作为subreddit处理（向后兼容）
+            # Default as subreddit (backward compatible)
             return ('subreddit', target_str)
     
     def collect(self) -> Dict[str, Any]:
-        """主收集方法"""
+        """Main collection method"""
         self.start_collection()
         
         try:
@@ -135,22 +135,22 @@ class RedditCollector(BaseCollector):
                     'stats': self.get_stats()
                 }
             
-            print("\nReddit数据收集")
+            print("\nReddit data collection")
             print("-" * 70)
 
-            # 从配置File加载targets和limit
-            # 优先使用新的targets字段，兼容旧的subreddits字段
+            # Load targets and limit from config file
+            # Prioritize new targets field, compatible with old subreddits field
             targets = self.config.get('targets', [])
             if not targets:
-                # 向后兼容：如果没有targets，从subreddits读取并转换
+                # Backward compatible: if no targets, read from subreddits and convert
                 subreddits = self.config.get('subreddits', [])
                 targets = [f"r/{s}" for s in subreddits]
             
             limit = self.config.get('limit', 50)
 
             if not targets:
-                self.logger.error("配置File中未指定targets或subreddits，无法继续。")
-                print("Error: 配置File中未指定要收集的目标。")
+                self.logger.error("No targets or subreddits specified in config file, cannot continue.")
+                print("Error: No targets specified in config file for collection.")
                 return {
                     'success': False,
                     'message': 'No targets specified in config file',
@@ -158,7 +158,7 @@ class RedditCollector(BaseCollector):
                 }
             
             # 收集数据
-            print(f"\n开始收集 {len(targets)} 个目标...")
+            print(f"\nStarting to collect {len(targets)} targets...")
             print(f"Output directory: {self.output_dir}")
             print("-" * 70)
             
@@ -168,11 +168,11 @@ class RedditCollector(BaseCollector):
                     target_type, target_name = self._parse_target(target)
                     
                     if target_type == 'subreddit':
-                        print(f"\n正在收集: r/{target_name}")
+                        print(f"\nCollecting: r/{target_name}")
                         data = self._collect_subreddit_data(target_name, limit=limit)
                         save_name = f"r_{target_name}"
                     elif target_type == 'user':
-                        print(f"\n正在收集: u/{target_name}")
+                        print(f"\nCollecting: u/{target_name}")
                         data = self._collect_user_data(target_name, limit=limit)
                         save_name = f"u_{target_name}"
                     else:
@@ -183,10 +183,10 @@ class RedditCollector(BaseCollector):
                     if data:
                         self._save_data(data, save_name)
                         self.increment_success()
-                        print(f"  成功并has been保存")
+                        print(f"  Success and saved")
                     else:
                         self.increment_failure()
-                        print(f"  Failed: 未收集到数据")
+                        print(f"  Failed: No data collected")
                 except Exception as e:
                     self.logger.error(f"Failed to collect {target}: {e}")
                     self.increment_failure()
@@ -195,7 +195,7 @@ class RedditCollector(BaseCollector):
             self.end_collection()
             self.log_summary()
             
-            # 统计收集的File
+            # Count collected JSON files
             file_count = len(list(self.output_dir.glob('*.json')))
             
             return {
@@ -207,7 +207,7 @@ class RedditCollector(BaseCollector):
             }
             
         except KeyboardInterrupt:
-            print("\n\n用户中断收集")
+            print("\n\nUser interrupted collection")
             self.end_collection()
             return {
                 'success': False,
@@ -225,19 +225,19 @@ class RedditCollector(BaseCollector):
             }
     
     def _collect_subreddit_data(self, subreddit_name: str, limit: int = 100) -> Dict[str, Any]:
-        """收集指定subreddit的数据"""
-        print(f"🔍 开始收集 r/{subreddit_name} 的数据...")
+        """Collect data from specified subreddit"""
+        print(f"🔍 Starting to collect data from r/{subreddit_name}...")
         
         try:
             subreddit = self.reddit.subreddit(subreddit_name)
             
-            # 收集帖子数据
+            # Collect submission data
             submissions_data = []
             comments_data = []
             
-            # 获取最新帖子（按时间顺序）
+            # Get latest submissions (by time order)
             for submission in subreddit.new(limit=limit):
-                # 收集帖子信息
+                # Collect submission information
                 submission_info = {
                     "id": submission.id,
                     "title": submission.title,
@@ -252,9 +252,9 @@ class RedditCollector(BaseCollector):
                 }
                 submissions_data.append(submission_info)
                 
-                # 收集评论
+                # Collect comments data
                 try:
-                    submission.comments.replace_more(limit=0)  # 不展开"更多评论"
+                    submission.comments.replace_more(limit=0)  # Do not expand "more comments"
                     for comment in submission.comments.list():
                         if hasattr(comment, 'body') and comment.body != '[deleted]':
                             comment_info = {
@@ -272,7 +272,7 @@ class RedditCollector(BaseCollector):
                 except Exception as e:
                     self.logger.warning(f"Failed to collect comments for post {submission.id}: {e}")
                 
-                # 简单的速率控制
+                # Simple rate limiting
                 time.sleep(0.1)
             
             print(f"📊 收集Completed: {len(submissions_data)} 个帖子, {len(comments_data)} entries评论")
@@ -291,22 +291,22 @@ class RedditCollector(BaseCollector):
         
         except Exception as e:
             self.logger.error(f"Failed to collect r/{subreddit_name}: {e}")
-            print(f"❌ 收集 r/{subreddit_name} 数据Failed: {e}")
+            print(f"❌ Failed to collect r/{subreddit_name} data: {e}")
             return None
     
     def _collect_user_data(self, username: str, limit: int = 100) -> Dict[str, Any]:
-        """收集指定用户的数据"""
-        print(f"🔍 开始收集 u/{username} 的数据...")
+        """Collect data from specified user"""
+        print(f"🔍 Starting to collect data from u/{username}...")
         
         try:
             redditor = self.reddit.redditor(username)
             
-            # 收集用户发布的帖子
+            # Collect user published submissions
             submissions_data = []
             comments_data = []
             
-            # 获取用户最新的提交
-            print(f"  收集用户帖子...")
+            # Get user latest submissions
+            print(f"  Collecting user posts...")
             for submission in redditor.submissions.new(limit=limit):
                 submission_info = {
                     "id": submission.id,
@@ -323,8 +323,8 @@ class RedditCollector(BaseCollector):
                 submissions_data.append(submission_info)
                 time.sleep(0.1)
             
-            # 获取用户最新的评论
-            print(f"  收集用户评论...")
+            # Get user latest comments
+            print(f"  Collecting user comments...")
             for comment in redditor.comments.new(limit=limit):
                 if hasattr(comment, 'body') and comment.body != '[deleted]':
                     comment_info = {
@@ -356,20 +356,20 @@ class RedditCollector(BaseCollector):
         
         except Exception as e:
             self.logger.error(f"Failed to collect u/{username}: {e}")
-            print(f"❌ 收集 u/{username} 数据Failed: {e}")
+            print(f"❌ Failed to collect u/{username} data: {e}")
             return None
     
     def _save_data(self, data: Dict[str, Any], save_name: str):
-        """保存数据到JSONFile
+        """Save data to JSON file
         
         Args:
-            data: 要保存的数据字典
-            save_name: 保存的File名前缀（如 "r_python" 或 "u_spez"）
+            data: Data dictionary to save
+            save_name: File name prefix to save (like "r_python" or "u_spez")
         """
         if not data:
             return
         
-        # 清理File名
+        # Clean filename
         safe_name = re.sub(r'[<>:"/\\|?*]', '_', save_name)
         filename = self.output_dir / f"{safe_name}_data.json"
         
@@ -378,8 +378,8 @@ class RedditCollector(BaseCollector):
                 json.dump(data, f, ensure_ascii=False, indent=2)
             
             self.logger.info(f"Saved: {filename.name}")
-            print(f"💾 数据has been保存: {filename}")
+            print(f"💾 Data saved: {filename}")
             
         except Exception as e:
             self.logger.error(f"Failed to save {filename}: {e}")
-            print(f"❌ 保存数据Failed: {e}")
+            print(f"❌ Failed to save data: {e}")

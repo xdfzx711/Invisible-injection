@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-数据收集主程序 - 统一入口
-提供交互式界面，让用户选择要收集的Data type
+Data Collection Main Program - Unified Entry Point
+Provides interactive interface for users to select data type to collect
 """
 
 import sys
 from pathlib import Path
 from typing import Dict, Any, Optional
 
-# 添加项目根directory到路径
+# Add project root directory to path
 # collect_data.py -> data_collection -> testscan
 project_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(project_root))
@@ -20,49 +20,49 @@ from data_collection.utils.path_manager import PathManager
 
 
 class DataCollectionManager:
-    """数据收集管理器"""
+    """Data Collection Manager"""
     
     def __init__(self):
         self.logger = setup_logger('DataCollectionManager', console_output=False)
         self.path_manager = PathManager()
         
-        # 确保必要directoryexists
+        # Ensure necessary directories exist
         self.path_manager.ensure_dirs_exist()
         
-        # 注册所有可用的收集器
-        # 延迟导入，避免循环依赖
+        # Register all available collectors
+        # Delayed import to avoid circular dependencies
         self.collectors = {
             '1': {
-                'name': 'HTML数据收集',
-                'description': '根据用户输入的网址爬取HTML页面',
+                'name': 'HTML Data Collection',
+                'description': 'Crawl HTML pages based on user-provided URLs',
                 'type': 'html',
                 'module': 'data_collection.collectors.html_collector',
                 'class': 'HTMLCollector'
             },
             '2': {
-                'name': 'Reddit数据收集',
-                'description': '收集Reddit帖子和评论',
+                'name': 'Reddit Data Collection',
+                'description': 'Collect Reddit posts and comments',
                 'type': 'reddit',
                 'module': 'data_collection.collectors.reddit_collector',
                 'class': 'RedditCollector'
             },
             '3': {
-                'name': 'Twitter数据收集',
-                'description': '收集Twitter推文数据',
+                'name': 'Twitter Data Collection',
+                'description': 'Collect Twitter tweet data',
                 'type': 'twitter',
                 'module': 'data_collection.collectors.twitter_collector',
                 'class': 'TwitterCollector'
             },
             '4': {
-                'name': 'GitHub数据收集',
-                'description': '收集GitHub仓库数据 (README, Issues等)',
+                'name': 'GitHub Data Collection',
+                'description': 'Collect GitHub repository data (README, Issues, etc.)',
                 'type': 'github',
                 'module': 'data_collection.collectors.github_collector',
                 'class': 'GithubCollector'
             },
             '5': {
-                'name': 'GodOfPrompt数据收集',
-                'description': '从 GodOfPrompt.ai 收集免费提示词',
+                'name': 'GodOfPrompt Data Collection',
+                'description': 'Collect free prompts from GodOfPrompt.ai',
                 'type': 'godofprompt',
                 'module': 'data_collection.collectors.godofprompt_collector',
                 'class': 'GodOfPromptCollector'
@@ -70,30 +70,30 @@ class DataCollectionManager:
         }
     
     def show_menu(self):
-        """显示交互式菜单"""
+        """Display interactive menu"""
         print("\n" + "="*70)
-        print("Unicode Agent - 数据收集系统")
+        print("Unicode Agent - Data Collection System")
         print("="*70)
-        print("\n请选择要收集的Data type:\n")
+        print("\nPlease select data type to collect:\n")
 
         for key, info in self.collectors.items():
             print(f"  [{key}] {info['name']}")
             print(f"      {info['description']}")
             print()
 
-        print(f"  [6] 收集所有类型数据")
-        print(f"  [0] 退出")
+        print(f"  [6] Collect all data types")
+        print(f"  [0] Exit")
         print("\n" + "="*70)
     
     def load_collector(self, collector_key: str):
         """
-        动态加载收集器类
+        Dynamically load collector class
         
         Args:
-            collector_key: 收集器键值
+            collector_key: Collector key
         
         Returns:
-            收集器实例
+            Collector instance
         """
         if collector_key not in self.collectors:
             return None
@@ -101,124 +101,124 @@ class DataCollectionManager:
         info = self.collectors[collector_key]
         
         try:
-            # 动态导入模块
+            # Dynamically import module
             import importlib
             module = importlib.import_module(info['module'])
             collector_class = getattr(module, info['class'])
             
-            # 实例化收集器
+            # Instantiate collector
             collector = collector_class()
             return collector
             
         except ImportError as e:
             self.logger.error(f"Failed to import collector {info['class']}: {e}")
-            print(f"\nError: 收集器 {info['name']} 尚未实现")
-            print(f"提示: 模块 {info['module']} 不exists")
+            print(f"\nError: Collector {info['name']} not yet implemented")
+            print(f"Tip: Module {info['module']} does not exist")
             return None
         except Exception as e:
             self.logger.error(f"Failed to instantiate collector: {e}")
-            print(f"\nError: 无法初始化收集器 {info['name']}: {e}")
+            print(f"\nError: Unable to initialize collector {info['name']}: {e}")
             return None
     
     def run_collector(self, collector_key: str) -> bool:
         """
-        运行指定的收集器
+        Run specified collector
         
         Args:
-            collector_key: 收集器键值
+            collector_key: Collector key
         
         Returns:
-            是否成功
+            Whether successful
         """
         if collector_key not in self.collectors:
-            print(f"\nError: 无效的选择: {collector_key}")
+            print(f"\nError: Invalid selection: {collector_key}")
             return False
         
         collector_info = self.collectors[collector_key]
         print(f"\n{'='*70}")
-        print(f"启动 {collector_info['name']}")
+        print(f"Starting {collector_info['name']}")
         print(f"{'='*70}\n")
         
-        # 加载收集器
+        # Load collector
         collector = self.load_collector(collector_key)
         if collector is None:
             return False
         
         try:
-            # 验证配置
+            # Validate configuration
             if not collector.validate_config():
-                print(f"\nError: 收集器配置无效")
-                print(f"请Check配置File: {collector.path_manager.get_config_dir()}")
+                print(f"\nError: Collector configuration invalid")
+                print(f"Please check configuration file: {collector.path_manager.get_config_dir()}")
                 return False
             
-            # 执行收集
+            # Execute collection
             result = collector.collect()
             
-            # 显示结果
+            # Display result
             if result.get('success', False):
                 self.show_collection_result(result, collector_info['type'])
                 return True
             else:
-                print(f"\n收集Failed: {result.get('message', 'Unknown error')}")
+                print(f"\nCollection failed: {result.get('message', 'Unknown error')}")
                 return False
             
         except KeyboardInterrupt:
-            print("\n\n用户中断操作")
+            print("\n\nUser interrupted operation")
             self.logger.info("Collection interrupted by user")
             return False
         except Exception as e:
             self.logger.error(f"Collector execution failed: {e}", exc_info=True)
-            print(f"\nError: 收集过程中发生异常: {e}")
+            print(f"\nError: Exception occurred during collection: {e}")
             return False
     
     def collect_all(self):
-        """收集所有类型的数据"""
+        """Collect all types of data"""
         print("\n" + "="*70)
-        print("开始收集所有类型的数据")
+        print("Starting collection of all data types")
         print("="*70)
         
         results = {}
         for key, info in self.collectors.items():
             print(f"\n{'-'*70}")
-            print(f"正在收集: {info['name']}")
+            print(f"Collecting: {info['name']}")
             print(f"{'-'*70}")
             
             success = self.run_collector(key)
             results[info['type']] = success
             
             if not success:
-                print(f"\nWarning: {info['name']} 收集Failed，继续下一个...")
+                print(f"\nWarning: {info['name']} collection failed, continuing to next...")
         
-        # 显示总结
+        # Display summary
         self.show_overall_summary(results)
     
     def show_collection_result(self, result: Dict[str, Any], data_type: str):
-        """显示收集结果"""
-        print(f"\nCompleted {data_type.upper()} 数据收集")
+        """Display collection result"""
+        print(f"\nCompleted {data_type.upper()} data collection")
         print(f"Output directory: testscan_data/origin_data/{data_type}/")
         
         if 'file_count' in result:
-            print(f"收集File数: {result['file_count']}")
+            print(f"Files collected: {result['file_count']}")
         
         if 'total_size' in result:
             size_mb = result['total_size'] / (1024 * 1024)
-            print(f"总大小: {size_mb:.2f} MB")
+            print(f"Total size: {size_mb:.2f} MB")
         
         if 'stats' in result:
             stats = result['stats']
-            print(f"成功项: {stats.get('successful_items', 0)}")
-            print(f"Failed项: {stats.get('failed_items', 0)}")
+            print(f"Successful items: {stats.get('successful_items', 0)}")
+            print(f"Failed items: {stats.get('failed_items', 0)}")
             
             if 'duration_seconds' in stats:
-                print(f"耗时: {stats['duration_seconds']:.2f} 秒")
+                print(f"Duration: {stats['duration_seconds']:.2f} seconds")
         
         if 'message' in result:
-            print(f"信息: {result['message']}")
+            print(f"Message: {result['message']}")
     
     def show_overall_summary(self, results: Dict[str, bool]):
-        """显示总体摘要"""
+        """Display overall summary"""
         print("\n" + "="*70)
-        print("收集总结")
+        print("Collection Summary")
         print("="*70)
         
         total = len(results)
@@ -226,70 +226,70 @@ class DataCollectionManager:
         failed = total - successful
         
         for data_type, success in results.items():
-            status = "成功" if success else "Failed"
+            status = "Success" if success else "Failed"
             symbol = "[OK]" if success else "[FAIL]"
             print(f"  {symbol} {data_type.upper()}: {status}")
         
-        print(f"\n总计: {successful}/{total} 成功, {failed}/{total} Failed")
+        print(f"\nTotal: {successful}/{total} successful, {failed}/{total} failed")
         print("="*70)
     
     def run(self):
-        """运行主程序"""
+        """Run main program"""
         print("\n" + "="*70)
-        print("欢迎使用 Unicode Agent 数据收集系统")
+        print("Welcome to Unicode Agent Data Collection System")
         print("="*70)
         
         while True:
             self.show_menu()
 
             try:
-                choice = input("\n请输入选项 [0-6]: ").strip()
+                choice = input("\nPlease enter option [0-6]: ").strip()
 
                 if choice == '0':
-                    print("\n退出数据收集系统")
+                    print("\nExiting data collection system")
                     break
 
                 elif choice == '6':
-                    confirm = input("\n确认收集所有类型的数据？这可能需要较长时间 (y/n): ").strip().lower()
+                    confirm = input("\nConfirm collection of all data types? This may take a long time (y/n): ").strip().lower()
                     if confirm == 'y':
                         self.collect_all()
                     else:
-                        print("has been取消")
+                        print("Cancelled")
                         continue
 
                 elif choice in self.collectors:
                     self.run_collector(choice)
 
                 else:
-                    print("\nError: 无效的选项，请重新选择")
+                    print("\nError: Invalid option, please select again")
                     continue
                 
-                # 询问是否继续
+                # Ask whether to continue
                 if choice != '0':
-                    continue_choice = input("\n是否继续收集其他数据? (y/n): ").strip().lower()
+                    continue_choice = input("\nContinue collecting other data? (y/n): ").strip().lower()
                     if continue_choice != 'y':
-                        print("\n退出数据收集系统")
+                        print("\nExiting data collection system")
                         break
             
             except KeyboardInterrupt:
-                print("\n\n用户中断操作")
+                print("\n\nUser interrupted operation")
                 break
             except EOFError:
-                print("\n\n输入结束，退出程序")
+                print("\n\nInput ended, exiting program")
                 break
             except Exception as e:
                 self.logger.error(f"Unexpected error in main loop: {e}", exc_info=True)
-                print(f"\n发生Error: {e}")
+                print(f"\nError occurred: {e}")
                 continue
 
 
 def main():
-    """主函数"""
+    """Main function"""
     try:
         manager = DataCollectionManager()
         manager.run()
     except Exception as e:
-        print(f"\n致命Error: {e}")
+        print(f"\nFatal error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

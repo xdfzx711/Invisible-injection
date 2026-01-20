@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-增强的Data Parsing Manager
-支持干扰字符过滤功能
-"""
 
 from pathlib import Path
 from typing import Optional, Dict, Any, List
@@ -21,16 +17,16 @@ from data_parsing.filters import INTERFERENCE_FILTER_CONFIG
 
 
 class EnhancedDataParsingManager(DataParsingManager):
-    """增强的Data Parsing Manager，支持干扰字符过滤"""
+    """Enhanced Data Parsing Manager supporting interference character filtering"""
     
     def __init__(self, enable_interference_filter: bool = True, 
                  filter_config: Optional[Dict[str, Any]] = None):
         """
-        初始化增强解析管理器
+        Initialize enhanced parsing manager
         
         Args:
-            enable_interference_filter: 是否启用干扰字符过滤器
-            filter_config: 过滤器配置
+            enable_interference_filter: Whether to enable interference character filter
+            filter_config: Filter configuration
         """
         super().__init__()
         
@@ -40,15 +36,15 @@ class EnhancedDataParsingManager(DataParsingManager):
         if enable_interference_filter:
             self.filter_config['enabled'] = True
         
-        self.logger.info(f"增强解析管理器初始化Completed，过滤器状态: {enable_interference_filter}")
+        self.logger.info(f"Enhanced parser manager initialization completed, filter status: {enable_interference_filter}")
         
-        # 更新解析器配置，添加过滤器支持
+        # Update parser configuration, add filter support
         self._update_parser_configs()
     
     def _update_parser_configs(self):
-        """更新解析器配置，添加过滤器支持"""
+        """Update parser configuration, add filter support"""
         
-        # 创建支持过滤器的解析器工厂函数
+        # Create parser factory functions supporting filter
         def create_html_parser():
             return HTMLParser(self.enable_interference_filter, self.filter_config)
         
@@ -64,140 +60,140 @@ class EnhancedDataParsingManager(DataParsingManager):
         def create_godofprompt_parser():
             return GodOfPromptParser(self.enable_interference_filter, self.filter_config)
         
-        # 更新解析器配置
+        # Update parser configuration
         self.parsers = {
             '1': {
                 'name': 'HTML Data Parsing',
                 'description': 'Extract text content from HTML pages' + 
-                             (' (启用干扰字符过滤)' if self.enable_interference_filter else ''),
+                             (' (Interference character filter enabled)' if self.enable_interference_filter else ''),
                 'parser': create_html_parser
             },
             '2': {
                 'name': 'Reddit Data Parsing',
                 'description': 'Extract posts and comments from Reddit JSON' + 
-                             (' (启用干扰字符过滤)' if self.enable_interference_filter else ''),
+                             (' (Interference character filter enabled)' if self.enable_interference_filter else ''),
                 'parser': create_reddit_parser
             },
             '3': {
                 'name': 'Twitter Data Parsing',
                 'description': 'Extract tweet content from Twitter JSON' + 
-                             (' (启用干扰字符过滤)' if self.enable_interference_filter else ''),
+                             (' (Interference character filter enabled)' if self.enable_interference_filter else ''),
                 'parser': create_twitter_parser
             },
             '4': {
                 'name': 'GitHub Data Parsing',
                 'description': 'Extract repository content from GitHub JSON' + 
-                             (' (启用干扰字符过滤)' if self.enable_interference_filter else ''),
+                             (' (Interference character filter enabled)' if self.enable_interference_filter else ''),
                 'parser': create_github_parser
             },
             '5': {
                 'name': 'GodOfPrompt Data Parsing',
-                'description': '从GodOfPrompt JSON中提取提示词内容' + 
-                             (' (启用干扰字符过滤)' if self.enable_interference_filter else ''),
+                'description': 'Extract prompt content from GodOfPrompt JSON' + 
+                             (' (Interference character filter enabled)' if self.enable_interference_filter else ''),
                 'parser': create_godofprompt_parser
             }
         }
     
     def show_menu(self):
-        """显示增强的解析菜单"""
+        """Display enhanced parsing menu"""
         print("\n" + "="*70)
-        print("📊 增强数据解析系统")
+        print("📊 Enhanced Data Parsing System")
         print("="*70)
         
         if self.enable_interference_filter:
-            print("🛡️  干扰字符过滤器: has been启用")
-            print("   - 将移除emoji、数学符号、颜文字、其他语言文字")
-            print("   - 保护Unicode攻击字符不被误删")
+            print("🛡️  Interference character filter: Enabled")
+            print("   - Will remove emoji, math symbols, kaomoji, other language characters")
+            print("   - Protect Unicode attack characters from being accidentally deleted")
         else:
-            print("⚠️  干扰字符过滤器: 未启用")
+            print("⚠️  Interference character filter: Disabled")
         
-        print("\n可用的解析选项:")
+        print("\nAvailable parsing options:")
         
         for key, parser_info in self.parsers.items():
             print(f"[{key}] {parser_info['name']}")
             print(f"    {parser_info['description']}")
         
-        print(f"[6] 解析所有类型数据")
-        print(f"[7] 切换过滤器状态 (当前: {'启用' if self.enable_interference_filter else '禁用'})")
-        print(f"[8] 配置过滤器设置")
-        print(f"[0] 退出")
+        print(f"[6] Parse all data types")
+        print(f"[7] Toggle filter status (Current: {'Enabled' if self.enable_interference_filter else 'Disabled'})")
+        print(f"[8] Configure filter settings")
+        print(f"[0] Exit")
         print("="*70)
     
     def toggle_filter(self):
-        """切换过滤器状态"""
+        """Toggle filter status"""
         self.enable_interference_filter = not self.enable_interference_filter
         
         if self.enable_interference_filter:
             self.filter_config['enabled'] = True
         
-        self.logger.info(f"过滤器状态has been切换为: {self.enable_interference_filter}")
+        self.logger.info(f"Filter status toggled to: {self.enable_interference_filter}")
         
-        # 重新配置解析器
+        # Reconfigure parser
         self._update_parser_configs()
         
-        print(f"\n✅ 过滤器状态has been更新为: {'启用' if self.enable_interference_filter else '禁用'}")
+        print(f"\n✅ Filter status updated to: {'Enabled' if self.enable_interference_filter else 'Disabled'}")
     
     def configure_filter(self):
-        """配置过滤器设置"""
+        """Configure filter settings"""
         if not self.enable_interference_filter:
-            print("\n⚠️  过滤器当前未启用，请先启用过滤器")
+            print("\n⚠️  Filter is currently disabled, please enable it first")
             return
         
-        print("\n🔧 过滤器配置")
+        print("\n🔧 Filter Configuration")
         print("="*50)
         
         categories = self.filter_config.get('categories', {})
         
-        print("当前过滤类别设置:")
+        print("Current filter category settings:")
         for category, enabled in categories.items():
-            status = "启用" if enabled else "禁用"
+            status = "Enabled" if enabled else "Disabled"
             print(f"  {category}: {status}")
         
-        print("\n可配置选项:")
-        print("[1] 切换emoji过滤")
-        print("[2] 切换数学符号过滤")
-        print("[3] 切换颜文字过滤")
-        print("[4] 切换其他语言过滤")
-        print("[5] 重置为默认设置")
-        print("[0] 返回主菜单")
+        print("\nConfigurable options:")
+        print("[1] Toggle emoji filtering")
+        print("[2] Toggle math symbol filtering")
+        print("[3] Toggle kaomoji filtering")
+        print("[4] Toggle other language filtering")
+        print("[5] Reset to default settings")
+        print("[0] Return to main menu")
         
         try:
-            choice = input("\n请选择配置选项: ").strip()
+            choice = input("\nSelect configuration option: ").strip()
             
             if choice == '1':
                 categories['emoji'] = not categories.get('emoji', True)
-                print(f"Emoji过滤has been{'启用' if categories['emoji'] else '禁用'}")
+                print(f"Emoji filtering has been {'enabled' if categories['emoji'] else 'disabled'}")
             elif choice == '2':
                 categories['math_symbols'] = not categories.get('math_symbols', True)
-                print(f"数学符号过滤has been{'启用' if categories['math_symbols'] else '禁用'}")
+                print(f"Math symbol filtering has been {'enabled' if categories['math_symbols'] else 'disabled'}")
             elif choice == '3':
                 categories['kaomoji'] = not categories.get('kaomoji', True)
-                print(f"颜文字过滤has been{'启用' if categories['kaomoji'] else '禁用'}")
+                print(f"Kaomoji filtering has been {'enabled' if categories['kaomoji'] else 'disabled'}")
             elif choice == '4':
                 categories['other_languages'] = not categories.get('other_languages', True)
-                print(f"其他语言过滤has been{'启用' if categories['other_languages'] else '禁用'}")
+                print(f"Other language filtering has been {'enabled' if categories['other_languages'] else 'disabled'}")
             elif choice == '5':
                 self.filter_config = INTERFERENCE_FILTER_CONFIG.copy()
                 self.filter_config['enabled'] = True
-                print("has been重置为默认设置")
+                print("Settings have been reset to default")
             elif choice == '0':
                 return
             
-            # 重新配置解析器
+            # Reconfigure parser
             self._update_parser_configs()
             
         except KeyboardInterrupt:
-            print("\n操作has been取消")
+            print("\nOperation cancelled")
     
     def run_interactive(self):
-        """运行交互式解析系统"""
+        """Run interactive parsing system"""
         while True:
             try:
                 self.show_menu()
-                choice = input("\n请选择操作: ").strip()
+                choice = input("\nSelect operation: ").strip()
                 
                 if choice == '0':
-                    print("👋 感谢使用增强数据解析系统!")
+                    print("👋 Thank you for using enhanced data parsing system!")
                     break
                 elif choice in self.parsers:
                     self.run_parser(choice)
@@ -208,58 +204,58 @@ class EnhancedDataParsingManager(DataParsingManager):
                 elif choice == '8':
                     self.configure_filter()
                 else:
-                    print("❌ 无效选择，请重新输入")
+                    print("❌ Invalid choice, please try again")
                     
             except KeyboardInterrupt:
-                print("\n\n👋 程序has been退出")
+                print("\n\n👋 Program exited")
                 break
             except Exception as e:
-                self.logger.error(f"运行时Error: {e}")
-                print(f"❌ 发生Error: {e}")
+                self.logger.error(f"Runtime error: {e}")
+                print(f"❌ Error occurred: {e}")
     
     def run_parser(self, parser_key: str):
-        """运行指定的解析器"""
+        """Run the specified parser"""
         if parser_key not in self.parsers:
-            print(f"❌ 无效的解析器选择: {parser_key}")
+            print(f"❌ Invalid parser selection: {parser_key}")
             return
         
         parser_info = self.parsers[parser_key]
-        print(f"\n🚀 启动 {parser_info['name']}")
+        print(f"\n🚀 Starting {parser_info['name']}")
         
         try:
-            # 创建解析器实例
+            # Create parser instance
             parser = parser_info['parser']()
             
-            # 执行解析
+            # Execute parsing
             results = parser.parse_directory()
             
             if results:
-                # 保存结果
+                # Save results
                 output_filename = f"{parser.parser_type}_parsed_filtered.json" if self.enable_interference_filter else f"{parser.parser_type}_parsed.json"
                 parser.save_batch_results(results, output_filename)
                 
-                # 显示摘要
+                # Display summary
                 parser.log_summary()
                 
-                # 显示过滤器统计
+                # Display filter statistics
                 if self.enable_interference_filter:
                     self._show_filter_summary(parser)
             else:
-                print("⚠️  未找到可解析的数据")
+                print("⚠️  No parseable data found")
                 
         except Exception as e:
-            self.logger.error(f"解析器运行Failed: {e}")
-            print(f"❌ 解析Failed: {e}")
+            self.logger.error(f"Parser execution failed: {e}")
+            print(f"❌ Parsing failed: {e}")
     
     def run_all_parsers(self):
-        """运行所有解析器"""
-        print(f"\n🚀 启动批量解析 (过滤器: {'启用' if self.enable_interference_filter else '禁用'})")
+        """Run all parsers"""
+        print(f"\n🚀 Starting batch parsing (Filter: {'Enabled' if self.enable_interference_filter else 'Disabled'})")
         
         total_results = {}
         
         for key, parser_info in self.parsers.items():
             print(f"\n{'='*50}")
-            print(f"正在运行: {parser_info['name']}")
+            print(f"Running: {parser_info['name']}")
             print(f"{'='*50}")
             
             try:
@@ -279,56 +275,56 @@ class EnhancedDataParsingManager(DataParsingManager):
                     if self.enable_interference_filter:
                         self._show_filter_summary(parser)
                 else:
-                    print(f"⚠️  {parser_info['name']}: 未找到可解析的数据")
+                    print(f"⚠️  {parser_info['name']}: No parseable data found")
                     
             except Exception as e:
-                self.logger.error(f"{parser_info['name']} 运行Failed: {e}")
+                self.logger.error(f"{parser_info['name']} failed to run: {e}")
                 print(f"❌ {parser_info['name']} Failed: {e}")
         
-        # 显示总体摘要
+        # Display overall summary
         self._show_total_summary(total_results)
     
     def _show_filter_summary(self, parser):
-        """显示过滤器摘要"""
+        """Display filter summary"""
         if hasattr(parser, 'get_filter_statistics'):
             filter_stats = parser.get_filter_statistics()
             if filter_stats and 'stats' in filter_stats:
                 stats = filter_stats['stats']
-                print(f"\n🛡️  过滤器统计:")
-                print(f"   处理文本数: {stats.get('texts_processed', 0)}")
-                print(f"   移除干扰字符数: {stats.get('interference_chars_removed', 0)}")
-                print(f"   保护字符数: {stats.get('protected_chars_preserved', 0)}")
+                print(f"\n🛡️  Filter statistics:")
+                print(f"   Texts processed: {stats.get('texts_processed', 0)}")
+                print(f"   Interference characters removed: {stats.get('interference_chars_removed', 0)}")
+                print(f"   Protected characters preserved: {stats.get('protected_chars_preserved', 0)}")
     
     def _show_total_summary(self, total_results: Dict[str, Any]):
-        """显示总体摘要"""
+        """Display overall summary"""
         print(f"\n{'='*70}")
-        print("📊 批量解析总体摘要")
+        print("📊 Batch parsing overall summary")
         print(f"{'='*70}")
         
         total_files = sum(result['stats']['successful_files'] for result in total_results.values())
         total_texts = sum(result['stats']['total_texts_extracted'] for result in total_results.values())
         
-        print(f"解析器数量: {len(total_results)}")
-        print(f"总处理File数: {total_files}")
-        print(f"总提取文本数: {total_texts}")
+        print(f"Number of parsers: {len(total_results)}")
+        print(f"Total files processed: {total_files}")
+        print(f"Total texts extracted: {total_texts}")
         
         if self.enable_interference_filter:
             total_filtered = sum(result['stats'].get('filtered_texts', 0) for result in total_results.values())
             total_chars_removed = sum(result['stats'].get('interference_chars_removed', 0) for result in total_results.values())
-            print(f"过滤文本数: {total_filtered}")
-            print(f"移除干扰字符数: {total_chars_removed}")
+            print(f"Filtered texts: {total_filtered}")
+            print(f"Interference characters removed: {total_chars_removed}")
         
         print(f"{'='*70}")
 
 
 def main():
-    """主函数"""
-    print("🚀 启动增强数据解析系统")
+    """Main function"""
+    print("🚀 Starting enhanced data parsing system")
     
-    # 创建增强解析管理器
+    # Create enhanced parsing manager
     manager = EnhancedDataParsingManager(enable_interference_filter=False)
     
-    # 运行交互式系统
+    # Run interactive system
     manager.run_interactive()
 
 

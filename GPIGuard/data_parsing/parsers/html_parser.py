@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-HTML Data Parsing器
-从HTMLFile中提取文本内容
+HTML Data Parser
+Extract text content from HTML files
 """
 
 from pathlib import Path
@@ -25,7 +25,7 @@ from data_parsing.utils import TextExtractor, FileUtils
 
 
 class HTMLParser(BaseParser):
-    """HTMLFile解析器（兼容旧格式）"""
+    """HTML File Parser (compatible with old format)"""
     
     def __init__(self, enable_interference_filter: bool = True, filter_config: Dict[str, Any] = None):
         super().__init__('html', enable_interference_filter, filter_config)
@@ -35,10 +35,10 @@ class HTMLParser(BaseParser):
     
     def parse_file(self, file_path: Path) -> Dict[str, Any]:
         """
-        解析单个HTMLFile
+        Parse a single HTML file
         
         Args:
-            file_path: HTMLFile路径
+            file_path: HTML file path
         
         Returns:
             Parsing result dictionary (compatible with old format)
@@ -46,10 +46,10 @@ class HTMLParser(BaseParser):
         self.logger.info(f"Parsing HTML file: {file_path}")
         
         try:
-            # 读取File内容
+            # Read file content
             content = FileUtils.safe_read_file(file_path)
             
-            # 提取文本entries目
+            # Extract text entries
             text_entries = []
             
             if BS4_AVAILABLE:
@@ -57,7 +57,7 @@ class HTMLParser(BaseParser):
             else:
                 self._extract_basic(content, text_entries)
             
-            # 构建解析结果（与旧格式相同）
+            # Build parsing result (same format as old format)
             result = {
                 'file_info': FileUtils.get_file_info(file_path),
                 'parsing_info': {
@@ -75,17 +75,17 @@ class HTMLParser(BaseParser):
             
         except Exception as e:
             self.logger.error(f"Error parsing {file_path}: {e}")
-            return self._create_error_result(file_path, f"解析Error: {e}")
+            return self._create_error_result(file_path, f"Parsing error: {e}")
     
     def _extract_with_bs4(self, html_content: str, entries: List[Dict]):
-        """使用BeautifulSoup提取文本（兼容旧格式）"""
+        """Extract text using BeautifulSoup (compatible with old format)"""
         soup = BeautifulSoup(html_content, 'html.parser')
         
-        # 移除script和style标签
+        # Remove script and style tags
         for script in soup(['script', 'style']):
             script.decompose()
         
-        # 提取文本节点
+        # Extract text nodes
         text = soup.get_text(separator='\n')
         lines = text.split('\n')
         
@@ -100,18 +100,18 @@ class HTMLParser(BaseParser):
                 })
     
     def _extract_basic(self, html_content: str, entries: List[Dict]):
-        """基础文本提取（兼容旧格式）"""
+        """Basic text extraction (compatible with old format)"""
         # 移除script和style标签
         html_content = re.sub(r'<script[^>]*>.*?</script>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
         html_content = re.sub(r'<style[^>]*>.*?</style>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
         
-        # 移除HTML标签
+        # Remove HTML tags
         text = re.sub(r'<[^>]+>', ' ', html_content)
         
-        # HTML实体解码
+        # HTML entity decoding
         text = html.unescape(text)
         
-        # 分行并清理
+        # Split by lines and clean
         lines = text.split('\n')
         for line_num, line in enumerate(lines):
             line = line.strip()
@@ -124,13 +124,13 @@ class HTMLParser(BaseParser):
                 })
     
     def _get_files_to_parse(self, directory: Path) -> List[Path]:
-        """获取所有HTMLFile"""
+        """Get all HTML files"""
         html_files = list(directory.glob('*.html'))
         htm_files = list(directory.glob('*.htm'))
         return html_files + htm_files
     
     def _create_error_result(self, file_path: Path, error_message: str) -> Dict[str, Any]:
-        """创建Error结果"""
+        """Create error result"""
         return {
             'file_info': FileUtils.get_file_info(file_path),
             'parsing_info': {
@@ -142,7 +142,7 @@ class HTMLParser(BaseParser):
         }
     
     def parse_directory(self, directory: Path = None) -> List[Dict[str, Any]]:
-        """解析整个directory（单File单独保存）"""
+        """Parse entire directory (save each file separately)"""
         if directory is None:
             directory = self.input_dir
         
@@ -151,14 +151,14 @@ class HTMLParser(BaseParser):
             return []
         
         files = self._get_files_to_parse(directory)
-        print(f"\n找到 {len(files)} 个HTMLFile待解析")
+        print(f"\nFound {len(files)} HTML files to parse")
         
         self.stats['total_files'] = len(files)
         results = []
         
         for i, file_path in enumerate(files, 1):
             try:
-                print(f"[{i}/{len(files)}] 解析: {file_path.name}")
+                print(f"[{i}/{len(files)}] Parsing: {file_path.name}")
                 result = self.parse_file(file_path)
                 
                 if result and result.get('parsing_info', {}).get('status') != 'failed':
@@ -169,7 +169,7 @@ class HTMLParser(BaseParser):
                     results.append(result)
                     self.stats['successful_files'] += 1
                     self.stats['total_texts_extracted'] += len(result.get('text_entries', []))
-                    print(f"  成功: {len(result.get('text_entries', []))} 个文本entries目")
+                    print(f"  Success: {len(result.get('text_entries', []))} text entries")
                 else:
                     self.stats['failed_files'] += 1
                     

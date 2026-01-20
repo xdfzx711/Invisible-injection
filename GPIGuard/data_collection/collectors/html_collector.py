@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-HTML数据收集器
-根据用户输入的网址爬取HTML页面
+HTML data collector
+Scrape HTML pages based on URLs provided by user
 """
 
 import time
@@ -18,46 +18,46 @@ from data_collection.scrapers.scraping_config import ScrapingConfig
 
 
 class HTMLCollector(BaseCollector):
-    """HTML数据收集器"""
+    """HTML data collector"""
     
     def __init__(self):
         super().__init__('html')
         
-        # 配置File路径
+        # Config file path
         self.config_file = self.get_config_path('web_scraping_config.json')
         
-        # 如果配置不在新位置，尝试从旧位置读取
+        # If config is not in new location, try reading from old location
         if not self.config_file.exists():
             old_config = self.path_manager.get_project_root() / "web_scraping_config.json"
             if old_config.exists():
                 self.config_file = old_config
                 self.logger.info(f"Using config from old location: {old_config}")
         
-        # 初始化Excel读取器
+        # Initialize Excel reader
         self.excel_reader = ExcelReader()
         
-        # 配置加载器
+        # Config loader
         self.config_loader = ConfigLoader()
         
-        # 爬虫对象（延迟初始化）
+        # Web scraper (lazy initialization)
         self.scraper = None
     
     def validate_config(self) -> bool:
-        """验证配置"""
+        """Validate configuration"""
         if not self.config_file.exists():
             self.logger.error(f"Config file not found: {self.config_file}")
-            print(f"\nError: 未找到配置File: {self.config_file}")
-            print(f"请确保配置Fileexists: data_collection/config/web_scraping_config.json")
-            print(f"或: web_scraping_config.json")
+            print(f"\nError: Config file not found: {self.config_file}")
+            print(f"Please ensure config file exists: data_collection/config/web_scraping_config.json")
+            print(f"Or: web_scraping_config.json")
             return False
         
-        # 尝试加载配置
+        # Try to load config
         config = self.config_loader.load_json_config(self.config_file)
         if not config:
             self.logger.error("Failed to load config")
             return False
         
-        # 验证必需的配置项
+        # Validate required config keys
         required_keys = ['request_settings', 'scraping_rules']
         for key in required_keys:
             if key not in config:
@@ -67,11 +67,11 @@ class HTMLCollector(BaseCollector):
         return True
     
     def collect(self) -> Dict[str, Any]:
-        """执行HTML收集"""
+        """Execute HTML collection"""
         self.start_collection()
         
         try:
-            # 1. 获取用户输入的网址
+            # 1. Get URLs provided by user
             websites = self._get_urls_from_user()
             if not websites:
                 return {
@@ -82,11 +82,11 @@ class HTMLCollector(BaseCollector):
             
             self.set_total_items(len(websites))
             
-            # 2. 初始化爬虫
+            # 2. Initialize web scraper
             self._initialize_scraper()
             
-            # 3. 批量爬取
-            print(f"\n开始爬取 {len(websites)} 个网站...")
+            # 3. Batch scrape websites
+            print(f"\nStarting to scrape {len(websites)} websites...")
             print(f"Output directory: {self.output_dir}")
             print("-" * 70)
             
@@ -95,7 +95,7 @@ class HTMLCollector(BaseCollector):
             self.end_collection()
             self.log_summary()
             
-            # 计算总大小
+            # Calculate total size
             total_size = sum(r.get('size', 0) for r in results if r.get('success'))
             
             return {
@@ -108,7 +108,7 @@ class HTMLCollector(BaseCollector):
             }
             
         except KeyboardInterrupt:
-            print("\n\n用户中断爬取操作")
+            print("\n\nUser interrupted scraping operation")
             self.end_collection()
             return {
                 'success': False,
@@ -127,9 +127,9 @@ class HTMLCollector(BaseCollector):
             }
     
     def _get_urls_from_user(self) -> List[Dict[str, Any]]:
-        """获取用户输入的网址"""
-        print("\n请输入要爬取的网址 (每行一个URL，输入空行结束):")
-        print("示例: https://example.com")
+        """Get URLs from user input"""
+        print("\nPlease enter URLs to scrape (one per line, press Enter to finish):")
+        print("Example: https://example.com")
         print("-" * 70)
         
         urls = []
@@ -137,22 +137,22 @@ class HTMLCollector(BaseCollector):
         
         while True:
             try:
-                url = input(f"URL {url_count + 1} (直接回车Completed输入): ").strip()
+                url = input(f"URL {url_count + 1} (press Enter to finish): ").strip()
                 
                 if not url:
                     if url_count == 0:
-                        print("Error: 至少需要输入一个URL")
+                        print("Error: At least one URL is required")
                         continue
                     break
                 
-                # 简单验证URL格式
+                # Simple URL format validation
                 if not url.startswith(('http://', 'https://')):
-                    print("Warning: URL应该以 http:// 或 https:// 开头")
-                    confirm = input("是否继续添加此URL? (y/n): ").strip().lower()
+                    print("Warning: URL should start with http:// or https://")
+                    confirm = input("Continue adding this URL? (y/n): ").strip().lower()
                     if confirm != 'y':
                         continue
                 
-                # 从URL提取域名作为名称
+                # Extract domain name from URL as name
                 from urllib.parse import urlparse
                 parsed = urlparse(url)
                 domain = parsed.netloc or 'unknown'
@@ -164,23 +164,23 @@ class HTMLCollector(BaseCollector):
                 })
                 
                 url_count += 1
-                print(f"has been添加: {domain}")
+                print(f"Added: {domain}")
                 
             except KeyboardInterrupt:
-                print("\n\n用户取消输入")
+                print("\n\nUser canceled input")
                 if urls:
-                    confirm = input(f"\nhas been输入 {len(urls)} 个URL，是否使用这些URL继续? (y/n): ").strip().lower()
+                    confirm = input(f"\nEntered {len(urls)} URLs, continue with these URLs? (y/n): ").strip().lower()
                     if confirm == 'y':
                         break
                 return []
         
-        print(f"\n共输入 {len(urls)} 个URL")
+        print(f"\nTotal {len(urls)} URLs entered")
         return urls
     
     def _initialize_scraper(self):
-        """初始化爬虫"""
+        """Initialize web scraper"""
         try:
-            # 使用旧的ScrapingConfig和WebScraper
+            # Use old ScrapingConfig and WebScraper
             scraping_config = ScrapingConfig(self.config_file)
             self.scraper = WebScraper(scraping_config, str(self.path_manager.data_root))
             self.logger.info("Web scraper initialized successfully")
@@ -190,27 +190,27 @@ class HTMLCollector(BaseCollector):
             raise
     
     def _scrape_websites(self, websites: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """批量爬取网站"""
+        """Batch scrape websites"""
         results = []
         
         for i, website in enumerate(websites, 1):
             try:
                 domain = website.get('domain', website.get('name', 'unknown'))
-                print(f"\n[{i}/{len(websites)}] 爬取: {domain}")
+                print(f"\n[{i}/{len(websites)}] Scraping: {domain}")
                 
-                # 调用旧的爬虫
+                # Call old scraper
                 result = self.scraper.scrape_website(website)
                 
                 if result.get('scraping_stats', {}).get('successful_pages', 0) > 0:
                     self.increment_success()
-                    print(f"  成功: {result['scraping_stats']['successful_pages']} 个页面")
+                    print(f"  Success: {result['scraping_stats']['successful_pages']} pages")
                 else:
                     self.increment_failure()
                     print(f"  Failed")
                 
                 results.append(result)
                 
-                # 添加延迟
+                # Add delay
                 if i < len(websites):
                     time.sleep(1)
                 

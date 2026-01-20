@@ -2,27 +2,27 @@
 # -*- coding: utf-8 -*-
 
 """
-API数据源配置
-集中管理所有API数据源的URL和配置
+API Data Source Configuration
+Centrally manage all API data source URLs and configurations
 """
 
-# ==================== JSON数据源 ====================
+# ==================== JSON Data Sources ====================
 
-# GitHub API数据源
+# GitHub API Data Source
 GITHUB_SOURCES = {
     'users': [
         {'username': 'torvalds', 'description': 'Linus Torvalds'},
-        {'username': 'gvanrossum', 'description': 'Python创始人'},
-        {'username': 'octocat', 'description': 'GitHub吉祥物'},
-        {'username': 'defunkt', 'description': 'GitHub联合创始人'},
-        {'username': 'mojombo', 'description': 'GitHub联合创始人'},
-        {'username': 'pjhyett', 'description': 'GitHub早期员工'},
-        {'username': 'wycats', 'description': 'Ember.js创始人'},
-        {'username': 'dhh', 'description': 'Ruby on Rails创始人'},
+        {'username': 'gvanrossum', 'description': 'Python Creator'},
+        {'username': 'octocat', 'description': 'GitHub Mascot'},
+        {'username': 'defunkt', 'description': 'GitHub Co-founder'},
+        {'username': 'mojombo', 'description': 'GitHub Co-founder'},
+        {'username': 'pjhyett', 'description': 'GitHub Early Employee'},
+        {'username': 'wycats', 'description': 'Ember.js Creator'},
+        {'username': 'dhh', 'description': 'Ruby on Rails Creator'},
     ]
 }
 
-# 公共API数据源
+# Public API Data Sources
 PUBLIC_API_SOURCES = [
     {
         'name': 'worldbank_population',
@@ -31,7 +31,7 @@ PUBLIC_API_SOURCES = [
             'https://api.worldbank.org/v2/country/CN/indicator/SP.POP.TOTL?format=json&date=2020:2023',
             'https://api.worldbank.org/v2/country/GB/indicator/SP.POP.TOTL?format=json&date=2020:2023'
         ],
-        'description': '世界银行人口数据',
+        'description': 'World Bank Population Data',
         'type': 'worldbank'
     },
     {
@@ -41,7 +41,7 @@ PUBLIC_API_SOURCES = [
             'https://en.wikipedia.org/w/api.php?action=query&titles=Artificial_intelligence&format=json&prop=extracts&exintro=true',
             'https://en.wikipedia.org/w/api.php?action=query&titles=Machine_learning&format=json&prop=extracts&exintro=true'
         ],
-        'description': 'Wikipedia文章数据',
+        'description': 'Wikipedia Article Data',
         'type': 'wikipedia'
     },
     {
@@ -51,7 +51,7 @@ PUBLIC_API_SOURCES = [
             'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q5&format=json',
             'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q1860&format=json'
         ],
-        'description': 'Wikidata实体数据',
+        'description': 'Wikidata Entity Data',
         'type': 'wikidata'
     },
     {
@@ -59,12 +59,12 @@ PUBLIC_API_SOURCES = [
         'urls': [
             'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=3'
         ],
-        'description': 'NASA每日天文图片',
+        'description': 'NASA Astronomy Picture of the Day',
         'type': 'nasa'
     }
 ]
 
-# 金融API数据源
+# Financial API Data Sources
 FINANCIAL_API_SOURCES = [
     {
         'name': 'crypto_prices',
@@ -73,7 +73,7 @@ FINANCIAL_API_SOURCES = [
             'https://api.coingecko.com/api/v3/coins/bitcoin',
             'https://api.coingecko.com/api/v3/coins/ethereum'
         ],
-        'description': '加密货币价格数据',
+        'description': 'Cryptocurrency Price Data',
         'type': 'crypto'
     },
     {
@@ -82,7 +82,7 @@ FINANCIAL_API_SOURCES = [
             'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1',
             'https://api.coingecko.com/api/v3/global'
         ],
-        'description': '加密货币市场数据',
+        'description': 'Cryptocurrency Market Data',
         'type': 'crypto'
     },
     {
@@ -92,12 +92,12 @@ FINANCIAL_API_SOURCES = [
             'https://api.exchangerate-api.com/v4/latest/EUR',
             'https://api.exchangerate-api.com/v4/latest/GBP'
         ],
-        'description': '汇率数据',
+        'description': 'Exchange Rate Data',
         'type': 'forex'
     }
 ]
 
-# 天气API数据源
+# Weather API Data Sources
 WEATHER_API_SOURCES = [
     {
         'name': 'weather_free',
@@ -106,144 +106,144 @@ WEATHER_API_SOURCES = [
             'https://wttr.in/NewYork?format=j1',
             'https://wttr.in/Tokyo?format=j1'
         ],
-        'description': '免费天气数据',
+        'description': 'Free Weather Data',
         'type': 'weather'
     }
 ]
 
-# ==================== CSV数据源 ====================
+# ==================== CSV Data Sources ====================
 
 GOVERNMENT_CSV_SOURCES = [
     {
         'name': 'us_federal_holidays',
         'url': 'https://raw.githubusercontent.com/datasets/us-federal-holidays/master/data/us-federal-holidays.csv',
-        'description': '美国联邦假日数据',
+        'description': 'US Federal Holidays Data',
         'country': 'US',
         'format': 'csv'
     },
     {
         'name': 'us_state_codes',
         'url': 'https://raw.githubusercontent.com/datasets/us-state-names/master/data/us-state-names.csv',
-        'description': '美国州代码数据',
+        'description': 'US State Codes Data',
         'country': 'US',
         'format': 'csv'
     },
     {
         'name': 'uk_postcode_sample',
         'url': 'https://raw.githubusercontent.com/datasets/uk-postcodes/master/data/sample.csv',
-        'description': '英国邮编样本数据',
+        'description': 'UK Postcode Sample Data',
         'country': 'UK',
         'format': 'csv'
     },
     {
         'name': 'canada_provinces',
         'url': 'https://raw.githubusercontent.com/datasets/country-codes/master/data/country-codes.csv',
-        'description': '国家代码数据',
+        'description': 'Country Codes Data',
         'country': 'CA',
         'format': 'csv'
     },
     {
         'name': 'world_cities',
         'url': 'https://raw.githubusercontent.com/datasets/world-cities/master/data/world-cities.csv',
-        'description': '世界城市数据',
+        'description': 'World Cities Data',
         'country': 'WORLD',
         'format': 'csv'
     },
     {
         'name': 'currency_codes',
         'url': 'https://raw.githubusercontent.com/datasets/currency-codes/master/data/codes-all.csv',
-        'description': '世界货币代码',
+        'description': 'World Currency Codes',
         'country': 'WORLD',
         'format': 'csv'
     }
 ]
 
-# ==================== XML数据源 ====================
+# ==================== XML Data Sources ====================
 
 XML_SOURCES = [
     {
         'name': 'rss_bbc_news',
         'url': 'http://feeds.bbci.co.uk/news/rss.xml',
-        'description': 'BBC新闻RSS Feed',
+        'description': 'BBC News RSS Feed',
         'type': 'rss'
     },
     {
         'name': 'rss_cnn_world',
         'url': 'http://rss.cnn.com/rss/edition.rss',
-        'description': 'CNN世界新闻RSS Feed',
+        'description': 'CNN World News RSS Feed',
         'type': 'rss'
     },
     {
         'name': 'nasa_rss_breaking',
         'url': 'https://www.nasa.gov/rss/dyn/breaking_news.rss',
-        'description': 'NASA突发新闻RSS Feed',
+        'description': 'NASA Breaking News RSS Feed',
         'type': 'rss'
     },
     {
         'name': 'nasa_rss_image',
         'url': 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss',
-        'description': 'NASA每日图片RSS Feed',
+        'description': 'NASA Daily Image RSS Feed',
         'type': 'rss'
     },
     {
         'name': 'worldbank_countries',
         'url': 'https://api.worldbank.org/v2/country?format=xml&per_page=50',
-        'description': '世界银行国家列表XML',
+        'description': 'World Bank Country List XML',
         'type': 'worldbank'
     },
     {
         'name': 'worldbank_indicators',
         'url': 'https://api.worldbank.org/v2/indicator?format=xml&per_page=20',
-        'description': '世界银行指标列表XML',
+        'description': 'World Bank Indicators List XML',
         'type': 'worldbank'
     },
     {
         'name': 'ecb_exchange_rates',
         'url': 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml',
-        'description': '欧洲央行每日汇率XML',
+        'description': 'ECB Daily Exchange Rates XML',
         'type': 'ecb'
     }
 ]
 
-# ==================== 数据源分组（用于子菜单）====================
+# ==================== Data Source Groups (for submenus) ====================
 
 JSON_SOURCE_GROUPS = {
     'github': {
         'name': 'GitHub API',
-        'description': '收集GitHub用户和仓库数据',
+        'description': 'Collect GitHub users and repository data',
         'sources': ['github']
     },
     'public': {
-        'name': '公共API',
-        'description': 'Wikipedia, NASA, Wikidata等公共数据',
+        'name': 'Public API',
+        'description': 'Wikipedia, NASA, Wikidata and other public data',
         'sources': PUBLIC_API_SOURCES
     },
     'financial': {
-        'name': '金融API',
-        'description': '加密货币价格, 汇率数据',
+        'name': 'Financial API',
+        'description': 'Cryptocurrency prices, exchange rate data',
         'sources': FINANCIAL_API_SOURCES
     },
     'weather': {
-        'name': '天气API',
-        'description': '城市天气数据',
+        'name': 'Weather API',
+        'description': 'City weather data',
         'sources': WEATHER_API_SOURCES
     }
 }
 
 XML_SOURCE_GROUPS = {
     'rss': {
-        'name': 'RSS新闻源',
-        'description': 'BBC, CNN, NASA等新闻订阅',
+        'name': 'RSS News Sources',
+        'description': 'BBC, CNN, NASA and other news subscriptions',
         'sources': [s for s in XML_SOURCES if s['type'] == 'rss']
     },
     'worldbank': {
-        'name': '世界银行XML',
-        'description': '国家列表, 经济指标等',
+        'name': 'World Bank XML',
+        'description': 'Country list, economic indicators, etc.',
         'sources': [s for s in XML_SOURCES if s['type'] == 'worldbank']
     },
     'financial_xml': {
-        'name': '金融XML',
-        'description': '欧洲央行汇率等',
+        'name': 'Financial XML',
+        'description': 'ECB exchange rates, etc.',
         'sources': [s for s in XML_SOURCES if s['type'] == 'ecb']
     }
 }

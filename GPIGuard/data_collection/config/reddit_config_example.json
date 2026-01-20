@@ -10,5 +10,5 @@
     "u/AutoModerator"
   ],
   "limit": 50,
-  "_comment": "支持两种模式: r/subreddit_name (社区模式) 和 u/username (用户模式)"
+  "_comment": " r/subreddit_name and u/username "
 }

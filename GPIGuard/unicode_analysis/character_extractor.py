@@ -11,35 +11,35 @@ from typing import Dict, List, Any, Union
 import sys
 import os
 
-# 添加父directory到路径
+# Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data_collection.utils.logger import setup_logger
 
 class CharacterExtractor:
-    """字符提取器 - 从解析结果中逐字符提取"""
+    """Character Extractor - Extract characters from parsed results one by one"""
     
     def __init__(self, output_dir: Union[str, Path] = "testscan", data_sources: List[str] = None):
         self.output_dir = Path(output_dir)
         self.logger = setup_logger('CharacterExtractor', 'character_extraction.log')
 
-        # 设置要处理的数据源
+        # Set data sources to process
         self.data_sources = data_sources or ['json', 'csv', 'xml', 'html', 'reddit', 'twitter', 'github', 'godofprompt']
-        self.logger.info(f"字符提取器启用的数据源: {', '.join(self.data_sources)}")
+        self.logger.info(f"Character Extractor enabled data sources: {', '.join(self.data_sources)}")
 
-        # 创建Output directory
+        # Create Output directory
         self.char_output_dir = self.output_dir / "unicode_analysis" / "character_extraction"
         self.char_output_dir.mkdir(parents=True, exist_ok=True)
     
     def extract_from_parsed_data(self, parsed_data_dir: Union[str, Path]) -> List[Dict[str, Any]]:
-        """从Parsed data directory中提取所有字符"""
+        """Extract all characters from Parsed data directory"""
         parsed_data_dir = Path(parsed_data_dir)
-        self.logger.info(f"开始从解析数据中提取字符: {parsed_data_dir}")
+        self.logger.info(f"Starting character extraction from parsed data: {parsed_data_dir}")
 
         all_characters = []
-        source_characters = {}  # 按数据源分组的字符
+        source_characters = {}  # Characters grouped by data source
         char_id_counter = 0
 
-        # 处理各种数据源
+
         source_handlers = {
             'json': ('json_analysis', self._extract_from_json_results),
             'csv': ('csv_analysis', self._extract_from_csv_results),
@@ -58,10 +58,10 @@ class CharacterExtractor:
             if source_type in source_handlers:
                 dir_name, handler = source_handlers[source_type]
             else:
-                # 尝试处理动态数据源
+                # Attempt to handle dynamic data sources
                 dir_name = f"{source_type}_analysis"
                 
-                # 根据名称推断处理程序
+                # Infer handler based on name
                 if 'reddit' in source_type:
                     handler = self._extract_from_reddit_results
                 elif 'twitter' in source_type:
@@ -83,17 +83,17 @@ class CharacterExtractor:
                 source_dir = parsed_data_dir / dir_name
 
                 if source_dir.exists():
-                    self.logger.info(f"处理 {source_type.upper()} 数据源...")
+                    self.logger.info(f"Processing {source_type.upper()} data source...")
                     source_chars = []
                     char_id_counter = handler(source_dir, source_chars, char_id_counter)
 
-                    # 修正提取出的字符的 source_type，确保与当前处理的 source_type 一致
-                    # 这对于动态数据源（如 reddit_top）尤为重要
+                    # Correct the source_type of extracted characters to ensure consistency with the current source_type
+                    # This is especially important for dynamic data sources (e.g., reddit_top)
                     for char in source_chars:
                         if "source_info" in char:
                             char["source_info"]["source_type"] = source_type
                         
-                        # 更新 char_id 前缀以匹配 source_type
+                        # Update char_id prefix to match source_type
                         if "char_id" in char:
                             parts = char["char_id"].rsplit('_', 1)
                             if len(parts) == 2 and parts[1].isdigit():
@@ -102,98 +102,98 @@ class CharacterExtractor:
                     if source_chars:
                         source_characters[source_type] = source_chars
                         all_characters.extend(source_chars)
-                        self.logger.info(f"{source_type.upper()} 数据源提取了 {len(source_chars)} 个字符")
+                        self.logger.info(f"{source_type.upper()} data source extracted {len(source_chars)} characters")
                 else:
-                    self.logger.info(f"{source_type.upper()} 数据directory不exists: {source_dir}")
+                    self.logger.info(f"{source_type.upper()} data source directory does not exist: {source_dir}")
             else:
-                self.logger.warning(f"无法识别的数据源类型或未找到处理程序: {source_type}")
+                self.logger.warning(f"Unrecognized data source type or no handler found: {source_type}")
 
-        self.logger.info(f"字符提取Completed，共提取 {len(all_characters)} 个字符")
+        self.logger.info(f"Character extraction completed, total characters extracted: {len(all_characters)}")
 
-        # 按数据源分别保存提取结果
+        # Save extraction results separately by data source
         self._save_extracted_characters_by_source(source_characters, all_characters)
 
         return all_characters
 
     def extract_from_parsed_data_smart(self, parsed_data_dir: Union[str, Path], force_extract: bool = False) -> List[Dict[str, Any]]:
-        """智能字符提取 - 跳过has beenexists的提取结果"""
+        """Smart character extraction - skip extraction if results already exist"""
 
         if force_extract:
-            self.logger.info("强制重新提取字符")
+            self.logger.info("Force re-extracting characters")
             return self.extract_from_parsed_data(parsed_data_dir)
 
-        # Check现有提取File
+        # Check existing extraction files
         existing_sources, missing_sources = self._check_existing_extractions()
 
         if not missing_sources:
-            # 所有数据源都has been提取，直接加载现有数据
-            self.logger.info("所有数据源的字符has been提取，跳过提取步骤")
+            # All data sources have been extracted, load existing data directly
+            self.logger.info("Characters for all data sources have been extracted, skipping extraction step")
             loaded_characters = self._load_existing_extractions(existing_sources)
 
             if not loaded_characters:
-                self.logger.warning(f"虽然检测到提取Fileexists，但加载的字符数为0。数据源: {existing_sources}")
-                self.logger.warning("这可能是由于File损坏、格式Error或确实没有可提取的字符")
+                self.logger.warning(f"Although extraction files were detected, the number of loaded characters is 0. Data sources: {existing_sources}")
+                self.logger.warning("This may be due to file corruption, format errors, or indeed no characters to extract")
 
             return loaded_characters
 
         if existing_sources:
-            # 部分数据源has been提取，只提取缺失的
-            self.logger.info(f"发现has been提取的数据源: {existing_sources}")
-            self.logger.info(f"需要提取的数据源: {missing_sources}")
+            # Some data sources have been extracted, only extract the missing ones
+            self.logger.info(f"Found already extracted data sources: {existing_sources}")
+            self.logger.info(f"Data sources to extract: {missing_sources}")
 
-            # 临时修改数据源列表，只处理缺失的
+            # Temporarily modify the data source list to only process the missing ones
             original_sources = self.data_sources
             self.data_sources = missing_sources
 
             try:
-                # 提取缺失的数据源
+                # Extract missing data sources
                 new_characters = self.extract_from_parsed_data(parsed_data_dir)
 
-                # 加载现有数据并合并
+                # Load existing data and merge
                 existing_characters = self._load_existing_extractions(existing_sources)
 
-                # 合并所有字符
+                # Merge all characters
                 all_characters = existing_characters + new_characters
-                self.logger.info(f"合并Completed，总字符数: {len(all_characters)}")
+                self.logger.info(f"Merge completed, total characters: {len(all_characters)}")
 
                 if not all_characters:
-                    self.logger.warning(f"合并后字符数为0。现有字符: {len(existing_characters)}, 新提取字符: {len(new_characters)}")
+                    self.logger.warning(f"Number of characters after merge is 0. Existing characters: {len(existing_characters)}, New extracted characters: {len(new_characters)}")
 
                 return all_characters
             finally:
-                # 恢复原始数据源列表
+                # Restore original data source list
                 self.data_sources = original_sources
         else:
-            # 没有现有提取，正常提取
-            self.logger.info("开始提取所有数据源的字符")
+            # No existing extractions, extract normally
+            self.logger.info("Starting extraction of characters from all data sources")
             extracted_characters = self.extract_from_parsed_data(parsed_data_dir)
 
             if not extracted_characters:
-                self.logger.warning(f"从解析数据中提取的字符数为0。数据源: {self.data_sources}")
+                self.logger.warning(f"Number of characters extracted from parsed data is 0. Data sources: {self.data_sources}")
                 self.logger.warning(f"Parsed data directory: {parsed_data_dir}")
 
             return extracted_characters
 
     def _check_existing_extractions(self) -> tuple[List[str], List[str]]:
-        """Check现有的字符提取File（简化版Check）"""
+        """Check existing character extraction files (simplified check)"""
         existing_sources = []
         missing_sources = []
 
         for source in self.data_sources:
             extraction_file = self.char_output_dir / f"character_extraction_{source}.json"
 
-            # 简化Check：只Checkexists性和大小 > 0
+            # Simplified check: only check existence and size > 0
             if extraction_file.exists() and extraction_file.stat().st_size > 0:
                 existing_sources.append(source)
-                self.logger.debug(f"发现有效的提取File: {extraction_file.name}")
+                self.logger.debug(f"Found valid extraction file: {extraction_file.name}")
             else:
                 missing_sources.append(source)
-                self.logger.debug(f"缺失或无效的提取File: {extraction_file.name}")
+                self.logger.debug(f"Missing or invalid extraction file: {extraction_file.name}")
 
         return existing_sources, missing_sources
 
     def _load_existing_extractions(self, source_list: List[str]) -> List[Dict[str, Any]]:
-        """加载现有的字符提取数据"""
+        """Load existing character extraction data"""
         all_characters = []
 
         for source in source_list:
@@ -201,98 +201,97 @@ class CharacterExtractor:
 
             try:
                 if not extraction_file.exists():
-                    self.logger.error(f"加载 {source} 提取FileFailed: File不exists - {extraction_file}")
+                    self.logger.error(f"Loading {source} extraction file failed: File does not exist - {extraction_file}")
                     continue
 
                 file_size = extraction_file.stat().st_size
                 if file_size == 0:
-                    self.logger.error(f"加载 {source} 提取FileFailed: File为空 - {extraction_file}")
+                    self.logger.error(f"Loading {source} extraction file failed: File is empty - {extraction_file}")
                     continue
 
-                # CheckFile大小，如果超过1GB则Warning并提供建议
+                # Check file size, warn if over 1GB and provide suggestions
                 file_size_gb = file_size / (1024 * 1024 * 1024)
                 if file_size_gb > 1.0:
-                    self.logger.warning(f"检测到大File: {source} 提取File大小为 {file_size_gb:.2f}GB")
-                    self.logger.warning(f"加载大File可能导致内存不足，建议使用 --force-extract 重新生成较小的File")
+                    self.logger.warning(f"Detected large file: {source} extraction file size is {file_size_gb:.2f}GB")
+                    self.logger.warning(f"Loading large files may cause memory issues, consider using --force-extract to regenerate smaller files")
 
-                    # 如果File超过8GB，直接跳过加载
+                    # If file is over 8GB, skip loading
                     if file_size_gb > 8.0:
-                        self.logger.error(f"File过大({file_size_gb:.2f}GB)，跳过加载以避免内存不足")
-                        self.logger.error(f"请使用 --force-extract 参数重新生成提取File")
+                        self.logger.error(f"File too large ({file_size_gb:.2f}GB), skipping loading to avoid memory issues")
+                        self.logger.error(f"Please use --force-extract to regenerate extraction files")
                         continue
 
-                self.logger.info(f"正在加载 {source} 提取File ({file_size_gb:.2f}GB)...")
+                self.logger.info(f"Loading {source} extraction file ({file_size_gb:.2f}GB)...")
 
-                # 对于大File，尝试分块加载
+                # For large files, try chunked loading
                 if file_size_gb > 2.0:
-                    self.logger.info(f"File较大({file_size_gb:.2f}GB)，尝试分块加载...")
+                    self.logger.info(f"File is large ({file_size_gb:.2f}GB), attempting chunked loading...")
                     characters = self._load_large_file_chunked(extraction_file, source)
                     if characters:
                         all_characters.extend(characters)
-                        self.logger.info(f"分块加载 {source.upper()} 字符: {len(characters)} 个")
+                        self.logger.info(f"Chunked loading {source.upper()} characters: {len(characters)}")
                         continue
                     else:
-                        self.logger.warning(f"分块加载Failed，尝试常规加载...")
+                        self.logger.warning(f"Chunked loading failed, attempting regular loading...")
 
                 with open(extraction_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
 
                 if not isinstance(data, dict):
-                    self.logger.error(f"加载 {source} 提取FileFailed: File格式Error，不是有效的JSON对象 - {extraction_file}")
+                    self.logger.error(f"Loading {source} extraction file failed: File format error, not a valid JSON object - {extraction_file}")
                     continue
 
-                # CheckFile格式
+                # Check file format
                 extraction_info = data.get('extraction_info', {})
                 file_format = extraction_info.get('format', 'standard')
 
                 if file_format == 'compressed':
-                    # 处理压缩格式
+                    # Handle compressed format
                     characters = self._load_compressed_characters(data, source)
                 else:
-                    # 处理标准格式
+                    # Handle standard format
                     characters = data.get('characters', [])
                     if not isinstance(characters, list):
-                        self.logger.error(f"加载 {source} 提取FileFailed: 'characters'字段不是列表格式 - {extraction_file}")
+                        self.logger.error(f"Loading {source} extraction file failed: 'characters' field is not a list - {extraction_file}")
                         continue
 
                 all_characters.extend(characters)
-                self.logger.info(f"加载 {source.upper()} 字符: {len(characters)} 个 (格式: {file_format})")
+                self.logger.info(f"Loaded {source.upper()} characters: {len(characters)} (format: {file_format})")
 
             except MemoryError as e:
                 file_size_gb = extraction_file.stat().st_size / (1024 * 1024 * 1024)
-                self.logger.error(f"加载 {source} 提取FileFailed: 内存不足 - File大小 {file_size_gb:.2f}GB")
-                self.logger.error(f"解决方案: 1) 增加系统内存 2) 使用 --force-extract 重新生成File 3) 分批处理数据")
+                self.logger.error(f"Loading {source} extraction file failed: MemoryError - File size {file_size_gb:.2f}GB")
+                self.logger.error(f"Solutions: 1) Increase system memory 2) Use --force-extract to regenerate files 3) Process data in chunks")
             except json.JSONDecodeError as e:
-                self.logger.error(f"加载 {source} 提取FileFailed: JSON解析Error - {extraction_file}, Error: {e}")
+                self.logger.error(f"Loading {source} extraction file failed: JSON decode error - {extraction_file}, Error: {e}")
             except PermissionError as e:
-                self.logger.error(f"加载 {source} 提取FileFailed: 权限Error - {extraction_file}, Error: {e}")
+                self.logger.error(f"Loading {source} extraction file failed: Permission error - {extraction_file}, Error: {e}")
             except FileNotFoundError as e:
-                self.logger.error(f"加载 {source} 提取FileFailed: File未找到 - {extraction_file}, Error: {e}")
+                self.logger.error(f"Loading {source} extraction file failed: File not found - {extraction_file}, Error: {e}")
             except Exception as e:
-                self.logger.error(f"加载 {source} 提取FileFailed: 未知Error - {extraction_file}, Error类型: {type(e).__name__}, Error: {e}")
+                self.logger.error(f"Loading {source} extraction file failed: Unknown error - {extraction_file}, Error type: {type(e).__name__}, Error: {e}")
 
-        # 记录加载汇总信息
-        self.logger.info(f"字符加载Completed，共加载 {len(all_characters)} 个字符，来源: {source_list}")
+        # Record loading summary information
+        self.logger.info(f"Character loading completed, total {len(all_characters)} characters loaded, sources: {source_list}")
 
         if not all_characters and source_list:
-            self.logger.warning(f"虽然尝试加载 {len(source_list)} 个数据源，但没有成功加载任何字符")
+            self.logger.warning(f"Although attempted to load from {len(source_list)} data sources, no characters were successfully loaded")
 
         return all_characters
 
     def _load_large_file_chunked(self, extraction_file: Path, source: str) -> List[Dict[str, Any]]:
-        """分块加载大File以避免内存不足"""
-        self.logger.info(f"尝试分块加载大File: {extraction_file}")
-
+        """Load large files in chunks to avoid memory issues"""
+        self.logger.info(f"Attempting chunked loading of large file: {extraction_file}")
         try:
-            # 尝试使用ijson进行流式解析
+            # Attempt to use ijson for streaming parsing
             import ijson
 
             characters = []
             with open(extraction_file, 'rb') as f:
-                # 解析characters数组中的每个对象
+                # Parse each object in the characters array
                 parser = ijson.items(f, 'characters.item')
 
-                chunk_size = 10000  # 每次处理10000个字符
+                chunk_size = 10000  # Process 10000 characters at a time
                 chunk = []
 
                 for char_obj in parser:
@@ -300,26 +299,25 @@ class CharacterExtractor:
 
                     if len(chunk) >= chunk_size:
                         characters.extend(chunk)
-                        self.logger.info(f"has been加载 {len(characters)} 个字符...")
+                        self.logger.info(f"Loaded {len(characters)} characters so far...")
                         chunk = []
 
-                # 处理最后一批
+                # Process the last batch
                 if chunk:
                     characters.extend(chunk)
 
-                self.logger.info(f"分块加载Completed，共加载 {len(characters)} 个字符")
+                self.logger.info(f"Chunked loading completed, total {len(characters)} characters loaded")
                 return characters
 
         except ImportError:
-            self.logger.error("分块加载需要ijson库，请安装: pip install ijson")
+            self.logger.error("Chunked loading requires the ijson library, please install: pip install ijson")
             return []
         except Exception as e:
-            self.logger.error(f"分块加载Failed: {e}")
+            self.logger.error(f"Chunked loading failed: {e}")
             return []
 
     def _extract_from_json_results(self, json_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从JSON解析结果中提取字符"""
-        self.logger.info(f"处理JSON解析结果: {json_dir}")
+        self.logger.info(f"Processing JSON results: {json_dir}")
         
         for json_file in json_dir.glob("*_parsed.json"):
             try:
@@ -340,13 +338,13 @@ class CharacterExtractor:
                         )
                         
             except Exception as e:
-                self.logger.error(f"处理JSONFileFailed {json_file}: {e}")
+                self.logger.error(f"Processing JSON file failed {json_file}: {e}")
         
         return char_id_counter
 
     def _extract_from_github_results(self, github_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从GitHub解析结果中提取字符"""
-        self.logger.info(f"处理GitHub解析结果: {github_dir}")
+        """Extract characters from GitHub parsing results"""
+        self.logger.info(f"Processing GitHub results: {github_dir}")
 
         for gh_file in github_dir.glob("*_parsed.json"):
             try:
@@ -367,7 +365,7 @@ class CharacterExtractor:
                     string_value = entry.get('value', '')
                     if not string_value:
                         continue
-                    # 针对 GitHub 的通用文本入口
+                    # General text entry for GitHub
                     source_info = {
                         "source_type": "github",
                         "content_type": entry.get('field_type', 'github_content'),
@@ -385,13 +383,13 @@ class CharacterExtractor:
                     )
 
             except Exception as e:
-                self.logger.error(f"处理GitHubFileFailed {gh_file}: {e}")
+                self.logger.error(f"Processing GitHub file failed {gh_file}: {e}")
 
         return char_id_counter
     
     def _extract_from_godofprompt_results(self, godofprompt_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从GodOfPrompt解析结果中提取字符"""
-        self.logger.info(f"处理GodOfPrompt解析结果: {godofprompt_dir}")
+        """Extract characters from GodOfPrompt parsing results"""
+        self.logger.info(f"Processing GodOfPrompt results: {godofprompt_dir}")
 
         for gp_file in godofprompt_dir.glob("*_parsed.json"):
             try:
@@ -409,11 +407,11 @@ class CharacterExtractor:
                     if not string_value:
                         continue
                     
-                    # 获取 slug 和 category 作为上下文信息
+                    # Get slug and category as context information
                     slug = entry.get('slug', '')
                     category = entry.get('category', '')
                     
-                    # 针对 GodOfPrompt 的文本入口
+                    # Text entry for GodOfPrompt
                     source_info = {
                         "source_type": "godofprompt",
                         "content_type": "prompt",
@@ -430,13 +428,13 @@ class CharacterExtractor:
                     )
 
             except Exception as e:
-                self.logger.error(f"处理GodOfPromptFileFailed {gp_file}: {e}")
+                self.logger.error(f"Processing GodOfPrompt file failed {gp_file}: {e}")
 
         return char_id_counter
     
     def _extract_from_csv_results(self, csv_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从CSV解析结果中提取字符"""
-        self.logger.info(f"处理CSV解析结果: {csv_dir}")
+        """Extract characters from CSV parsing results"""
+        self.logger.info(f"Processing CSV results: {csv_dir}")
         
         for csv_file in csv_dir.glob("*_parsed.json"):
             try:
@@ -457,13 +455,13 @@ class CharacterExtractor:
                         )
                         
             except Exception as e:
-                self.logger.error(f"处理CSVFileFailed {csv_file}: {e}")
+                self.logger.error(f"Processing CSV file failed {csv_file}: {e}")
         
         return char_id_counter
     
     def _extract_from_xml_results(self, xml_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从XML解析结果中提取字符"""
-        self.logger.info(f"处理XML解析结果: {xml_dir}")
+        """Extract characters from XML parsing results"""
+        self.logger.info(f"Processing XML results: {xml_dir}")
         
         for xml_file in xml_dir.glob("*_parsed.json"):
             try:
@@ -484,25 +482,25 @@ class CharacterExtractor:
                         )
                         
             except Exception as e:
-                self.logger.error(f"处理XMLFileFailed {xml_file}: {e}")
+                self.logger.error(f"Processing XML file failed {xml_file}: {e}")
         
         return char_id_counter
 
     def _extract_from_html_results(self, html_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从HTML解析结果中提取字符"""
-        self.logger.info(f"处理HTML解析结果: {html_dir}")
+        """Extract characters from HTML parsing results"""
+        self.logger.info(f"Processing HTML results: {html_dir}")
 
         for html_file in html_dir.glob("*_extracted.json"):
             try:
                 with open(html_file, 'r', encoding='utf-8') as f:
                     parsed_result = json.load(f)
 
-                # Check是否有Error
+                # Check for parsing errors
                 page_info = parsed_result.get('page_info', {})
                 if 'error' in page_info:
                     continue
 
-                # 获取File信息
+                # Get file information
                 file_info = {
                     'file_name': html_file.name,
                     'relative_path': str(html_file.relative_to(html_dir.parent.parent)),
@@ -511,7 +509,7 @@ class CharacterExtractor:
                     'page_type': page_info.get('page_type', '')
                 }
 
-                # 提取文本entries目
+                # Extract text entries
                 extracted_content = parsed_result.get('extracted_content', {})
                 text_entries = extracted_content.get('text_entries', [])
 
@@ -522,11 +520,11 @@ class CharacterExtractor:
                             string_value, entry, file_info, 'html', all_characters, char_id_counter
                         )
 
-                # 也从meta信息中提取字符
+                # Also extract characters from meta information
                 meta_info = extracted_content.get('meta_info', {})
                 for meta_key, meta_value in meta_info.items():
                     if isinstance(meta_value, str) and meta_value:
-                        # 创建metaentries目
+                        # Create meta entries
                         meta_entry = {
                             'element_type': 'meta',
                             'tag_name': 'meta',
@@ -537,7 +535,7 @@ class CharacterExtractor:
                             meta_value, meta_entry, file_info, 'html', all_characters, char_id_counter
                         )
 
-                # 从链接文本中提取字符
+                # Extract characters from link texts
                 links = extracted_content.get('links', [])
                 for link in links:
                     link_text = link.get('text', '')
@@ -552,7 +550,7 @@ class CharacterExtractor:
                             link_text, link_entry, file_info, 'html', all_characters, char_id_counter
                         )
 
-                # 从图片alt文本中提取字符
+                # Extract characters from image alt texts
                 images = extracted_content.get('images', [])
                 for image in images:
                     alt_text = image.get('alt', '')
@@ -573,21 +571,21 @@ class CharacterExtractor:
         return char_id_counter
 
     def _detect_normalization_changes(self, original: str, nfc: str, nfkc: str) -> List[Dict[str, Any]]:
-        """检测Unicode规范化变化"""
+        """Detect Unicode normalization changes"""
         changes = []
 
-        # NFC变化检测
+        # NFC change detection
         if original != nfc:
             changes.append({
                 "type": "nfc_change",
                 "original": original,
                 "normalized": nfc,
                 "risk_level": "medium",
-                "description": "字符串在NFC规范化后发生变化",
+                "description": "String changed after NFC normalization",
                 "character_count_change": len(nfc) - len(original)
             })
 
-        # NFKC变化检测
+        # NFKC change detection
         if original != nfkc:
             risk_level = "high" if nfc != nfkc else "medium"
             changes.append({
@@ -595,11 +593,11 @@ class CharacterExtractor:
                 "original": original,
                 "normalized": nfkc,
                 "risk_level": risk_level,
-                "description": "字符串在NFKC规范化后发生变化",
+                "description": "String changed after NFKC normalization",
                 "character_count_change": len(nfkc) - len(original)
             })
 
-        # 长度显著变化检测（可能的安全风险）
+        # Significant length change detection (potential security risk)
         if len(original) != len(nfkc) and abs(len(original) - len(nfkc)) > 1:
             changes.append({
                 "type": "significant_length_change",
@@ -607,13 +605,13 @@ class CharacterExtractor:
                 "normalized_length": len(nfkc),
                 "length_difference": len(nfkc) - len(original),
                 "risk_level": "high",
-                "description": "规范化导致字符串长度显著变化"
+                "description": "Normalization caused significant change in string length"
             })
 
         return changes
 
     def _assess_normalization_risk(self, changes: List[Dict[str, Any]]) -> str:
-        """评估规范化变化的风险级别"""
+        """Assess the risk level of normalization changes"""
         if not changes:
             return "none"
 
@@ -627,13 +625,13 @@ class CharacterExtractor:
             return "low"
 
     def _find_original_position(self, char: str, normalized_pos: int, original: str, normalized: str) -> int:
-        """尝试找到字符在原始字符串中的位置"""
-        # 简单的启发式方法：如果字符串长度相同，位置应该对应
+        """Attempt to find the position of a character in the original string"""
+        # Simple heuristic: if the strings are the same length, positions should correspond
         if len(original) == len(normalized):
             return normalized_pos
 
-        # 如果长度不同，尝试通过字符匹配找到大致位置
-        # 这是一个简化的实现，复杂情况可能需要更精确的算法
+        # If lengths differ, try to find approximate position through character matching
+        # This is a simplified implementation; more complex cases may require a more precise algorithm
         if normalized_pos < len(original):
             return normalized_pos
         else:
@@ -641,25 +639,25 @@ class CharacterExtractor:
 
     def _extract_characters_from_string(self, string_value: str, entry: Dict, file_info: Dict,
                                       source_type: str, all_characters: List, char_id_counter: int) -> int:
-        """从单个字符串中提取所有字符"""
+        """Extract all characters from a single string"""
 
-        # 1. 进行Unicode规范化
+        # 1. Perform Unicode normalization
         original_string = string_value
         nfc_normalized = unicodedata.normalize('NFC', string_value)
         nfkc_normalized = unicodedata.normalize('NFKC', string_value)
 
-        # 2. 检测规范化变化
+        # 2. Detect normalization changes
         normalization_changes = self._detect_normalization_changes(
             original_string, nfc_normalized, nfkc_normalized
         )
 
-        # 3. 评估风险级别
+        # 3. Assess risk level
         normalization_risk = self._assess_normalization_risk(normalization_changes)
 
-        # 4. 使用NFKC规范化后的字符串进行字符提取（更严格的规范化）
+        # 4. Use NFKC normalized string for character extraction (stricter normalization)
         final_string = nfkc_normalized
 
-        # 5. 记录字符串级别的规范化信息
+        # 5. Record string-level normalization information
         string_normalization_info = {
             "original_string": original_string,
             "nfc_normalized": nfc_normalized,
@@ -680,7 +678,7 @@ class CharacterExtractor:
                 "position_in_string": position,
                 "position_in_original": self._find_original_position(char, position, original_string, final_string),
                 "source_info": {
-                    "string_value": final_string,  # 使用规范化后的字符串
+                    "string_value": final_string,  
                     "string_length": len(final_string),
                     "file_path": file_info.get('relative_path', ''),
                     "file_name": file_info.get('file_name', ''),
@@ -690,7 +688,7 @@ class CharacterExtractor:
                 "normalization_info": string_normalization_info
             }
             
-            # 添加特定于源类型的位置信息
+            # Add source-type-specific location information
             if source_type == 'json':
                 char_info["source_info"]["json_path"] = entry.get('json_path', '')
             elif source_type == 'csv':
@@ -708,7 +706,7 @@ class CharacterExtractor:
                 char_info["source_info"]["website_name"] = file_info.get('website_name', '')
                 char_info["source_info"]["page_type"] = file_info.get('page_type', '')
 
-                # 添加特定元素类型的额外信息
+                # Add additional information for specific element types
                 if entry.get('element_type') == 'link_text':
                     char_info["source_info"]["link_url"] = entry.get('url', '')
                 elif entry.get('element_type') == 'image_alt':
@@ -716,7 +714,7 @@ class CharacterExtractor:
                 elif entry.get('element_type') == 'meta':
                     char_info["source_info"]["meta_key"] = entry.get('meta_key', '')
             elif source_type == 'twitter':
-                # 添加Twitter特定的上下文信息
+                # Add Twitter-specific context information
                 context = entry.get('context', {})
                 char_info["source_info"]["content_type"] = entry.get('field_type', 'unknown')
                 char_info["source_info"]["tweet_id"] = context.get('tweet_id', '')
@@ -725,14 +723,14 @@ class CharacterExtractor:
                 char_info["source_info"]["lang"] = context.get('lang', '')
                 char_info["source_info"]["query"] = context.get('query', '')
 
-                # 添加上下文预览（字符前后的文本）
+                # Add context preview (text before and after the character)
                 context_length = 20
                 start_pos = max(0, position - context_length)
                 end_pos = min(len(string_value), position + context_length + 1)
                 char_info["source_info"]["context_before"] = string_value[start_pos:position]
                 char_info["source_info"]["context_after"] = string_value[position + 1:end_pos]
             elif source_type == 'reddit':
-                # 添加Reddit特定的上下文信息
+                # Add Reddit-specific context information
                 context = entry.get('context', {})
                 char_info["source_info"]["content_type"] = entry.get('field_type', 'unknown')
                 char_info["source_info"]["subreddit"] = context.get('subreddit', '')
@@ -740,7 +738,7 @@ class CharacterExtractor:
                 char_info["source_info"]["comment_id"] = context.get('comment_id', '')
                 char_info["source_info"]["submission_id"] = context.get('submission_id', '')
 
-                # 添加上下文预览
+                # Add context preview
                 context_length = 20
                 start_pos = max(0, position - context_length)
                 end_pos = min(len(string_value), position + context_length + 1)
@@ -753,13 +751,13 @@ class CharacterExtractor:
         return char_id_counter
 
     def _save_extracted_characters_by_source(self, source_characters: Dict[str, List[Dict[str, Any]]], all_characters: List[Dict[str, Any]]):
-        """按数据源分别保存提取的字符数据"""
+        """Save extracted characters separately by data source"""
 
-        # 为每个数据源保存单独的File
+        # Save separate files for each data source
         for source_type, characters in source_characters.items():
             output_file = self.char_output_dir / f"character_extraction_{source_type}.json"
 
-            # 创建数据源特定的结果
+            # Create source-specific results
             source_result = {
                 "extraction_info": {
                     "source_type": source_type,
@@ -773,14 +771,14 @@ class CharacterExtractor:
             try:
                 with open(output_file, 'w', encoding='utf-8') as f:
                     json.dump(source_result, f, ensure_ascii=False, indent=2)
-                self.logger.info(f"{source_type.upper()} 字符提取结果has been保存: {output_file} ({len(characters)} 个字符)")
+                self.logger.info(f"{source_type.upper()} character extraction results have been saved: {output_file} ({len(characters)} characters)")
             except Exception as e:
-                self.logger.error(f"保存 {source_type} 字符提取结果Failed: {e}")
+                self.logger.error(f"Failed to save {source_type} character extraction results: {e}")
 
-    # 删除了统计生成方法，简化输出
+    # Removed summary generation method for simplicity
 
     def get_character_summary(self, all_characters: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """获取Character extraction summary信息"""
+        """Get character extraction summary information"""
         if not all_characters:
             return {"total_characters": 0, "unique_characters": 0}
         
@@ -788,12 +786,12 @@ class CharacterExtractor:
             "total_characters": len(all_characters),
             "unique_characters": len(set(char["character"] for char in all_characters)),
             "source_types": list(set(char["source_info"]["source_type"] for char in all_characters)),
-            "sample_characters": all_characters[:10]  # 前10个字符作为样本
+            "sample_characters": all_characters[:10]  # First 10 characters as sample
         }
 
     def _extract_from_json_results(self, json_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从JSON解析结果中提取字符"""
-        self.logger.info(f"处理JSON解析结果: {json_dir}")
+        """Extract characters from JSON parsing results"""
+        self.logger.info(f"Processing JSON parsing results: {json_dir}")
 
         for json_file in json_dir.glob("*_parsed.json"):
             try:
@@ -814,13 +812,13 @@ class CharacterExtractor:
                         )
 
             except Exception as e:
-                self.logger.error(f"处理JSONFileFailed {json_file}: {e}")
+                self.logger.error(f"Failed to process JSON file {json_file}: {e}")
 
         return char_id_counter
 
     def _extract_from_csv_results(self, csv_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从CSV解析结果中提取字符"""
-        self.logger.info(f"处理CSV解析结果: {csv_dir}")
+        """Extract characters from CSV parsing results"""
+        self.logger.info(f"Processing CSV parsing results: {csv_dir}")
 
         for csv_file in csv_dir.glob("*_parsed.json"):
             try:
@@ -841,13 +839,13 @@ class CharacterExtractor:
                         )
 
             except Exception as e:
-                self.logger.error(f"处理CSVFileFailed {csv_file}: {e}")
+                self.logger.error(f"Failed to process CSV file {csv_file}: {e}")
 
         return char_id_counter
 
     def _extract_from_xml_results(self, xml_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从XML解析结果中提取字符"""
-        self.logger.info(f"处理XML解析结果: {xml_dir}")
+        """Extract characters from XML parsing results"""
+        self.logger.info(f"Processing XML parsing results: {xml_dir}")
 
         for xml_file in xml_dir.glob("*_parsed.json"):
             try:
@@ -868,17 +866,17 @@ class CharacterExtractor:
                         )
 
             except Exception as e:
-                self.logger.error(f"处理XMLFileFailed {xml_file}: {e}")
+                self.logger.error(f"Failed to process XML file {xml_file}: {e}")
 
         return char_id_counter
 
 
 
     def _extract_from_reddit_results(self, reddit_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从Reddit解析结果中提取字符"""
-        self.logger.info(f"处理Reddit解析结果: {reddit_dir}")
+        """Extract characters from Reddit parsing results"""
+        self.logger.info(f"Processing Reddit parsing results: {reddit_dir}")
 
-        # 处理帖子File
+        # Process posts files
         for posts_file in reddit_dir.glob("*_posts_parsed.json"):
             char_id_counter = self._extract_from_reddit_posts(posts_file, all_characters, char_id_counter)
 
@@ -889,8 +887,8 @@ class CharacterExtractor:
         return char_id_counter
 
     def _extract_from_twitter_results(self, twitter_dir: Path, all_characters: List, char_id_counter: int) -> int:
-        """从Twitter解析结果中提取字符"""
-        self.logger.info(f"处理Twitter解析结果: {twitter_dir}")
+        """Extract characters from Twitter parsing results"""
+        self.logger.info(f"Processing Twitter parsing results: {twitter_dir}")
 
         for twitter_file in twitter_dir.glob("*.json"):
             try:
@@ -900,7 +898,7 @@ class CharacterExtractor:
                 if 'error' in data.get('parsing_info', {}):
                     continue
 
-                # Twitter数据格式: {"parsing_info": {...}, "tweets": [...]}
+                # Twitter data format: {"parsing_info": {...}, "tweets": [...]}
                 tweets = data.get('tweets', [])
                 if not tweets:
                     continue
@@ -927,12 +925,12 @@ class CharacterExtractor:
                         )
 
             except Exception as e:
-                self.logger.error(f"处理TwitterFileFailed {twitter_file}: {e}")
+                self.logger.error(f"Failed to process Twitter file {twitter_file}: {e}")
 
         return char_id_counter
 
     def _extract_from_reddit_posts(self, posts_file: Path, all_characters: List, char_id_counter: int) -> int:
-        """从Reddit帖子中提取字符"""
+        """Extract characters from Reddit posts"""
         try:
             with open(posts_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -943,7 +941,7 @@ class CharacterExtractor:
             subreddit = data.get('parsing_info', {}).get('subreddit', 'unknown')
 
             for post in data['posts']:
-                # 提取标题字符
+                # Extract title characters
                 if post.get('title'):
                     char_id_counter = self._extract_characters_from_text(
                         text=post['title'],
@@ -959,7 +957,7 @@ class CharacterExtractor:
                         char_id_counter=char_id_counter
                     )
 
-                # 提取正文字符
+                # Extract post content characters
                 if post.get('selftext'):
                     char_id_counter = self._extract_characters_from_text(
                         text=post['selftext'],
@@ -978,11 +976,11 @@ class CharacterExtractor:
             return char_id_counter
 
         except Exception as e:
-            self.logger.error(f"处理Reddit帖子FileFailed {posts_file}: {e}")
+            self.logger.error(f"Failed to process Reddit posts file {posts_file}: {e}")
             return char_id_counter
 
     def _extract_from_reddit_comments(self, comments_file: Path, all_characters: List, char_id_counter: int) -> int:
-        """从Reddit评论中提取字符"""
+        """Extract characters from Reddit comments"""
         try:
             with open(comments_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -1012,11 +1010,11 @@ class CharacterExtractor:
             return char_id_counter
 
         except Exception as e:
-            self.logger.error(f"处理Reddit评论FileFailed {comments_file}: {e}")
+            self.logger.error(f"Failed to process Reddit comments file {comments_file}: {e}")
             return char_id_counter
 
     def _extract_characters_from_text(self, text: str, source_info: Dict, all_characters: List, char_id_counter: int) -> int:
-        """从文本中提取字符（通用方法，支持多种数据源）"""
+        """Extract characters from text (general method supporting multiple data sources)"""
         source_type = source_info.get("source_type", "unknown")
         content_type = source_info.get("content_type", f"{source_type}_content")
         
@@ -1040,7 +1038,7 @@ class CharacterExtractor:
         return char_id_counter
 
     def _extract_characters_from_string(self, string_value: str, entry: Dict, file_info: Dict, source_type: str, all_characters: List, char_id_counter: int) -> int:
-        """从字符串中提取字符（通用方法）"""
+        """Extract characters from string (general method)"""
         for position, char in enumerate(string_value):
             char_info = {
                 "char_id": f"{source_type}_{char_id_counter:06d}",

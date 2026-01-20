@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-JSON API数据收集器
-从各种公共API收集JSON格式的数据
+JSON API data collector
+Collect JSON formatted data from various public APIs
 """
 
 import sys
@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Dict, Any, List
 import random
 
-# 添加项目根directory到路径
+# Add project root directory to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -26,16 +26,16 @@ from data_collection.utils.api_sources import (
 
 
 class JSONAPICollector(BaseCollector):
-    """JSON API数据收集器"""
+    """JSON API data collector"""
     
     def __init__(self):
         super().__init__('json')
         
-        # 初始化HTTP会话
+        # Initialize HTTP session
         self.session = self._setup_session()
         
     def _setup_session(self) -> requests.Session:
-        """设置HTTP会话"""
+        """Setup HTTP session"""
         session = requests.Session()
         session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -45,17 +45,17 @@ class JSONAPICollector(BaseCollector):
         return session
     
     def validate_config(self) -> bool:
-        """验证配置 - JSON收集器不需要额外配置"""
+        """Validate configuration - JSON collector does not require additional configuration"""
         return True
     
     def collect(self) -> Dict[str, Any]:
-        """执行JSON数据收集"""
+        """Execute JSON data collection"""
         self.start_collection()
         
-        print("\nJSON API数据收集")
+        print("\nJSON API data collection")
         print("-" * 70)
         
-        # 显示子菜单
+        # Display submenu
         choice = self._show_submenu()
         
         if not choice:
@@ -66,7 +66,7 @@ class JSONAPICollector(BaseCollector):
             }
         
         try:
-            # 根据选择收集数据
+            # Collect data based on choice
             if choice == 'all':
                 self._collect_all_json_sources()
             elif choice == 'github':
@@ -81,7 +81,7 @@ class JSONAPICollector(BaseCollector):
             self.end_collection()
             self.log_summary()
             
-            # 统计收集的File
+            # Count collected JSON files
             file_count = len(list(self.output_dir.glob('*.json')))
             
             return {
@@ -93,7 +93,7 @@ class JSONAPICollector(BaseCollector):
             }
             
         except KeyboardInterrupt:
-            print("\n\n用户中断收集")
+            print("\n\nUser interrupted collection")
             self.end_collection()
             return {
                 'success': False,
@@ -111,18 +111,18 @@ class JSONAPICollector(BaseCollector):
             }
     
     def _show_submenu(self) -> str:
-        """显示子菜单"""
-        print("\n请选择JSON数据源:")
-        print("  [1] GitHub API - 收集GitHub用户和仓库数据")
-        print("  [2] 公共API - Wikipedia, NASA, Wikidata")
-        print("  [3] 金融API - 加密货币价格, 汇率数据")
-        print("  [4] 天气API - 城市天气数据")
-        print("  [5] 收集所有JSON数据源")
-        print("  [0] 返回主菜单")
+        """Display submenu"""
+        print("\nPlease select JSON data source:")
+        print("  [1] GitHub API - Collect GitHub user and repository data")
+        print("  [2] Public APIs - Wikipedia, NASA, Wikidata")
+        print("  [3] Financial APIs - Cryptocurrency prices, exchange rates")
+        print("  [4] Weather APIs - City weather data")
+        print("  [5] Collect all JSON data sources")
+        print("  [0] Return to main menu")
         
         while True:
             try:
-                choice = input("\n请输入选项 [0-5]: ").strip()
+                choice = input("\nPlease enter option [0-5]: ").strip()
                 
                 if choice == '0':
                     return None
@@ -137,14 +137,14 @@ class JSONAPICollector(BaseCollector):
                 elif choice == '5':
                     return 'all'
                 else:
-                    print("Error: 无效的选项")
+                    print("Error: Invalid option")
                     
             except KeyboardInterrupt:
                 return None
     
     def _collect_all_json_sources(self):
-        """收集所有JSON数据源"""
-        print("\n开始收集所有JSON数据源...")
+        """Collect all JSON data sources"""
+        print("\nStarting to collect all JSON data sources...")
         print("-" * 70)
         
         total = 4  # GitHub + Public + Financial + Weather
@@ -152,14 +152,14 @@ class JSONAPICollector(BaseCollector):
         
         sources = [
             ('GitHub API', self._collect_github),
-            ('公共API', self._collect_public_apis),
-            ('金融API', self._collect_financial),
-            ('天气API', self._collect_weather)
+            ('Public APIs', self._collect_public_apis),
+            ('Financial APIs', self._collect_financial),
+            ('Weather APIs', self._collect_weather)
         ]
         
         for name, collect_func in sources:
             try:
-                print(f"\n正在收集: {name}")
+                print(f"\nCollecting: {name}")
                 collect_func()
                 print(f"  Completed")
             except Exception as e:
@@ -167,8 +167,8 @@ class JSONAPICollector(BaseCollector):
                 print(f"  Failed: {e}")
     
     def _collect_github(self):
-        """收集GitHub API数据"""
-        print("\n收集GitHub数据...")
+        """Collect GitHub API data"""
+        print("\nCollecting GitHub data...")
         
         users = GITHUB_SOURCES['users']
         
@@ -176,24 +176,24 @@ class JSONAPICollector(BaseCollector):
             username = user_info['username']
             success_count = 0
             try:
-                # 收集用户信息
+                # Collect user information
                 user_url = f"https://api.github.com/users/{username}"
                 user_data = self._fetch_json(user_url)
                 
                 if user_data:
                     filename = self.output_dir / f"github_user_{username}.json"
                     self._save_json(user_data, filename)
-                    print(f"  保存用户: {username} ({user_info['description']})")
+                    print(f"  Saved user: {username} ({user_info['description']})")
                     success_count += 1
                 
-                # 收集仓库信息
+                # Collect repository information
                 repos_url = f"https://api.github.com/users/{username}/repos?per_page=5"
                 repos_data = self._fetch_json(repos_url)
                 
                 if repos_data:
                     filename = self.output_dir / f"github_repos_{username}.json"
                     self._save_json(repos_data, filename)
-                    print(f"  保存仓库: {username}")
+                    print(f"  Saved repos: {username}")
                     success_count += 1
                 
                 if success_count > 0:
@@ -201,7 +201,7 @@ class JSONAPICollector(BaseCollector):
                 else:
                     self.increment_failure()
                 
-                time.sleep(1)  # 避免API限制
+                time.sleep(1)  # Avoid API rate limiting
                 
             except Exception as e:
                 self.logger.error(f"Failed to collect GitHub data for {username}: {e}")
@@ -209,8 +209,8 @@ class JSONAPICollector(BaseCollector):
                 print(f"  Error: {username} - {e}")
     
     def _collect_public_apis(self):
-        """收集公共API数据"""
-        print("\n收集公共API数据...")
+        """Collect public API data"""
+        print("\nCollecting public API data...")
         
         for source in PUBLIC_API_SOURCES:
             source_name = source['name']
@@ -225,7 +225,7 @@ class JSONAPICollector(BaseCollector):
                     if data:
                         filename = self.output_dir / f"{source_type}_{source_name}_{i}.json"
                         self._save_json(data, filename)
-                        print(f"    保存: {source_type} #{i}")
+                        print(f"    Saved: {source_type} #{i}")
                         self.increment_success()
                     else:
                         self.increment_failure()
@@ -238,8 +238,8 @@ class JSONAPICollector(BaseCollector):
                     print(f"    Failed: {e}")
     
     def _collect_financial(self):
-        """收集金融API数据"""
-        print("\n收集金融API数据...")
+        """Collect financial API data"""
+        print("\nCollecting financial API data...")
         
         for source in FINANCIAL_API_SOURCES:
             source_name = source['name']
@@ -254,7 +254,7 @@ class JSONAPICollector(BaseCollector):
                     if data:
                         filename = self.output_dir / f"financial_{source_type}_{source_name}_{i}.json"
                         self._save_json(data, filename)
-                        print(f"    保存: {source_type} #{i}")
+                        print(f"    Saved: {source_type} #{i}")
                         self.increment_success()
                     else:
                         self.increment_failure()
@@ -267,8 +267,8 @@ class JSONAPICollector(BaseCollector):
                     print(f"    Failed: {e}")
     
     def _collect_weather(self):
-        """收集天气API数据"""
-        print("\n收集天气API数据...")
+        """Collect weather API data"""
+        print("\nCollecting weather API data...")
         
         for source in WEATHER_API_SOURCES:
             source_name = source['name']
@@ -283,7 +283,7 @@ class JSONAPICollector(BaseCollector):
                     if data:
                         filename = self.output_dir / f"{source_type}_{source_name}_{i}.json"
                         self._save_json(data, filename)
-                        print(f"    保存: {source_type} #{i}")
+                        print(f"    Saved: {source_type} #{i}")
                         self.increment_success()
                     else:
                         self.increment_failure()
@@ -296,7 +296,7 @@ class JSONAPICollector(BaseCollector):
                     print(f"    Failed: {e}")
     
     def _fetch_json(self, url: str) -> Dict[str, Any]:
-        """获取JSON数据"""
+        """Fetch JSON data"""
         try:
             response = self.session.get(url, timeout=30)
             
@@ -314,7 +314,7 @@ class JSONAPICollector(BaseCollector):
             return None
     
     def _save_json(self, data: Dict[str, Any], filename: Path):
-        """保存JSON数据"""
+        """Save JSON data"""
         try:
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
